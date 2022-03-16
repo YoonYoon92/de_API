@@ -1,0 +1,69 @@
+package com.saydept.api.spf.saleNews.clsSaleNews;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsModel;
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsParamModel;
+import com.saydept.utils.SayUtils;
+
+@CrossOrigin(origins = "*")
+@RestController
+public class ClsSaleNewsController {
+	
+	@Autowired
+	private ClsSaleNewsService clsSaleNewsService;
+	
+	/**
+	 * API 상태체크
+	 * @return
+	 * @throws ParseException 
+	 */
+	@RequestMapping(value = "api/clsSaleNews", method = RequestMethod.GET)
+	public String condition() throws ParseException {
+		
+		System.out.println( new SayUtils().getCusomYear("20200603", -1) );
+		
+		return this.getClass().getName() + " : " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	/**
+	 * 복수 대상 조회
+	 * 작성방법은 select'업무를 구분할 명칭'List
+	 * Ex)selectTamplate1List
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/clsSaleNews/selectClsSaleNewsList")
+	public List<ClsSaleNewsModel> clsSaleNewsList(@RequestBody ClsSaleNewsParamModel request)throws Exception {
+		System.out.println("1");
+		clsSaleNewsService.clsSaleNewsList(request);
+		return clsSaleNewsService.clsSaleNewsList(request);
+	}
+	/* 테스트 */
+	@RequestMapping(value = "api/spf/saleNews/clssalenewstest")
+	public List<ClsSaleNewsModel> clsSaleNewsList()throws Exception {
+
+		ClsSaleNewsParamModel param = new ClsSaleNewsParamModel();
+		param.setJum("01");
+//		param.setBu("71");
+		param.setSerchLevel("jum");
+		param.setSearchDay("20200603");
+		
+//		List<ClsSaleNewsModel> result = clsSaleNewsService.clsSaleNewsList(param);
+		
+		return clsSaleNewsService.clsSaleNewsList(param);
+	}
+	
+
+}

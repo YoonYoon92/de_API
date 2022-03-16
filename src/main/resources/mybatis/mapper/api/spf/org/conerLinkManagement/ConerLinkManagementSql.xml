@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.conerLinkManagement.ConerLinkManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="conerLinkManagementModel" type="com.saydept.api.tasks.conerLinkManagement.model.ConerLinkManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectConerLinkManagement" resultType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel" parameterType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel">
+		/*selectConerLinkManagement*/
+		SELECT DISTINCT(MS0505) AS coner 
+		FROM ${dbType}SPFRDB.SPFM05PF
+		WHERE MS0501 =#{jum} AND MS0505=#{coner} AND MS0515 =''
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectConerLinkManagementList" resultType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel" parameterType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel" fetchSize="1000">
+		/*selectConerLinkManagementList*/
+		SELECT 	MS05102 		AS coner
+				,MS05103		as linkConer
+				,TRIM(MS0510)	AS linkConerNm
+				,MS05104 		as regiDt
+		FROM ${dbType}SPFRDB.SPFM051PF 
+		LEFT OUTER JOIN TSSPFRDB.SPFM05PF
+		ON MS0501=MS05101 AND MS0505=MS05103
+		WHERE MS05101 =#{jum} AND MS05102=#{coner}
+		
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateConerLinkManagement" parameterType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel">
+		/*updateConerLinkManagement*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertConerLinkManagement" parameterType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel">
+		/*insertConerLinkManagement*/
+		INSERT INTO ${dbType}SPFRDB.SPFM051PF
+		(
+			MS05101
+			,MS05102
+			,MS05103
+			,MS05104
+			,MS05105
+			,MS05106
+			,MS05107
+		)
+		VALUES(
+			#{jum}
+			,#{coner}
+			,#{linkConer}
+			,#{startDt}
+			,''
+			,''
+			,''
+			)
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteConerLinkManagement" parameterType="com.saydept.api.spf.org.conerLinkManagement.model.ConerLinkManagementModel">
+		/*deleteConerLinkManagement*/
+		DELETE ${dbType}SPFRDB.SPFM051PF
+		WHERE MS05101=#{jum} AND MS05102=#{coner} AND MS05103=#{linkConer}
+	</delete>
+
+</mapper>

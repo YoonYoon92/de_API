@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.eventHallSaleInq.EventHallSaleInqMapper">
+	
+	<select id="PcList" resultType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel" parameterType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel">
+		
+			SELECT	 A1.IS1701		
+					,A1.IS1702		
+					,A1.IS1705 		
+					,A1.IS1708 		AS pc
+					,MS0408			AS pcNm
+			FROM ${dbType}SPFRDB.SPFI17PF A1
+			
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF
+					ON 	A1.IS1705 = MS0401 
+					AND A1.IS1706 = MS0402 
+					AND A1.IS1708 = MS0404 
+		
+			WHERE 		A1.IS1704=#{startDt}	
+					AND A1.IS1705=#{jum}
+					AND A1.IS1706=SUBSTR(#{bu},3,2)
+		
+			GROUP BY A1.IS1701,A1.IS1702,A1.IS1705,A1.IS1706,A1.IS1708,MS0408
+	</select>
+	<!-- 행사 조회 -->
+	<select id="SearchEventlist" resultType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel" parameterType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel">
+		/*콤보박스 - 행사목록*/
+		SELECT 	Trim(MS4101) 			AS 	eventcd1
+				,MS4102					AS	eventcd2
+				,MS4105||MS4106||MS4107 AS	eventstartDt
+				,MS4108||MS4109||MS4110 AS	eventendDt
+				,TRIM(MS4104) 				AS	eventNm
+				,MS4101||MS4102||MS4105||MS4106||MS4107||MS4108||MS4109||MS4110 			AS 	alleventcd
+				FROM ${dbType}SPFRDB.SPFM41PF  
+	
+		WHERE 	    MS4105||MS4106||MS4107 &lt;=#{startDt}	
+				AND MS4108||MS4109||MS4110 &gt;=#{startDt}
+	
+					   
+	</select>
+	<!-- 매출조회 -->
+	<select id="EventHallSaleInqListJum" resultType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqModel" parameterType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel">
+	/*점만일때 조회*/
+			WITH 
+				/*행사 점,부,팀,코너 뽑기*/
+			TA1 (CD1,CD2,JUM,BU,BUNM,TRY,SUMTRY,TOT,SUMTOT,SUNMAE,SUMSUNMAE,HALIN,SUMHALIN,CUSTMERNUM,SUMCUSTMERNUM,CUSTMERCST,SUMCUSTMERCST) AS(
+			
+			SELECT	 A1.IS1701								AS CD1
+					,A1.IS1702								AS CD2
+					,A1.IS1705 								AS JUM
+					,A1.IS1706 								AS BU1
+					,MS0204 								AS BUNM
+					,SUM(TRY)*1000							AS TRY
+					,SUM(SUMTRY)*1000						AS SUMTRY
+					,SUM(JTOT)								AS TOT
+					,SUM(JSUMTOT)							AS SUMTOT
+					,SUM(JSUNMAE)							AS SUNMAE
+					,SUM(JSUMSUNMAE)						AS SUMSUNMAE
+					,SUM(JHALIN)							AS HALIN	
+					,SUM(JSUMHALIN)							AS SUMHALIN
+					,SUM(CUSTMERNUM)						AS CUSTMERNUM
+					,SUM(SUMCUSTMERNUM)						AS SUMCUSTMERNUM
+					,SUM(JSUNMAE)/SUM(CUSTMERNUM)			AS CUSTMERCST
+					,SUM(JSUMSUNMAE)/SUM(SUMCUSTMERNUM)		AS SUMCUSTMERCST
+			
+					
+			FROM ${dbType}SPFRDB.SPFI17PF A1
+			/*목표*/
+					LEFT OUTER JOIN (SELECT A2.IS1703		AS A2CLASS     
+											,SUM(CASE WHEN IS1704=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS TRY
+											,SUM(CASE WHEN IS1704&lt;=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS SUMTRY
+									FROM ${dbType}SPFRDB.SPFI17PF A2
+									WHERE 		A2.IS1701=#{eventcd1} 
+											AND	A2.IS1702=#{eventcd2}
+											
+									GROUP BY A2.IS1703)
+									ON A1.IS1703 =A2CLASS
+			/*매출*/				
+					LEFT OUTER JOIN (SELECT SUBSTR(B1.JR0203,1,5)				AS JCLASS
+										,SUM(CASE WHEN B1.JR0201=#{startDt}	 THEN B1.JR0224 ELSE 0 END)												AS JTOT
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224 ELSE 0 END)					AS JSUMTOT
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0224-B1.JR0225 ELSE 0 END)									AS JSUNMAE
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224-B1.JR0225 ELSE 0 END)		AS JSUMSUNMAE
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0225 ELSE 0 END)												AS JHALIN
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0225 ELSE 0 END)					AS JSUMHALIN	
+								FROM	${dbType}SPORDB.SPOJ02PF B1
+								
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM42PF 
+									ON		MS4201=#{eventcd1} 
+									AND		MS4202=#{eventcd2} 
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+									ON		SUBSTR(B1.JR0203,1,5) = MS0505
+									
+								WHERE		B1.JR0200=#{jum}
+										AND B1.JR0201 &lt;=#{startDt} 
+										AND B1.JR0201 &gt;=#{eventstartDt}	
+										AND B1.JR0202=MS4203	
+										
+								GROUP BY SUBSTR(B1.JR0203,1,5)	
+								)
+									ON	SUBSTR(JCLASS,1,5)=A1.IS1703
+			/*고객수*/							
+					LEFT OUTER JOIN	(SELECT C2.IS0910														 								AS CLASS4 
+											,SUM(CASE WHEN IS0901||IS0902||IS0903=#{startDt} THEN C2.IS0933 ELSE 0 END)						AS CUSTMERNUM	
+											,SUM(C2.IS0933) 																				AS SUMCUSTMERNUM
+											
+									FROM ${dbType}SPFRDB.SPFI09PF C2
+				
+									WHERE 	IS0901||IS0902||IS0903&gt;=#{eventstartDt}
+									AND		IS0901||IS0902||IS0903&lt;=#{startDt}	
+									AND		C2.IS0904=#{eventcd1} 
+									AND		C2.IS0905=#{eventcd2}
+									
+									GROUP BY C2.IS0910
+				 					)				
+							 	ON CLASS4 = A1.IS1703		
+				
+					LEFT OUTER JOIN ${dbType}SPFRDB.SPFM02PF 
+									ON 	A1.IS1705=MS0201 
+									AND A1.IS1706=MS0202	
+									
+			
+			WHERE 		A1.IS1701=#{eventcd1}
+					AND	A1.IS1702=#{eventcd2}
+					AND A1.IS1704=#{startDt}	
+					AND A1.IS1705=#{jum}	
+			
+		
+			GROUP BY A1.IS1701,A1.IS1702,A1.IS1705,A1.IS1706,MS0204
+			
+			)
+				
+			SELECT 	TRIM(BUNM)										AS Nm
+					,TRY/1000										AS Try
+					,SUNMAE/1000									AS sale		
+					,ROUND(FLOAT(SUNMAE)/FLOAT(TRY)*100,2)			AS Achivmentrate 
+					,SUMTRY/1000									AS sumTry
+					,SUMSUNMAE/1000									AS sumSale
+					,HALIN/1000										AS discount
+					,SUMHALIN/1000									AS sumDiscount	
+					,ROUND(FLOAT(SUMSUNMAE)/FLOAT(SUMTRY)*100,2)	AS sumAchivmentrate
+					,CUSTMERNUM										AS custmernum
+					,SUMCUSTMERNUM									AS sumCustmernum
+					,CUSTMERCST										AS custmercst
+					,SUMCUSTMERCST									AS sumCustmercst
+					
+			FROM TA1
+			</select>
+<select id="EventHallSaleInqListBu" resultType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqModel" parameterType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel">
+			
+/*부일때 조회*/
+	
+			WITH 
+				/*행사 점,부,팀,코너 뽑기*/
+			TA1 (CD1,CD2,JUM,BU,PC,PCNM,TRY,SUMTRY,TOT,SUMTOT,SUNMAE,SUMSUNMAE,HALIN,SUMHALIN,CUSTMERNUM,SUMCUSTMERNUM,CUSTMERCST,SUMCUSTMERCST) AS(
+			
+			SELECT	 A1.IS1701				AS CD1
+					,A1.IS1702				AS CD2
+					,A1.IS1705 				AS JUM
+					,A1.IS1706 				AS BU
+					,A1.IS1708 				AS PC
+					,MS0408 				AS PCNM
+					,SUM(TRY)*1000			AS TRY
+					,SUM(SUMTRY)*1000		AS SUMTRY
+					,SUM(JTOT)				AS TOT
+					,SUM(JSUMTOT) 			AS SUMTOT
+					,SUM(JSUNMAE)			AS SUNMAE
+					,SUM(JSUMSUNMAE)		AS SUMSUNMAE
+					,SUM(JHALIN)			AS HALIN	
+					,SUM(JSUMHALIN)			AS SUMHALIN
+					,SUM(CUSTMERNUM)						AS CUSTMERNUM
+					,SUM(SUMCUSTMERNUM)						AS SUMCUSTMERNUM
+					,SUM(JSUNMAE)/SUM(CUSTMERNUM)			AS CUSTMERCST
+					,SUM(JSUMSUNMAE)/SUM(SUMCUSTMERNUM)		AS SUMCUSTMERCST
+	
+			FROM ${dbType}SPFRDB.SPFI17PF A1
+			/*목표*/
+					LEFT OUTER JOIN (SELECT A2.IS1703		AS A2CLASS     
+											,SUM(CASE WHEN IS1704=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS TRY
+											,SUM(CASE WHEN IS1704&lt;=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS SUMTRY
+									FROM ${dbType}SPFRDB.SPFI17PF A2
+									WHERE 		A2.IS1701=#{eventcd1} 
+											AND	A2.IS1702=#{eventcd2}
+											
+									GROUP BY A2.IS1703)
+									ON A1.IS1703 =A2CLASS
+			/*매출*/				
+					LEFT OUTER JOIN (SELECT SUBSTR(B1.JR0203,1,5)				AS JCLASS
+										,SUM(CASE WHEN B1.JR0201=#{startDt}	 THEN B1.JR0224 ELSE 0 END)												AS JTOT
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224 ELSE 0 END)					AS JSUMTOT
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0224-B1.JR0225 ELSE 0 END)									AS JSUNMAE
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224-B1.JR0225 ELSE 0 END)		AS JSUMSUNMAE
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0225 ELSE 0 END)												AS JHALIN
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0225 ELSE 0 END)					AS JSUMHALIN	
+								FROM	${dbType}SPORDB.SPOJ02PF B1
+								
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM42PF 
+									ON		MS4201=#{eventcd1} 
+									AND		MS4202=#{eventcd2} 
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+									ON		SUBSTR(B1.JR0203,1,5) = MS0505
+									
+								WHERE		B1.JR0200=#{jum}
+										AND B1.JR0201 &lt;=#{startDt} 
+										AND B1.JR0201 &gt;=#{eventstartDt}	
+										AND B1.JR0202=MS4203	
+										
+								GROUP BY SUBSTR(B1.JR0203,1,5)	
+								)
+									ON	SUBSTR(JCLASS,1,5)=A1.IS1703
+		/*고객수*/							
+					LEFT OUTER JOIN	(SELECT C2.IS0910														 								AS CLASS4 
+											,SUM(CASE WHEN IS0901||IS0902||IS0903=#{startDt} THEN C2.IS0933 ELSE 0 END)						AS CUSTMERNUM	
+											,SUM(C2.IS0933) 																				AS SUMCUSTMERNUM
+											
+									FROM ${dbType}SPFRDB.SPFI09PF C2
+				
+									WHERE 	IS0901||IS0902||IS0903&gt;=#{eventstartDt}
+									AND		IS0901||IS0902||IS0903&lt;=#{startDt}	
+									AND		C2.IS0904=#{eventcd1} 
+									AND		C2.IS0905=#{eventcd2}
+									
+									GROUP BY C2.IS0910
+				 					)				
+							 	ON CLASS4 = A1.IS1703				
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF 
+									ON 	A1.IS1705=MS0401 
+									AND A1.IS1706=MS0402	
+									AND A1.IS1707=MS0403
+									AND A1.IS1708=MS0404
+			
+			WHERE 		A1.IS1701=#{eventcd1}
+					AND	A1.IS1702=#{eventcd2}
+					AND A1.IS1704=#{startDt}	
+					AND A1.IS1705=#{jum}	
+					AND A1.IS1706=SUBSTR(#{bu},3,2)
+		
+							
+			GROUP BY A1.IS1701,A1.IS1702,A1.IS1705,A1.IS1706,A1.IS1708 ,MS0408
+			
+			)
+				
+			SELECT 	TRIM(PCNM)										AS Nm
+					,TRY/1000										AS Try
+					,SUNMAE/1000									AS sale		
+					,ROUND(FLOAT(SUNMAE)/FLOAT(TRY)*100,2)			AS Achivmentrate 
+					,SUMTRY/1000									AS sumTry
+					,SUMSUNMAE/1000									AS sumSale	
+					,HALIN/1000										AS discount
+					,SUMHALIN/1000									AS sumDiscount	
+					,ROUND(FLOAT(SUMSUNMAE)/FLOAT(SUMTRY)*100,2)	AS sumAchivmentrate
+					,CUSTMERNUM										AS custmernum
+					,SUMCUSTMERNUM									AS sumCustmernum
+					,CUSTMERCST										AS custmercst
+					,SUMCUSTMERCST									AS sumCustmercst
+			FROM TA1
+		
+	</select>
+	<select id="EventHallSaleInqListPc" resultType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqModel" parameterType="com.saydept.api.spf.saleNews.eventHallSaleInq.model.EventHallSaleInqSearchModel">
+			
+/*PC일때 조회*/
+	
+			WITH 
+				/*행사 점,부,팀,코너 뽑기*/
+			TA1 (CD1,CD2,JUM,BU,PC,CLASS,CLASSNM,TRY,SUMTRY,TOT,SUMTOT,SUNMAE,SUMSUNMAE,HALIN,SUMHALIN,CUSTMERNUM,SUMCUSTMERNUM,CUSTMERCST,SUMCUSTMERCST) AS(
+			
+			SELECT	 A1.IS1701				AS CD1
+					,A1.IS1702				AS CD2
+					,A1.IS1705 				AS JUM
+					,A1.IS1706 				AS BU
+					,A1.IS1708 				AS PC
+					,A1.IS1703   			AS CLASS
+					,MS0510					AS CLASSNM
+					,SUM(TRY)*1000			AS TRY
+					,SUM(SUMTRY)*1000		AS SUMTRY
+					,SUM(JTOT)				AS TOT
+					,SUM(JSUMTOT) 			AS SUMTOT
+					,SUM(JSUNMAE)			AS SUNMAE
+					,SUM(JSUMSUNMAE)		AS SUMSUNMAE
+					,SUM(JHALIN)			AS HALIN	
+					,SUM(JSUMHALIN)			AS SUMHALIN
+					,SUM(CUSTMERNUM)						AS CUSTMERNUM
+					,SUM(SUMCUSTMERNUM)						AS SUMCUSTMERNUM
+					,SUM(JSUNMAE)/SUM(CUSTMERNUM)			AS CUSTMERCST
+					,SUM(JSUMSUNMAE)/SUM(SUMCUSTMERNUM)		AS SUMCUSTMERCST
+	
+					
+			FROM ${dbType}SPFRDB.SPFI17PF A1
+			/*목표*/
+					LEFT OUTER JOIN (SELECT A2.IS1703		AS A2CLASS     
+											,SUM(CASE WHEN IS1704=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS TRY
+											,SUM(CASE WHEN IS1704&lt;=#{startDt}	 THEN A2.IS1709 ELSE 0 END ) AS SUMTRY
+									FROM ${dbType}SPFRDB.SPFI17PF A2
+									WHERE 		A2.IS1701=#{eventcd1} 
+											AND	A2.IS1702=#{eventcd2}
+											
+									GROUP BY A2.IS1703)
+									ON A1.IS1703 =A2CLASS
+			/*매출*/				
+					LEFT OUTER JOIN (SELECT SUBSTR(B1.JR0203,1,5)				AS JCLASS
+										,SUM(CASE WHEN B1.JR0201=#{startDt}	 THEN B1.JR0224 ELSE 0 END)												AS JTOT
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224 ELSE 0 END)					AS JSUMTOT
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0224-B1.JR0225 ELSE 0 END)									AS JSUNMAE
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0224-B1.JR0225 ELSE 0 END)		AS JSUMSUNMAE
+										,SUM(CASE WHEN B1.JR0201=#{startDt} THEN B1.JR0225 ELSE 0 END)												AS JHALIN
+										,SUM(CASE WHEN B1.JR0201 &lt;= #{startDt} AND B1.JR0201&gt;=#{eventstartDt}	 THEN B1.JR0225 ELSE 0 END)					AS JSUMHALIN	
+								FROM	${dbType}SPORDB.SPOJ02PF B1
+								
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM42PF 
+									ON		MS4201=#{eventcd1} 
+									AND		MS4202=#{eventcd2} 
+								LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+									ON		SUBSTR(B1.JR0203,1,5) = MS0505
+									
+								WHERE		B1.JR0200=#{jum}
+										AND B1.JR0201 &lt;=#{startDt} 
+										AND B1.JR0201 &gt;=#{eventstartDt}	
+										AND B1.JR0202=MS4203	
+										
+								GROUP BY SUBSTR(B1.JR0203,1,5)	
+								)
+									ON	SUBSTR(JCLASS,1,5)=A1.IS1703
+		/*고객수*/							
+					LEFT OUTER JOIN	(SELECT C2.IS0910														 								AS CLASS4 
+											,SUM(CASE WHEN IS0901||IS0902||IS0903=#{startDt} THEN C2.IS0933 ELSE 0 END)						AS CUSTMERNUM	
+											,SUM(C2.IS0933) 																				AS SUMCUSTMERNUM
+											
+									FROM ${dbType}SPFRDB.SPFI09PF C2
+				
+									WHERE 	IS0901||IS0902||IS0903&gt;=#{eventstartDt}
+									AND		IS0901||IS0902||IS0903&lt;=#{startDt}	
+									AND		C2.IS0904=#{eventcd1} 
+									AND		C2.IS0905=#{eventcd2}
+									
+									GROUP BY C2.IS0910
+				 					)				
+							 	ON CLASS4 = A1.IS1703				
+							 	
+					
+					LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+								ON	A1.IS1703 = MS0505
+						
+			
+			WHERE 		A1.IS1701=#{eventcd1}
+					AND	A1.IS1702=#{eventcd2}
+					AND A1.IS1704=#{startDt}	
+					AND A1.IS1705=#{jum}	
+					AND A1.IS1706=SUBSTR(#{bu},3,2)
+					AND A1.IS1708=#{pc}
+		
+							
+			GROUP BY A1.IS1701,A1.IS1702,A1.IS1705,A1.IS1706,A1.IS1708 ,A1.IS1703  ,MS0510
+			
+			)
+				
+			SELECT 	TRIM(CLASSNM)									AS Nm
+					,TRY											AS Try
+					,SUNMAE											AS sale		
+					,ROUND(FLOAT(SUNMAE)/FLOAT(TRY)*100,2)			AS Achivmentrate 
+					,SUMTRY											AS sumTry
+					,SUMSUNMAE										AS sumSale	
+					,ROUND(FLOAT(SUMSUNMAE)/FLOAT(SUMTRY)*100,2)	AS sumAchivmentrate
+					,HALIN											AS discount
+					,SUMHALIN										AS sumDiscount	
+					,CUSTMERNUM										AS custmernum
+					,SUMCUSTMERNUM									AS sumCustmernum
+					,CUSTMERCST										AS custmercst
+					,SUMCUSTMERCST									AS sumCustmercst
+			FROM TA1
+		
+	</select>
+</mapper>

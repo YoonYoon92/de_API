@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.cornerRtnSts.CornerRtnStsMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="cornerRtnStsModel" type="com.saydept.api.spf.saleNews.cornerRtnSts.model.CornerRtnStsModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectCornerRtnStsList" resultType="com.saydept.api.spf.saleNews.cornerRtnSts.model.CornerRtnStsModel" parameterType="com.saydept.api.spf.saleNews.cornerRtnSts.model.CornerRtnStsParamModel" fetchSize="1000">
+		/*selectCornerRtnStsList*/
+		SELECT 					
+		        MS0501																	AS JUMCD
+		,       TRIM(SUBSTR(MS0506,1,23))||X'0F'     									AS JUMNAME
+		, 		MS0502																	AS BUCD
+		, 		TRIM(SUBSTR(MS0507,1,19))||X'0F'										AS BUNAME
+		,		MS0503																	AS TIMCD
+		,		TRIM(SUBSTR(MS0508,1,19))||X'0F'										AS TIMNAME	
+		,		IS0305 																	AS CORNERNO
+		,		TRIM(SUBSTR(MS0510,1,19))||X'0F'     									AS CORNERNAME
+				--고객변심 	JR1707='01'							
+		,		SUM(CASE WHEN JR1707='01' THEN 1 ELSE 0 END)							AS COUNTOFCUSTCHG
+		,		SUM(CASE WHEN JR1707='01' THEN IS0331 ELSE 0 END)/1000  				AS AMTOFCUSTCHG
+				--상품교환 	JR1707='02'
+		,		SUM(CASE WHEN JR1707='02' THEN 1 ELSE 0 END)							AS COUNTOFPRODUCTEXCHG
+		,		SUM(CASE WHEN JR1707='02' THEN IS0331 ELSE 0 END)/1000					AS AMTOFPRODUCTEXCHG
+				--결제방법교체 	JR1707='03'
+		,		SUM(CASE WHEN JR1707='03' THEN 1 ELSE 0 END)							AS COUNTOFPAYMENTCHG
+		,		SUM(CASE WHEN JR1707='03' THEN IS0331 ELSE 0 END)/1000					AS AMTOFPAYMENTCHG
+				--할인적용 	JR1707='04'
+		,		SUM(CASE WHEN JR1707='04' THEN 1 ELSE 0 END)							AS COUNTOFAPPLYDISCOUNT
+		,		SUM(CASE WHEN JR1707='04' THEN IS0331 ELSE 0 END)/1000					AS AMTOFAPPLYDISCOUNT
+				--고객컴플레인 	JR1707='05'
+		,		SUM(CASE WHEN JR1707='05' THEN 1 ELSE 0 END)							AS COUNTOFCUSTOMERCOMPLAINT
+		,		SUM(CASE WHEN JR1707='05' THEN IS0331 ELSE 0 END)/1000					AS AMTOFCUSTOMERCOMPLAINT
+				--약속불이행 	JR1707='06'
+		,		SUM(CASE WHEN JR1707='06' THEN 1 ELSE 0 END)							AS COUNTOFNOTPROMISE
+		,		SUM(CASE WHEN JR1707='06' THEN IS0331 ELSE 0 END)/1000					AS AMTOFNOTPROMISE
+				--사이즈부적합 	JR1707='07'
+		,		SUM(CASE WHEN JR1707='07' THEN 1 ELSE 0 END)							AS COUNTOFSIZENOTSUITABLE
+		,		SUM(CASE WHEN JR1707='07' THEN IS0331 ELSE 0 END)/1000					AS AMTOFSIZENOTSUITABLE
+				--기타 		
+		,		SUM(CASE WHEN NOT JR1707 IN ('01','02','03','04','05','06','07') THEN 1 ELSE 0 END)				AS COUNTOFETC
+		,		SUM(CASE WHEN NOT JR1707 IN ('01','02','03','04','05','06','07') THEN IS0331 ELSE 0 END)/1000	AS AMTOFETC
+				--합계
+		,		COUNT(JR1703)															AS COUNTOFTOTAL
+		,		SUM(IS0331)/1000														AS AMTOFTOTAL
+		
+		FROM 	${dbType}SPFRDB.SPFI03LF1
+				--매출 취소 사유 TABLE JOIN
+				INNER JOIN ${dbType}SPORDB.SPOJ17PF   
+				ON 	JR1700=IS0303	--매출점 
+				AND JR1701=IS0301 	--매출취소일자
+				AND JR1702=IS03041 	--REGI번호
+				AND JR1703=IS03042  --영수증번호
+				--코너번호 MASTER TABLE JOIN 
+				INNER JOIN ${dbType}SPFRDB.SPFM05PF
+				ON 	MS0501=IS0303	--점번호
+				AND MS0505=IS0305   --코너번호
+				
+		WHERE   
+				IS0301 &gt;= #{startDt}  
+		AND		IS0301 &lt;= #{endDt}	--매출취소일 FROM TO
+		AND		IS0303 = #{jum}			--매출점 
+		<if test="bu != null and bu !=''">
+		AND 	IS0304 = SUBSTR(#{bu},3,2) --매출부
+		</if>
+		<if test="tim != null and tim !=''">
+		AND 	IS0307 = SUBSTR(#{tim},5,2) --매출팀
+		</if>		
+		
+		GROUP BY MS0501, MS0506, MS0502, MS0507, MS0503, MS0508, IS0305, MS0510
+		ORDER BY MS0501, MS0502, MS0503, IS0305, MS0510 
+	</select>
+
+</mapper>

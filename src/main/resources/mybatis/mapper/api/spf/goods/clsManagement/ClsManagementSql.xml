@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.clsManagement.ClsManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="clsManagementModel" type="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectClsManagement" resultType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel">
+		SELECT 	MS0601 AS jum
+				,MS0602	AS cls1
+				,MS0603	AS key
+				,trim(MS0604) AS clsNm
+				,MS0605	AS coner
+				,MS0606 AS featureCd
+				,MS0607 AS partner
+				,MS0608 AS stockLoss
+				,MS0609 AS margin
+				,MS0613 AS eventCd
+				,MS0630 AS tagCd
+				,MS0625 AS crtDt
+				,MS0626 AS uptDt
+				,MS0627 AS delDt
+				,MS0632 AS stopDt
+				,MS0633 AS Expire
+				,trim(MS0634) AS payment
+		
+		FROM spfrdb.spfm06pf
+		WHERE MS0601=#{jum} and MS0602=#{coner} AND MS0603=#{key}
+
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectClsManagementList" resultType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" fetchSize="1000">
+		/*selectClsManagementList*/
+		SELECT ...
+	</select>
+	<select id="selectConerList" resultType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" >
+		SELECT 	MS0505 AS coner
+				,MS0505||'('||TRIM(MS0510)||')' AS conerNm
+		FROM ${dbType}SPFRDB.SPFM05PF
+		WHERE MS0501=#{jum} and MS0515=''
+	</select>
+	
+	<select id="selectKeyList" resultType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel" >
+			SELECT MS0603 as key 
+			FROM ${dbType}SPFRDB.SPFM06PF 
+			
+			WHERE MS0601 =#{jum} AND MS0602=#{coner}
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateClsManagement" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel">
+		/*updateClsManagement*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertClsManagement" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel">
+		/*insertClsManagement*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteClsManagement" parameterType="com.saydept.api.spf.goods.clsManagement.model.ClsManagementModel">
+		/*deleteClsManagement*/
+		DELETE ...
+	</delete>
+
+</mapper>

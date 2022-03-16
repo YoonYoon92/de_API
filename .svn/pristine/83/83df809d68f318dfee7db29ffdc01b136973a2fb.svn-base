@@ -1,0 +1,58 @@
+package com.saydept.api.login;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.saydept.api.login.model.LoginModel;
+
+@CrossOrigin(origins = "*")
+@RestController
+public class LoginController {
+	
+	@Autowired
+	private LoginService loginService;
+
+	/**
+	 * API 상태체크
+	 * @return
+	 */
+	@RequestMapping(value = "api/login", method = RequestMethod.GET)
+	public String condition() {
+    	return this.getClass().getName() + " : " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	
+	/**
+	 * 사용자 Login
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/login/selectUserLogin", method = RequestMethod.POST)
+	public LoginModel selectUserLogin(@RequestBody LoginModel request)throws Exception {
+		
+		//LoginModel result = loginService.selectUserLogin(request);
+		LoginModel result = new LoginModel();
+    	return result;
+	}
+	
+	/**
+	 * 그리드 조회 테스트
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/login/selectGridList", method = RequestMethod.POST)
+	public List<LoginModel> selectGridList(@RequestBody LoginModel request)throws Exception {
+		
+		List<LoginModel> result = loginService.selectGridList(request);
+    	return result;
+	}
+}

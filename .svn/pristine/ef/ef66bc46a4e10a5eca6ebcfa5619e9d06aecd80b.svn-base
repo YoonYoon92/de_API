@@ -1,0 +1,31 @@
+package com.saydept.api.comm.model;
+
+import lombok.Data;
+
+@Data
+public class CommModel {
+	
+	/**
+	 * 공통코드
+	 */
+	private String groupCd;		//그룹코드
+	private String codeId;		//공통코드
+	private String groupNm;		//그룹명
+	private String codeNm;		//코드명
+	
+	/**
+	 * 점포목록
+	 */
+	private String storeCd;
+	private String storeNm;
+	
+	/**
+	 * POS목록
+	 */
+	private String posNo;
+	
+	/**
+	 * 상품분류
+	 */
+
+}

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.buPlanSaleInq.BuPlanSaleInqMapper">
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectBuPlanSaleInqList" parameterType="com.saydept.api.spf.saleNews.buPlanSaleInq.model.BuPlanSaleInqParamModel" resultType="com.saydept.api.spf.saleNews.buPlanSaleInq.model.BuPlanSaleInqModel">
+	<choose>
+	
+	<when test="bu != null and bu != ''">
+	WITH
+		TABLE1( Team,Pc,TeamNm,PcNm,Try,Splan,LastyearSplan,CustmerNum,CustmerCst,Achivmentrate,Incrsrate)AS (
+		SELECT  MS0403
+		        ,MS0404
+		        ,MS0407
+		        ,MS0408
+		        ,TA3.Plan
+		        ,TA2.Splan
+		        ,TA2.LSplan
+		        ,TA2.CustmerNum
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA2.CustmerNum),2) 				AS CustmerCst
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA3.Plan)*100,2)   				AS Achivmentrate
+		        ,ROUND(FLOAT((TA2.Splan-TA2.LSplan)/FLOAT(TA2.LSplan))*100,2)	AS Incrsrate
+		FROM ${dbType}SPFRDB.SPFM04PF TA1
+		        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF2
+		        ON      MS0401 = MS04201
+		        AND     MS0402 = MS04202
+		        AND     MS0403 = MS04203
+		        AND     MS0404 = MS04204
+		        LEFT OUTER JOIN
+		        (SELECT IS5203,IS5204,IS5205,IS5206
+		               ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5213 ELSE 0 END)/1000 					AS Splan
+				       ,SUM(CASE WHEN IS5201  &gt;= #{LastyearstartDt} AND IS5201 &lt;= #{LastyearendDt} THEN IS5213 ELSE 0 END)/1000  	AS LSplan
+				       ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5216 ELSE 0 END)    					AS CustmerNum
+				FROM ${dbType}SPFRDB.SPFI52PF
+		         GROUP BY IS5203,IS5204,IS5205,IS5206) TA2
+		        ON      MS0401 = TA2.IS5203
+		        AND     MS0402 = TA2.IS5204
+		        AND     MS0403 = TA2.IS5205
+		        AND     MS0404 = TA2.IS5206
+		
+		         LEFT OUTER JOIN
+		         (SELECT IS05102,IS05103,IS05104,IS05105,SUM(IS05106)  AS Plan
+		         FROM ${dbType}SPFRDB.SPFI05PF1
+		         WHERE  IS05101 &gt;= #{startDt}  AND IS05101 &lt;= #{endDt}
+		         GROUP BY IS05102,IS05103,IS05104,IS05105 ) TA3
+		         ON      MS0401 = IS05102
+		         AND     MS0402 = IS05103
+		         AND     MS0403 = IS05104
+		         AND     MS0404 = IS05105
+		
+		WHERE MS04221='Y' AND MS0401=SUBSTR(#{bu},1,2) AND MS0402=SUBSTR(#{bu},3,2)
+		
+		UNION ALL
+		
+		SELECT  MS0303
+		        ,'999'
+		        ,''
+		        ,MS0306
+		        ,TA3.Plan
+		        ,TA2.Splan
+		        ,TA2.LSplan
+		        ,TA2.CustmerNum
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA2.CustmerNum),2) 				AS CustmerCst
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA3.Plan)*100,2)   				AS Achivmentrate
+		        ,ROUND(FLOAT((TA2.Splan-TA2.LSplan)/FLOAT(TA2.LSplan))*100,2) 	AS Incrsrate
+		FROM ${dbType}SPFRDB.SPFM03PF TA1
+		
+		        LEFT OUTER JOIN
+		        (SELECT IS5203,IS5204,IS5205
+		                ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5213 ELSE 0 END)/1000 					AS Splan
+		                ,SUM(CASE WHEN IS5201  &gt;= #{LastyearstartDt} AND IS5201 &lt;= #{LastyearendDt} THEN IS5213 ELSE 0 END)/1000  AS LSplan
+		                ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5216 ELSE 0 END)    					AS CustmerNum
+		         FROM ${dbType}SPFRDB.SPFI52PF
+		         GROUP BY IS5203,IS5204,IS5205) TA2
+		        ON      MS0301 = TA2.IS5203
+		        AND     MS0302 = TA2.IS5204
+		        AND     MS0303 = TA2.IS5205
+		
+		         LEFT OUTER JOIN
+		         (SELECT IS05102,IS05103,IS05104,SUM(IS05106)  AS Plan
+		         FROM ${dbType}SPFRDB.SPFI05PF1
+		       	 WHERE  IS05101 &gt;= #{startDt}  AND IS05101 &lt;= #{endDt}
+		         GROUP BY IS05102,IS05103,IS05104 ) TA3
+		         ON      MS0301 = IS05102
+		         AND     MS0302 = IS05103
+		         AND     MS0303 = IS05104
+		
+		WHERE MS0301=SUBSTR(#{bu},1,2) AND MS0302=SUBSTR(#{bu},3,2)
+		)
+  				SELECT			Team   		   	                             AS   Team
+                                ,Pc                                          AS   Pc
+                                ,TeamNm
+                                ,TRIM(PcNm)                                  AS   PcNm
+                                ,Try                                         AS   Try
+                                ,Splan                                       AS   Splan
+                                ,LastyearSplan                               AS   LastyearSplan
+                                ,Achivmentrate                               AS   Achivmentrate
+                                ,Incrsrate                                   AS   Incrsrate
+                                ,CustmerNum                                  AS   CustmerNum
+                                ,CustmerCst                                  AS   CustmerCst
+		        FROM TABLE1
+		        ORDER BY Team,Pc
+	</when>	
+	
+	<when test="bu = null or bu = ''">
+	SELECT       MS0202															AS Pc
+		        ,trim(MS0204)													AS PcNm
+		        ,TA3.PLAN														AS Try
+		        ,TA2.Splan														AS Splan
+		        ,TA2.LSplan														AS LastyearSplan		
+		        ,TA2.CustmerNum													AS CustmerNum
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA2.CustmerNum),2) 				AS CustmerCst
+		        ,ROUND(FLOAT(TA2.Splan)/FLOAT(TA3.Plan)*100,2)   				AS Achivmentrate
+		        ,ROUND(FLOAT((TA2.Splan-TA2.LSplan)/FLOAT(TA2.LSplan))*100,2) 	AS Incrsrate
+		FROM ${dbType}SPFRDB.SPFM02PF TA1
+		
+		        LEFT OUTER JOIN
+		        (SELECT IS5203,IS5204
+		                ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5213 ELSE 0 END)/1000 					AS Splan
+		                ,SUM(CASE WHEN IS5201  &gt;= #{LastyearstartDt} AND IS5201 &lt;= #{LastyearendDt} THEN IS5213 ELSE 0 END)/1000  AS LSplan
+		                ,SUM(CASE WHEN IS5201  &gt;= #{startDt} AND IS5201 &lt;= #{endDt} THEN IS5216 ELSE 0 END)    					AS CustmerNum
+		         FROM ${dbType}SPFRDB.SPFI52PF
+		  
+		         GROUP BY IS5203,IS5204) TA2
+		        ON      MS0201 = TA2.IS5203
+		        AND     MS0202 = TA2.IS5204
+		       
+			
+		         LEFT OUTER JOIN
+		         (SELECT IS05102,IS05103,SUM(IS05106)  AS Plan
+		         FROM ${dbType}SPFRDB.SPFI05PF1
+		       	 WHERE  IS05101 &gt;= #{startDt} AND IS05101 &lt;= #{endDt}
+		         GROUP BY IS05102,IS05103 ) TA3
+		         ON      MS0201 = IS05102
+		         AND     MS0202 = IS05103
+		         
+		     	 LEFT OUTER JOIN SPFRDB.SPFM02PF2
+                 ON      MS02201=MS0201 AND MS02202=MS0202
+		
+		WHERE MS0201=#{jum}  AND MS02200&lt;=6--AND SPLAN !=0 AND lsplan !=0 
+		ORDER BY MS02200
+		
+		
+	</when>
+	</choose>
+			
+		
+		
+		
+	</select>
+
+</mapper>

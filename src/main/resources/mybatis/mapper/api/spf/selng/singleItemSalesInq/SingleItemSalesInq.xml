@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.singleItemSalesInq.SingleItemSalesInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSingleItemSalesInqList" resultType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqModel" parameterType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" fetchSize="1000">
+		/*selectSingleItemSalesInqList*/
+		
+		WITH 
+		TA01 	(JUM, ORG, SINGLEITEMCD, CLASS1, CLASS2, ITEMCD, CNT, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT) AS 
+				(SELECT IS1003, 
+						IS1004||IS1005||IS1006, 
+						IS1010,
+						IS1008,
+						IS1009,
+						IS1011||IS1012||IS1013,
+						SUM(IS1015),
+						SUM(IS1016),
+						SUM(IS1017),
+						SUM(IS1018)
+				 FROM 	${dbType}SPFRDB.SPFI10PF
+				 WHERE  			
+				 		IS1003 = #{jum} 
+						<if test="bu != null and bu !=''">
+						AND 	IS1004 = SUBSTR(#{bu},3,2)
+						</if>
+						<if test="tim != null and tim !=''">
+						AND 	IS1005 = SUBSTR(#{tim},5,2)
+						</if>
+						<if test="pc != null and pc !=''">
+						AND 	IS1006 = SUBSTR(#{pc},7,2)
+						</if>
+						AND 	IS1001 &gt;= #{startDt}
+						AND 	IS1001 &lt;= #{endDt}
+				
+						--코너
+						<if test="cornerCd != null and cornerCd !=''">
+						AND     IS1007 = #{cornerCd}
+						</if>
+						--클래스
+						<if test="classKeyCd != null and classKeyCd !=''">
+						AND     IS1008||IS1009 = #{cornerCd}||#{classKeyCd}
+						</if>
+						--거래선
+						<if test="partner != null and partner !=''">
+						AND     IS1014 = #{partner}
+						</if>
+						--단품 대중소 분류코드
+						<if test="lcatCd != null and lcatCd !=''">
+						AND     IS1011 = #{lcatCd}
+						</if>
+						<if test="mcatCd != null and mcatCd !=''">
+						AND     IS1011||IS1012 = #{mcatCd}
+						</if>
+						<if test="scatCd != null and scatCd !=''">
+						AND     IS1011||IS1012||IS1013 = #{scatCd}
+						</if>	 		
+	            GROUP BY IS1003, IS1004||IS1005||IS1006, IS1010, IS1008, IS1009, IS1011||IS1012||IS1013)
+				 
+		SELECT  TA01.JUM AS JUM, 
+				TA01.ORG AS ORG, 
+				MS0406 AS BUNAME,
+				TA01.SINGLEITEMCD AS SINGLEITEMCD,
+				MS0706 AS SINGLEITEMNAME,
+				TA01.CNT AS CNT, 
+				MS0718 AS UNIT, 
+				TA01.NETAMOUNT AS NETAMOUNT, 
+				TA01.SALEAMOUNT AS SALEAMOUNT, 
+				TA01.TOTALAMOUNT AS TOTALAMOUNT,
+				TA01.ITEMCD AS ITEMCD,
+				MS1307 AS ITEMNAME,
+				MS0607 AS PARTNERCD,
+				MS0804 AS PARTNERNAME,
+				TA01.CLASS1||TA01.CLASS2 AS CLASSCD,
+				MS0604 AS CLASSNAME        		
+		 FROM 	TA01 		 		
+		        INNER JOIN ${dbType}SPFRDB.SPFM06PF 
+		        ON 	MS0601=TA01.JUM AND 
+		        	MS0602=TA01.CLASS1 AND 
+		        	MS0603=TA01.CLASS2
+		        INNER JOIN ${dbType}SPFRDB.SPFM04PF 
+		        ON 	MS0401=MS0601 AND 
+		        	MS0402=MS0618 AND 
+		        	MS0403=MS0619 AND 
+		        	MS0404=MS0620
+		        INNER JOIN ${dbType}SPFRDB.SPFM08PF 
+		        ON 	MS0801=MS0601 AND 
+		        	MS0802=MS0607
+		        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM13PF
+		        ON  MS1301 = SUBSTR(TA01.ITEMCD,1,1) AND
+		            MS1302 = SUBSTR(TA01.ITEMCD,2,1) AND
+		            MS1303 = SUBSTR(TA01.ITEMCD,3,3)
+		        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM07PF
+		 		ON 	MS0701=TA01.JUM AND 
+		 			MS0702=SUBSTR(TA01.ORG,1,2)  AND 
+		 			MS0703=TA01.SINGLEITEMCD 
+		ORDER BY JUM, ORG, SINGLEITEMCD
+
+	</select>
+	
+	<!-- 품목코드 대분류 -->
+	<select id="selectStoreComboLargeCatList" resultType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" fetchSize="500">
+		/*selectStoreComboLargeCatList*/
+		SELECT	TRIM(TB1.MS1101)							AS LCATCD			/* 단품대분류 */
+		,		TRIM(TB1.MS1102)||' ('||TRIM(TB1.MS1101)||')'                            AS LCATNAME			/* 단품대분류명 */
+		FROM 	${dbType}SPFRDB.SPFM11PF TB1
+	</select>
+	
+	<!-- 품목코드 중분류 -->
+	<select id="selectStoreComboMidiumCatList" resultType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" parameterType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" fetchSize="500">
+		/*selectStoreComboMidiumCatList*/
+		SELECT	TRIM(TB1.MS1201)||TRIM(TB1.MS1202)		    AS MCATCD			/* 단품중분류 */
+		,		TRIM(TB1.MS1204)||' ('||TRIM(TB1.MS1202)||')'                            AS MCATNAME			/* 단품중분류명 */
+		FROM 	${dbType}SPFRDB.SPFM12PF TB1
+		WHERE   MS1201=#{lcatCd}
+	</select>
+	
+	<!-- 품목코드 소분류 -->
+	<select id="selectStoreComboSmallCatList" resultType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" parameterType="com.saydept.api.spf.selng.singleItemSalesInq.model.SingleItemSalesInqParamModel" fetchSize="500">
+		/*selectStoreComboMidiumCatList*/
+		SELECT	TRIM(TB1.MS1301)||TRIM(TB1.MS1302)||TRIM(TB1.MS1303)		    AS SCATCD			/* 단품소분류 */
+		,		TRIM(TB1.MS1306)||' ('||TRIM(TB1.MS1307)||','||TRIM(TB1.MS1303)||')'                                                 AS SCATNAME			/* 단품소분류명 */
+		FROM 	${dbType}SPFRDB.SPFM13PF TB1
+		WHERE   MS1301=SUBSTR(#{mcatCd},1,1) AND
+		        MS1302=SUBSTR(#{mcatCd},2,1)
+	</select>
+
+</mapper>

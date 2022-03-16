@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.largeShopSaleInq.LargeShopSaleInqMapper">
+
+	
+
+	
+	<select id="selectLargeShopSaleInqList" resultType="com.saydept.api.spf.saleNews.largeShopSaleInq.model.LargeShopSaleInqModel"
+											parameterType="com.saydept.api.spf.saleNews.largeShopSaleInq.model.LargeShopSaleInqModel" >
+				WITH
+		/*주코너합산*/
+		TA1(coner,conernm,YEARTry,MONTHTry,DAYTry,YEARSplan,MONTHSplan,DAYSplan)AS(
+		SELECT	TB1.MS05702
+		        ,TRIM(TB4.MS0510)
+		        ,SUM(B1)
+		        ,SUM(B2)
+		        ,SUM(B3)
+		        ,SUM(A1)
+		        ,SUM(A2)
+		        ,SUM(A3)
+		 
+		--FROM    ${dbType}SPFRDB.SPFM05PF7 TB1
+		FROM  SPFRDB.SPFM05PF7 TB1
+		LEFT OUTER JOIN
+		                (SELECT IS0104
+                        ,SUM(CASE WHEN IS0102 &gt;= #{yyDt} AND IS0102 &lt;= #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS A1
+                        ,SUM(CASE WHEN IS0102 &gt;= #{mmDt} AND IS0102 &lt;= #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS A2
+                        ,SUM(CASE WHEN IS0102 &gt;= #{startDt} AND IS0102 &lt;= #{startDt} THEN   IS0129 ELSE 0 END)/1000  AS A3
+                        FROM ${dbType}SPFRDB.SPFI01PF
+                        WHERE (IS0102  &gt;= #{yyDt} and IS0102 &lt;= #{startDt})
+                        GROUP BY IS0104) A
+                        ON A.IS0104 = TB1.MS05702
+        LEFT OUTER JOIN
+		                (SELECT IS0707
+		               	,SUM(CASE WHEN IS0702 &gt;= #{yyDt} AND IS0702 &lt;= #{startDt} THEN  IS0709 ELSE 0 END) AS B1
+		               	,SUM(CASE WHEN IS0702 &gt;= #{mmDt} AND IS0702 &lt;= #{startDt} THEN  IS0709 ELSE 0 END) AS B2
+                        ,SUM(CASE WHEN IS0702 &gt;= #{startDt} AND IS0702 &lt;= #{startDt} THEN  IS0709 ELSE 0 END) AS B3
+                        FROM ${dbType}SPFRDB.SPFI07LF2
+                        WHERE (IS0702 &gt;= #{yyDt} and IS0702 &lt;= #{startDt})
+                        GROUP BY IS0707
+                         ) B
+                        ON B.IS0707 = TB1.MS05702
+		LEFT OUTER JOIN
+		       SPFRDB.SPFM05PF  TB4
+		       ON TB4.MS0501='01' AND TB4.MS0505=TB1.MS05702
+		        AND MS0515='' AND SUBSTR(MS0521,2,1)='Y'
+		        /*관리코너 CHECK*/
+		       
+		       WHERE MS05703='1' AND
+		       NOT EXISTS (SELECT MS05103 FROM ${dbType}SPFRDB.SPFM051PF WHERE MS05103=TB1.MS05702)
+		     
+
+		GROUP BY TB1.MS05702,TB4.MS0510
+		HAVING SUM(B.B2)  &gt; 0 OR SUM(A.A1)  &gt;0 OR SUM(A.A2)  &gt;0
+		ORDER BY MS05702
+		
+		)
+		,
+		/*종속코너 합산*/
+		TA2(coner,conernm,YEARTry,MONTHTry,DAYTry,YEARSplan,MONTHSplan,DAYSplan)AS(
+		
+		SELECT  TB3.MS05102
+		        ,TRIM(TB4.MS0510)
+		        ,SUM(B1)
+		        ,SUM(B2)
+		        ,SUM(B3)
+		        ,SUM(A1)
+		        ,SUM(A2)
+		        ,SUM(A3)
+		      
+		FROM    ${dbType}SPFRDB.SPFM05PF7 TB1
+	
+			LEFT OUTER JOIN
+		                (SELECT IS0104
+                        ,SUM(CASE WHEN IS0102 &gt;= #{yyDt} AND IS0102 &lt;=  #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS A1
+                        ,SUM(CASE WHEN IS0102 &gt;= #{mmDt} AND IS0102 &lt;=  #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS A2
+                        ,SUM(CASE WHEN IS0102 &gt;=  #{startDt} AND IS0102 &lt;=  #{startDt} THEN   IS0129 ELSE 0 END)/1000  AS A3
+                        FROM ${dbType}SPFRDB.SPFI01PF
+                        WHERE (IS0102 &gt;= #{yyDt}and IS0102 &lt;= #{startDt} )
+                        GROUP BY IS0104) A
+                        ON A.IS0104 = TB1.MS05702
+        LEFT OUTER JOIN
+		                (SELECT IS0707
+		               	,SUM(CASE WHEN IS0702 &gt;= #{yyDt} AND IS0702 &lt;=  #{startDt} THEN  IS0709 ELSE 0 END) AS B1
+		               	,SUM(CASE WHEN IS0702 &gt;=#{mmDt} AND IS0702 &lt;=  #{startDt} THEN  IS0709 ELSE 0 END) AS B2
+                        ,SUM(CASE WHEN IS0702 &gt;=#{startDt} AND IS0702 &lt;=  #{startDt} THEN  IS0709 ELSE 0 END) AS B3
+                        FROM ${dbType}SPFRDB.SPFI07LF2
+                        WHERE (IS0702 &gt;= #{yyDt}and IS0702 &lt;= #{startDt} )
+                        GROUP BY IS0707
+                         ) B
+                        ON B.IS0707 = TB1.MS05702
+        LEFT OUTER JOIN
+		       ${dbType}SPFRDB.SPFM051PF TB3
+		       ON MS05103=TB1.MS05702
+		LEFT OUTER JOIN
+		       ${dbType}SPFRDB.SPFM05PF  TB4
+		       ON TB4.MS0501='01' AND TB4.MS0505=TB3.MS05102
+		        AND TB4.MS0515='' 
+		        AND SUBSTR(TB4.MS0521,2,1)='Y'
+		        
+		        
+		        WHERE MS05703='1' AND 
+		        EXISTS (SELECT MS05103 FROM ${dbType}SPFRDB.SPFM051PF WHERE MS05103=TB1.MS05702)
+
+		
+		GROUP BY TB3.MS05102,TB4.MS0510
+		HAVING SUM(B.B2)  &gt; 0 OR SUM(A.A1) &gt;0 OR SUM(A.A2) &gt;0
+		ORDER BY TB3.MS05102
+		)
+		,
+		
+		TA3(coner,conernm,YEARTry,MONTHTry,DAYTry,YEARSplan,MONTHSplan,DAYSplan) as(
+		select 	coner																											
+				,conernm 
+				,SUM(YEARTry) AS YEARTry
+				,SUM(MONTHTry) AS MONTHTry
+				,sum(DAYTry) as DAYTry
+				,sum(YEARSplan) as YEARSplan
+				,sum(MONTHSplan) as MONTHSplan
+				,sum(float(DAYSplan)) as DAYSplan
+          from (
+                select * from ta1
+                union all
+                select * from ta2
+                )
+          		LEFT OUTER JOIN SPFRDB.SPFM05PF8
+				ON  MS05803=coner	
+		
+		  WHERE	DAYSplan&gt;=0  		
+          group by coner																						
+          			,conernm
+          		
+   		)
+		,
+		TA4(coner,conernm,YEARTry,MONTHTry,DAYTry,YEARSplan,MONTHSplan,DAYSplan,YEARAchivmentrate,MONTHAchivmentrate,DAYAchivmentrateorder ) AS(
+		select  coner										
+				,conernm		
+				,YEARTry
+				,MONTHTry
+				,DAYTry
+				,YEARSplan	
+				,MONTHSplan
+				,DAYSplan				
+				,ROUND((FLOAT(YEARSplan))/(FLOAT(YEARTry))*100,2) 	
+				,ROUND((FLOAT(MONTHSplan))/(FLOAT(MONTHTry))*100,2) 	
+				,ROUND((FLOAT(DAYSplan))/(FLOAT(DAYTry))*100,2) 	
+				
+		from TA3
+ 
+		WHERE DAYSplan != 0 
+		)
+	    SELECT   
+	    		MS0508						AS timNm
+	    		,coner						AS coner				
+				,conernm					AS conerNm
+				,DAYTry						AS ddTry
+				,DAYSplan					AS ddSplan	
+				,DAYAchivmentrateorder		AS ddAchivmentrate
+				,MONTHTry					AS mmTry
+				,MONTHSplan					AS mmSplan
+				,MONTHAchivmentrate			AS mmAchivmentrate
+				,YEARTry					AS yyTry
+				,YEARSplan					AS yySplan       					
+				, CASE WHEN (YEARTry =0 OR YEARSplan =0 OR YEARTry IS NULL)   THEN 0  ELSE ROUND(YEARAchivmentrate,2) END		AS yyAchivmentrate
+					
+		FROM TA4
+		
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+		ON coner = MS0505
+		
+		
+		ORDER BY  yyAchivmentrate DESC
+		
+	</select>
+
+
+
+
+</mapper>

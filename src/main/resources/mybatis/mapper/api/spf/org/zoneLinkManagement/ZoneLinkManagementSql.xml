@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.zoneLinkManagement.ZoneLinkManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="zoneLinkManagementModel" type="com.saydept.api.tasks.zoneLinkManagement.model.zoneLinkManagementModel"/>
+	-->
+	
+	<!-- 존 조회 -->
+	<select id="selectzoneStoreList" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel" 
+						resultType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+						
+			SELECT 	MS2105 as zoneCd
+					,trim(MS2106)||'('||MS2105||')' as zoneNm
+			FROM ${dbType}SPFRDB.SPFM21PF
+		<where>
+			<choose>
+				<when test="pc != null and pc != '' ">
+				MS2101=SUBSTR(#{pc},1,2)
+				AND	  MS2102=SUBSTR(#{pc},3,2)
+				AND	  MS2103=SUBSTR(#{pc},5,2)
+				AND	  MS2104=SUBSTR(#{pc},7,2)
+				AND   MS2113='' 
+				</when>
+				<when test="tim != null and tim != '' ">
+				MS2101=SUBSTR(#{tim},1,2)
+				AND	  MS2102=SUBSTR(#{tim},3,2)
+				AND	  MS2103=SUBSTR(#{tim},5,2)
+				AND   MS2113='' 
+				</when>
+				<when test="tim = null and tim = '' ">
+				MS2101=SUBSTR(#{bu},1,2)
+				AND	  MS2102=SUBSTR(#{bu},3,2)
+				AND   MS2113='' 
+				</when>
+			</choose>
+		</where>
+			
+		
+			
+	</select>	
+	
+	<select id="selectConerchk" resultType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+			/*selectConerLinkManagement*/
+		SELECT 	MS0501 AS jum
+				,MS0502	AS bu
+				,MS0503	as tim	
+				,MS0504	as pc
+				,MS0505 AS coner 
+		
+		FROM ${dbType}SPFRDB.SPFM05PF
+		WHERE MS0501 =#{jum} AND MS0505=#{coner} AND MS0515 =''
+		
+		</select>
+	<!-- 단일 조회 -->
+	<select id="selectzoneLinkManagement" resultType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+		/*selectzoneLinkManagement*/
+		SELECT DISTINCT(MS0505) AS coner 
+		FROM ${dbType}SPFRDB.SPFM05PF
+		WHERE MS0501 =#{jum} AND MS0505=#{coner} AND MS0515 =''
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectZoneLinkManagementList" resultType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel" fetchSize="1000">
+		/*selectzoneLinkManagementList*/
+		SELECT 	MS0505 		AS coner
+				,TRIM(MS0510)	AS conerNm
+				,MS0516 		as regiDt
+				,MS05209		as delDt
+		FROM ${dbType}SPFRDB.SPFM05LF8 
+		LEFT outer JOIN ${dbType}SPFRDB.SPFM052PF
+		ON MS05201=MS0501 AND MS05202=MS0502 AND MS05203=MS0503 AND MS05204 = MS0504 AND MS05205=#{zone} AND MS05206=MS0505
+
+		
+		WHERE MS0518=#{zone} and MS0501 =#{jum}
+		
+	</select>
+
+	<!-- 수정 -->
+	<update id="updatezoneLinkManagement" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+		/*updatezoneLinkManagement*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertZoneLinkManagement" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+	INSERT INTO ${dbType}SPFRDB.SPFM052PF 
+
+	SELECT MS0501,MS0502,MS0503,MS0504,'${zone}',MS0505,MS0510,MS0516,'${startDt}',''
+	FROM ${dbType}SPFRDB.SPFM05PF 
+	WHERE MS0501=#{jum} AND MS0505=#{linkConer}
+	
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteZoneLinkManagement" parameterType="com.saydept.api.spf.org.zoneLinkManagement.model.ZoneLinkManagementModel">
+
+		DELETE ${dbType}SPFRDB.SPFM052PF 
+		WHERE MS05201=#{jum}  AND MS05202=#{bu} AND MS05203=#{tim} AND MS05204 = #{pc} AND MS05205=#{zone} AND MS05206=#{linkConer}
+	</delete>
+
+</mapper>

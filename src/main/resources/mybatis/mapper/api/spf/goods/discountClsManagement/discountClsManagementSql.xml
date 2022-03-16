@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.discountClsManagement.DiscountClsManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="discountClsManagementModel" type="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectDiscountClsManagement" resultType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel" parameterType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel">
+		/*selectDiscountClsManagement*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDiscountClsManagementList" resultType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel" parameterType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel" fetchSize="1000">
+		SELECT 
+				MS3002	AS	cls1
+				,MS3003	as	cls2
+				,substr(MS3008,1,4)||'/'||substr(MS3008,5,2)||'/'||substr(MS3008,7,2)	as	uptDt
+				,substr(MS3009,1,2)||':'||substr(MS3009,3,2)||':'||substr(MS3009,5,2)	as	uptTime
+				,MS0604	as	clsNm
+				,TRIM(MS0621)||'('||MS0618||')'||TRIM(MS0622)||'('||MS0619||')'||TRIM(MS0623)||'('||MS0620||')' as orgCd, 
+				CASE WHEN MAX(MS2609) &lt;=#{startDt} THEN substr(MAX(MS2609),1,4)||'/'||substr(MAX(MS2609),5,2)||'/'||substr(MAX(MS2609),7,2) ELSE '' END as clsEndDt
+		
+		FROM SPFRDB.SPFM30PF
+		 
+			LEFT OUTER JOIN SPFRDB.SPFM06PF 
+			ON MS0601=MS3001 AND MS0602=MS3002 AND MS0603=MS3003
+		
+			LEFT OUTER JOIN SPFRDB.SPFM26LF2 
+			ON MS2604=MS0602 AND MS2605=MS0603 AND MS2611=MS0601
+		
+			WHERE MS3001='01' AND MS30011=#{discountCd}   AND MS0628!='' 
+			
+			GROUP BY MS3002,MS3003,MS3008,MS3009,MS0604,TRIM(MS0621)||'('||MS0618||')'||TRIM(MS0622)||'('||MS0619||')'||TRIM(MS0623)||'('||MS0620||')' 
+			
+			ORDER BY MS3002
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateDiscountClsManagement" parameterType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel">
+		/*updateDiscountClsManagement*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertDiscountClsManagement" parameterType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel">
+		
+		INSERT INTO SPFRDB.SPFM30PF
+		(
+			MS3001
+			,MS30011
+			,MS3002
+			,MS3003
+			,MS3007
+			,MS3008
+			,MS3009
+			,MS3010
+			
+		)
+		VALUES(
+			'01'
+			,#{discountCd}
+			,#{cls1}
+			,#{cls2}
+			,'A'
+			,TRIM(CHAR(YEAR(CURRENT DATE)))||RIGHT('00'||TRIM(CHAR(MONTH(CURRENT DATE))),2)||RIGHT('00'||TRIM(CHAR(DAY(CURRENT DATE))),2)
+			,RIGHT('00'||TRIM(CHAR(HOUR(CURRENT TIMESTAMP))),2)||RIGHT('00'||TRIM(CHAR(MINUTE(CURRENT TIMESTAMP))),2)||RIGHT('00'||TRIM(CHAR(SECOND(CURRENT TIMESTAMP))),2)
+			,#{userId}
+		)
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteDiscountClsManagement" parameterType="com.saydept.api.spf.goods.discountClsManagement.model.DiscountClsManagementModel">
+		/*deleteDiscountClsManagement*/
+		DELETE SPFRDB.SPFM30PF 
+		WHERE  MS3001='01' AND  MS3002=#{cls1} AND  MS3003=#{cls2} 
+	</delete>
+
+</mapper>

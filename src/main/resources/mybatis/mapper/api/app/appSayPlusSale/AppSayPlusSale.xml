@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.app.appSayPlusSale.AppSayPlusSaleMapper">
+
+
+	<select id="getAppSayPlusSalelist"
+		parameterType="com.saydept.api.app.appSayPlusSale.model.AppSayPlusSaleParamModel"
+		resultType="com.saydept.api.app.appSayPlusSale.model.AppSayPlusSaleModel">
+
+		SELECT P02MAEJUM										AS jum
+			,P02WHEGU||P02SEQNO||P02CHECK||P02SAGU||P02RBALNO	AS cdNo
+			,P02MAEY1||P02MAEY2||'/'||P02MAEM||'/'||P02MAED 	AS saleDate
+			,P02REGINO||'-'||RIGHT('000'||P02SLPNO,4)			AS slpNo
+		--	,P02CLSNO1||'-'||P02CLSNO2							AS clsNo
+			--,replace(P02CLSNAME,'　','')							AS clsNm
+			,REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(P02CLSNAME
+                                ,'　','')
+                                ,('（면）'),'')
+                                ,('（정）'),'')
+                                ,('（행）'),'')
+                                ,('（균）'),'')
+                                ,('（한）'),'')
+                                ,('（특）'),'')
+                                ,('（Ｆ）'),'')
+                                ,('（전시）'),'')
+                                ,('（교육）'),'')
+                                ,('（배달）'),'')
+                                ,('（２）'),'')						AS clsNm
+			
+			,P02UPTCOD											AS uptCd
+			,SUM(P02TOTMAE)										AS totAmt
+			,SUM(P02HALIN) 										AS halAmt
+			,SUM(P02SUNMAE)										AS saleAmt
+			,SUM(INT(P02MPOINT*100))							AS salePoint
+			,SUBSTR(P02TIME,1,2)||':'||SUBSTR(P02TIME,3,2)||':'||SUBSTR(P02TIME,5,2)	AS saleTime
+			
+		FROM SCDRDB.SCDP02LF1 -- 입력된 포인트카드로 주민번호찾고 그 주민번호로 된 포인트카드를 찾아 입력 기간중의 포인트카드 매출 출력하기 위함
+                INNER JOIN -- 주민번호로 포인트카드
+                (SELECT P01WHEGU WHEGU, P01SEQNO SEQNO, P01CHECK CHK
+                 FROM SCDRDB.SCDP01LF2 A
+	                 INNER JOIN (SELECT P01JUMIN1 JU1,P01JUMIN2 JU2 -- 포인트카드로 주민번호
+	                 FROM SCDRDB.SCDP01PF
+	                         WHERE P01JUM = '01'
+	                         AND P01WHEGU = SUBSTR(${onlineChk},1,2)
+	                         AND P01SEQNO = SUBSTR(${onlineChk},3,6)
+	                         AND P01CHECK = SUBSTR(${onlineChk},9,1)
+	                         --AND P01WHEGU = SUBSTR('9020860160109266',1,2)
+	                         --AND P01SEQNO = SUBSTR('9020860160109266',3,6)
+	                         --AND P01CHECK = SUBSTR('9020860160109266',9,1)
+	                         ) B
+	                 ON B.JU1 = A.P01JUMIN1 AND B.JU2 = A.P01JUMIN2
+	                 ) C
+                ON P02WHEGU = C.WHEGU AND P02SEQNO = C.SEQNO AND P02CHECK = CHK
+		
+		--WHERE P02JUM   = ${jum}
+		WHERE P02JUM   = '01'
+--		AND P02WHEGU = SUBSTR(${onlineChk},1,2)
+--		AND P02SEQNO = SUBSTR(${onlineChk},3,6)
+--		AND P02CHECK = SUBSTR(${onlineChk},9,1)
+		AND P02MAEY1||P02MAEY2||P02MAEM||P02MAED &gt;= ${frDate}
+		AND P02MAEY1||P02MAEY2||P02MAEM||P02MAED &lt;= ${toDate}
+		
+		AND P02MAEGU IN ('1','2')
+		AND P02REGINO >= '6000' --포인트조정 제외
+		GROUP BY P02MAEJUM -- P02여러클래스 찍을때 SEQ 증가하는거 더해서 출력
+                        ,P02WHEGU,P02SEQNO,P02CHECK,P02SAGU,P02RBALNO
+                        ,P02MAEY1,P02MAEY2,P02MAEM,P02MAED
+                        ,P02REGINO,P02SLPNO
+                        --,replace(P02CLSNAME,'　','')
+                        ,REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(
+                 REPLACE(P02CLSNAME
+                                ,'　','')
+                                ,('（면）'),'')
+                                ,('（정）'),'')
+                                ,('（행）'),'')
+                                ,('（균）'),'')
+                                ,('（한）'),'')
+                                ,('（특）'),'')
+                                ,('（Ｆ）'),'')
+                                ,('（전시）'),'')
+                                ,('（교육）'),'')
+                                ,('（배달）'),'')
+                                ,('（２）'),'')
+                        
+                        ,P02UPTCOD
+                        ,SUBSTR(P02TIME,1,2)||':'||SUBSTR(P02TIME,3,2)||':'||SUBSTR(P02TIME,5,2)		
+		ORDER BY P02MAEY1||P02MAEY2||P02MAEM||P02MAED DESC, P02REGINO DESC, P02SLPNO DESC
+	</select>
+
+</mapper>
+
+

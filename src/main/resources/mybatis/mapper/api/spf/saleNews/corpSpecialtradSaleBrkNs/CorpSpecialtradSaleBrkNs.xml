@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.corpSpecialtradSaleBrkNs.CorpSpecialtradSaleBrkNsMapper">
+	
+		<select id="getCorpSpecialtradSaleBrkNslist"
+		parameterType="com.saydept.api.spf.saleNews.corpSpecialtradSaleBrkNs.model.CorpSpecialtradSaleBrkNsParamModel"
+		resultType="com.saydept.api.spf.saleNews.corpSpecialtradSaleBrkNs.model.CorpSpecialtradSaleBrkNsModel">
+	
+SELECT SUBSTRING(IS0102,1,4)||'/'||SUBSTRING(IS0102,5,2)||'/'||SUBSTRING(IS0102,7,2) as mdate
+        ,MS0408 				as pcNm
+        ,IS0104||'-'||IS0105 	as cls
+        ,MS0604 				as clsNm
+        ,IS0117 				as spcsale
+        FROM ${dbType}SPFRDB.SPFI01LF1
+        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF
+        ON MS0401 = IS0103 AND MS0402 = IS0106 AND MS0403 = IS0107 AND MS0404 = IS0108
+        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM06PF
+        ON MS0601 = IS0103 AND MS0602 = IS0104 AND MS0603 = IS0105
+WHERE IS0102 &gt;= #{frDate}
+        AND IS0102 &lt;= #{toDate}
+        AND IS0117 != 0
+
+
+	</select>
+
+</mapper>
+
+

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.clsPlnNetSaleSlt.ClsPlnNetSaleSltMapper">
+
+<!-- null 단위 조회 -->
+<sql id="Typln_sql">
+SELECT IS0707, SUM(IS0709) Splan
+		         	FROM ${dbType}SPFRDB.SPFI07LF2 
+		         	WHERE IS0703 = '01' AND IS0702 &gt;= #{frDateLy} AND IS0702 &lt;= #{toDateLy}
+		            GROUP BY IS0707
+</sql>
+
+<sql id="Tspln_sql">
+SELECT IS0707, SUM(IS0709) Splan
+		          	FROM ${dbType}SPFRDB.SPFI07LF2 
+		            WHERE IS0703 = '01'  AND IS0702 &gt;= #{frDate} AND IS0702 &lt;= #{toDate}
+		            GROUP BY IS0707
+</sql>
+
+<sql id="LastSale_sql">
+SELECT IS0104, SUM(IS0129) Netsale
+					FROM ${dbType}SPFRDB.SPFI01LF12
+					WHERE IS0103 = '01' AND IS0102 &gt;= #{frDateLy} AND IS0102 &lt;= #{toDateLy}
+					GROUP BY IS0104 
+</sql>
+
+<sql id="ThisSale_sql">
+SELECT IS0104, SUM(IS0129) Netsale
+					FROM ${dbType}SPFRDB.SPFI01LF12
+					WHERE IS0103 = '01' AND IS0102 &gt;= #{frDate} AND IS0102 &lt;= #{toDate}
+					GROUP BY IS0104 
+</sql>
+
+
+	<select id="getClsPlnNetSaleSltlist"
+		parameterType="com.saydept.api.spf.saleNews.clsPlnNetSaleSlt.model.ClsPlnNetSaleSltParamModel"
+		resultType="com.saydept.api.spf.saleNews.clsPlnNetSaleSlt.model.ClsPlnNetSaleSltModel">
+
+WITH
+TA1(cls,clsnm,thisYySplan,thisYyNetsale,thisYyAchivmentrate,lastYySplan,lastYyNetsale,lastYyAchivmentrate)as(
+SELECT  
+				 TB1.MS0505 								AS cls
+				,TB1.MS0510 								AS clsNm
+				,Tspln.Splan 								AS thisYySplan
+				,ThisSale.Netsale / 1000 					AS thisYyNetsale
+				,ROUND((FLOAT(ThisSale.Netsale) / FLOAT(Tspln.Splan) / 10),2) thisYyAchivmentrate
+				,Typln.Splan 								AS lastYySplan
+				,LastSale.Netsale  / 1000 					AS lastYyNetsale
+				,ROUND((FLOAT(LastSale.Netsale) / FLOAT(Typln.Splan) / 10),2) lastYyAchivmentrate
+
+
+	FROM ${dbType}SPFRDB.SPFM05PF TB1
+	        
+		LEFT OUTER JOIN
+		         (<include refid="Typln_sql"></include>) Typln
+		        ON Typln.IS0707 = TB1.MS0505 
+		                       	
+		LEFT OUTER JOIN
+		          (<include refid="Tspln_sql"></include>) Tspln
+		        ON Tspln.IS0707 = TB1.MS0505
+		                       	
+		LEFT OUTER JOIN 	
+				(<include refid="LastSale_sql"></include>) LastSale
+				ON LastSale.IS0104 = TB1.MS0505
+				
+		LEFT OUTER JOIN 	
+				(<include refid="ThisSale_sql"></include>) ThisSale
+				ON ThisSale.IS0104 = TB1.MS0505
+	
+	<where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               TRIM(TB1.MS0501)=SUBSTR(#{tim},1,2) AND TRIM(TB1.MS0502)=SUBSTR(#{tim},3,2) AND TRIM(TB1.MS0503)=SUBSTR(#{tim},5,2)
+            </when>
+            <when test="bu != null and bu != ''">
+               TRIM(TB1.MS0501)=SUBSTR(#{bu},1,2) and TRIM(TB1.MS0502)=SUBSTR(#{bu},3,2)
+            </when>
+            <otherwise>
+               TRIM(TB1.MS0501) = #{jum}
+            </otherwise>
+         </choose>
+      </where>
+		
+		AND TB1.MS0515 = '' -- 폐기코너
+		
+		AND NOT EXISTS(SELECT MS05803 FROM ${dbType}SPFRDB.SPFM05PF8L WHERE MS05801 = '01' AND MS05803 = TB1.MS0505) -- 온라인 제외
+		
+		--AND TB1.MS0505 IN ('11913','12013','24873','23603')
+		
+		AND Tspln.Splan != 0 -- 당년 계획있는 코너만
+		AND ThisSale.Netsale != 0 -- 당년 실적있는 코너만
+
+		
+		union all
+		
+		SELECT  
+				 M58.MS05802 								AS cls
+				,TB1.MS0510 								AS clsNm
+				,Tspln.Splan 								AS thisYySplan
+				,ThisSale.Netsale / 1000 					AS thisYyNetsale
+				,ROUND((FLOAT(ThisSale.Netsale) / FLOAT(Tspln.Splan) / 10),2) thisYyAchivmentrate
+				,Typln.Splan 								AS lastYySplan
+				,LastSale.Netsale  / 1000 					AS lastYyNetsale
+				,ROUND((FLOAT(LastSale.Netsale) / FLOAT(Typln.Splan) / 10),2) lastYyAchivmentrate
+
+
+	FROM ${dbType}SPFRDB.SPFM05PF TB1
+	
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF8 M58
+		ON M58.MS05801 = '01' AND M58.MS05803 = TB1.MS0505
+	        
+		LEFT OUTER JOIN
+		         (<include refid="Typln_sql"></include>) Typln
+		        ON Typln.IS0707 = TB1.MS0505 
+		                       	
+		LEFT OUTER JOIN
+		          (<include refid="Tspln_sql"></include>) Tspln
+		        ON Tspln.IS0707 = TB1.MS0505
+		                       	
+		LEFT OUTER JOIN 	
+				(<include refid="LastSale_sql"></include>) LastSale
+				ON LastSale.IS0104 = TB1.MS0505
+				
+		LEFT OUTER JOIN 	
+				(<include refid="ThisSale_sql"></include>) ThisSale
+				ON ThisSale.IS0104 = TB1.MS0505
+	
+	<where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               TRIM(TB1.MS0501)=SUBSTR(#{tim},1,2) AND TRIM(TB1.MS0502)=SUBSTR(#{tim},3,2) AND TRIM(TB1.MS0503)=SUBSTR(#{tim},5,2)
+            </when>
+            <when test="bu != null and bu != ''">
+               TRIM(TB1.MS0501)=SUBSTR(#{bu},1,2) and TRIM(TB1.MS0502)=SUBSTR(#{bu},3,2)
+            </when>
+            <otherwise>
+               TRIM(TB1.MS0501) = #{jum}
+            </otherwise>
+         </choose>
+      </where>
+		
+		AND TB1.MS0515 = '' -- 폐기코너
+		
+		AND  EXISTS(SELECT MS05803 FROM ${dbType}SPFRDB.SPFM05PF8L WHERE MS05801 = '01' AND MS05803 = TB1.MS0505) -- 온라인
+		
+		AND Tspln.Splan != 0 -- 당년 계획있는 코너만
+		AND ThisSale.Netsale != 0 -- 당년 실적있는 코너만
+)
+
+select * from ta1
+
+
+	</select>
+
+</mapper>
+
+

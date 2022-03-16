@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.NonSalesCornerByPeriodMgtMapper">
+
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectNonSalesCornerByPeriodList" resultType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtModel"
+		parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtParamModel">
+	
+		SELECT
+				MS0501   AS  JUMNO
+		, 		MS0506   AS  JUMNAME
+		, 		MS0502   AS  BUNO
+		,       MS0507   AS  BUNAME
+		, 		MS0503   AS  TEAMNO 
+		,       MS0508   AS  TEAMNAME
+		, 		MS0504   AS  PCNO
+		,       MS0509   AS  PCNAME
+		, 		MS0505   AS  CORNERNO
+		, 		MS0510   AS  CORNERNAME
+		, 		MS0516   AS  REGIDATE
+		
+		FROM	${dbType}SPFRDB.SPFM05PF
+		--FROM	TSSPFRDB.SPFM05PF
+
+		WHERE 	MS0501 = #{jum}
+		--직매입제외 
+		AND     NOT SUBSTR(MS0505,5,1) IN ('1','2')
+		--매출발생이전 등록 코너 
+		AND     MS0516 &lt;= #{fromSaleDate}
+		--폐기되지 않은 코너
+		AND     MS0515 = ''	
+		
+		--기간매출 = 0
+	    AND    (SELECT  SUM(IS0413) 
+				FROM 	${dbType}SPFRDB.SPFI04PF
+				WHERE 	IS0404=MS0501 
+				AND 	IS0401||IS0402||IS0403 &gt;= #{fromSaleDate}
+				AND     IS0401||IS0402||IS0403 &lt;= #{toSaleDate}
+				AND     IS0408||IS0409=MS0505
+			   ) = 0	
+			   
+		--현재 재고 = 0	
+		AND    (SELECT  SUM(WS0125) 
+				FROM 	${dbType}SPFRDB.SPFW01PF TT1 						
+				WHERE 	WS0101=MS0501 
+				AND     WS0102=MS0505 
+				AND 	WS0104=(SELECT 	MAX(TT2.WS0104) 
+				                FROM 	${dbType}SPFRDB.SPFW01PF TT2 
+				                WHERE 	TT2.WS0101=TT1.WS0101 
+				                AND   	TT2.WS0102=TT1.WS0102
+				                AND   	TT2.WS0103=TT1.WS0103)
+			   ) = 0 	
+			   
+		ORDER BY MS0501, MS0502, MS0503, MS0504, MS0505, MS0516
+		
+	</select>
+	
+	<update id="updateNonSalesCornerClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtCornerClosedModel">
+		UPDATE	${dbType}SPFRDB.SPFM05PF
+		--UPDATE	TSSPFRDB.SPFM05PF
+		SET		MS0515=#{cornerClosedDate}
+		,		MS0517=#{updateDate}
+		WHERE   MS0501=#{jum} 
+		AND     MS0505=#{cornerNo}
+	</update>
+	
+	
+</mapper>

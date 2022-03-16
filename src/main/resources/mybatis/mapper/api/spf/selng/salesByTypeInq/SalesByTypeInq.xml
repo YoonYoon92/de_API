@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.salesByTypeInq.SalesByTypeInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSalesByTypeInqList" resultType="com.saydept.api.spf.selng.salesByTypeInq.model.SalesByTypeInqModel" parameterType="com.saydept.api.spf.selng.salesByTypeInq.model.SalesByTypeInqParamModel" fetchSize="1000">
+		/*selectSalesByTypeInqList*/
+		
+		SELECT  
+		 
+				IS0103||IS0106
+				<if test="bu != null and bu !=''">
+				||IS0107
+				</if>
+				<if test="tim != null and tim !=''">
+				||IS0108
+				</if>
+				<if test="pc != null and pc !=''">
+				||IS0109||IS0110		
+				</if>		
+				       AS ORGCD,
+		        
+				<choose>
+			        <when test="pc != null and pc !=''">
+			        MS0510
+			        </when>
+			        <when test="tim != null and tim !=''">
+			        MS0408
+			        </when>
+			        <when test="bu != null and bu !=''">
+			        MS0407
+			        </when>
+			        <otherwise>
+					MS0406 
+					</otherwise>
+				</choose>        
+		               AS ORGNAME, 
+		        SUM(IS0113) AS CASH,
+		        SUM(IS0114) AS CARD,
+		        SUM(IS0115) AS NORCRDT,
+		        SUM(IS0119+IS0121) AS GIFT,
+		        SUM(IS0124) AS COD,
+		        SUM(IS0116 + IS0117 + IS0118 + IS0120 + IS0122 + IS0123 + IS0125 + IS0126 + IS0127 + IS0128) AS ETC,
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0129 ELSE 0 END) AS NORMAL,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0129 ELSE 0 END) AS EVENT,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0129 ELSE 0 END) AS UNIFORM,  	
+		        
+		        SUM(IS0129) AS NETAMOUNT,
+		        SUM(IS0130) AS SALEAMOUNT,
+		        SUM(IS0131) AS TOTALAMOUNT,
+		        SUM(IS0133) AS CUSTOMCNT
+        
+		FROM 	 ${dbType}SPFRDB.SPFI01PF
+		        --코너마스터
+				INNER JOIN  ${dbType}SPFRDB.SPFM05PF
+				ON  MS0501=IS0103 AND 
+					MS0505=IS0109||IS0110 
+				--클래스마스터	
+				INNER JOIN  ${dbType}SPFRDB.SPFM06PF
+				ON	MS0601=IS0103 AND 
+					MS0602=IS0104 AND 
+					MS0603=IS0105 
+				--조직코드마스터(세분류)
+				INNER JOIN  ${dbType}SPFRDB.SPFM04PF
+				ON 	MS0401=IS0103 AND 
+				   	MS0402=IS0106 AND 
+				   	MS0403=IS0107 AND 
+				   	MS0404=IS0108 
+				   
+		WHERE 
+				IS0103 = #{jum} 
+				<if test="bu != null and bu !=''">
+				AND 	MS0502 = SUBSTR(#{bu},3,2)
+				</if>
+				<if test="tim != null and tim !=''">
+				AND 	MS0503 = SUBSTR(#{tim},5,2)
+				</if>
+				<if test="pc != null and pc !=''">
+				AND 	MS0504 = SUBSTR(#{pc},7,2)
+				</if>
+				AND IS0102 &gt;= #{startDt}
+				AND IS0102 &lt;= #{endDt}
+				
+								 
+		GROUP BY 
+				IS0103||IS0106
+				<if test="bu != null and bu !=''">
+				||IS0107
+				</if>
+				<if test="tim != null and tim !=''">
+				||IS0108
+				</if>
+				<if test="pc != null and pc !=''">
+				||IS0109||IS0110		
+				</if>		
+		        ,
+			    <choose>
+			        <when test="pc != null and pc !=''">
+			        MS0510
+			        </when>
+			        <when test="tim != null and tim !=''">
+			        MS0408
+			        </when>
+			        <when test="bu != null and bu !=''">
+			        MS0407
+			        </when>
+			        <otherwise>
+					MS0406 
+					</otherwise>
+				</choose>        
+		
+		ORDER BY ORGCD
+
+	</select>
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSalesByTypeInqDetail" resultType="com.saydept.api.spf.selng.salesByTypeInq.model.SalesByTypeInqDetailModel" parameterType="com.saydept.api.spf.selng.salesByTypeInq.model.SalesByTypeInqParamModel" fetchSize="1000">
+		/*selectSalesByTypeInqDetail*/
+		
+		SELECT  
+		        
+		        --현금
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0113 ELSE 0 END) AS CASH01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0113 ELSE 0 END) AS CASH02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0113 ELSE 0 END) AS CASH03,
+		        SUM(IS0113) AS CASH,
+		        --카드
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0114 ELSE 0 END) AS CARD01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0114 ELSE 0 END) AS CARD02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0114 ELSE 0 END) AS CARD03,
+		        SUM(IS0114) AS CARD,
+		        --일반외상
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0115 ELSE 0 END) AS NORCRDT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0115 ELSE 0 END) AS NORCRDT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0115 ELSE 0 END) AS NORCRDT03,
+		        SUM(IS0115) AS NORCRDT,
+		        --상품권
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0119+IS0121 ELSE 0 END) AS GIFT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0119+IS0121 ELSE 0 END) AS GIFT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0119+IS0121 ELSE 0 END) AS GIFT03,
+		        SUM(IS0119+IS0121) AS GIFTTOTAL,
+		        --COD
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0124 ELSE 0 END) AS COD01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0124 ELSE 0 END) AS COD02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0124 ELSE 0 END) AS COD03,
+		        SUM(IS0124) AS COD,
+		        --기타
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0116 + IS0117 + IS0118 + IS0120 + IS0122 + IS0123 + IS0125 + IS0126 + IS0127 + IS0128 ELSE 0 END) AS ETC01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0116 + IS0117 + IS0118 + IS0120 + IS0122 + IS0123 + IS0125 + IS0126 + IS0127 + IS0128 ELSE 0 END) AS ETC02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0116 + IS0117 + IS0118 + IS0120 + IS0122 + IS0123 + IS0125 + IS0126 + IS0127 + IS0128 ELSE 0 END) AS ETC03,
+		        SUM(IS0116 + IS0117 + IS0118 + IS0120 + IS0122 + IS0123 + IS0125 + IS0126 + IS0127 + IS0128) AS ETC,        
+		        --순매출
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0129 ELSE 0 END) AS NETAMOUNT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0129 ELSE 0 END) AS NETAMOUNT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0129 ELSE 0 END) AS NETAMOUNT03,
+		        SUM(IS0129) AS NETAMOUNT,
+		        --할인
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0130 ELSE 0 END) AS SALEAMOUNT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0130 ELSE 0 END) AS SALEAMOUNT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0130 ELSE 0 END) AS SALEAMOUNT03,
+		        SUM(IS0130) AS SALEAMOUNT,
+		        --총매출
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0131 ELSE 0 END) AS TOTALAMOUNT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0131 ELSE 0 END) AS TOTALAMOUNT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0131 ELSE 0 END) AS TOTALAMOUNT03,
+		        SUM(IS0131) AS TOTALAMOUNT,
+		        --고객수
+		        SUM(CASE WHEN IS0111 = '01' THEN IS0133 ELSE 0 END) AS CUSTOMCNT01,
+		        SUM(CASE WHEN IS0111 = '02' THEN IS0133 ELSE 0 END) AS CUSTOMCNT02,
+		        SUM(CASE WHEN IS0111 = '03' THEN IS0133 ELSE 0 END) AS TCUSTOMCNT03,
+		        SUM(IS0133) AS CUSTOMCNT
+        
+		FROM 	 ${dbType}SPFRDB.SPFI01PF
+		        --코너마스터
+				INNER JOIN  ${dbType}SPFRDB.SPFM05PF
+				ON  MS0501=IS0103 AND 
+					MS0505=IS0109||IS0110 
+				--클래스마스터	
+				INNER JOIN  ${dbType}SPFRDB.SPFM06PF
+				ON	MS0601=IS0103 AND 
+					MS0602=IS0104 AND 
+					MS0603=IS0105 
+				--조직코드마스터(세분류)
+				INNER JOIN  ${dbType}SPFRDB.SPFM04PF
+				ON 	MS0401=IS0103 AND 
+				   	MS0402=IS0106 AND 
+				   	MS0403=IS0107 AND 
+				   	MS0404=IS0108 
+				   
+		WHERE 
+				IS0103 = #{jum}
+				<if test="bu != null and bu !=''"> 
+				AND     MS0502 = SUBSTR(#{detailInqOrgCd},3,2)
+				</if>
+				<if test="tim != null and tim !=''">
+				AND 	MS0503 = SUBSTR(#{detailInqOrgCd},5,2)
+				</if>
+				<if test="pc != null and pc !=''">
+				AND 	MS0504 = SUBSTR(#{detailInqOrgCd},7,2)
+				</if>
+				<if test="corner != null and corner !=''">
+				AND 	MS0505 = SUBSTR(#{detailInqOrgCd},9,5)
+				</if>
+				<if test="key != null and key !=''">
+				AND 	MS0603 = SUBSTR(#{detailInqOrgCd},14,2)
+				</if>
+				AND IS0102 &gt;= #{startDt}
+				AND IS0102 &lt;= #{endDt}
+								 
+
+	</select>  
+
+</mapper>

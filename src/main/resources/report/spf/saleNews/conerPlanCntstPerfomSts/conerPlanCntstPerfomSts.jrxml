@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fb6e4b8f-ea8e-4300-8083-71a78214b3f6">
+	<parameter name="startDt" class="java.lang.String"/>
+	<parameter name="toDt" class="java.util.Date"/>
+	<parameter name="pgId" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="jumNm" class="java.lang.String"/>
+	<field name="buNm" class="java.lang.String"/>
+	<field name="pcNm" class="java.lang.String"/>
+	<field name="conerNm" class="java.lang.String"/>
+	<field name="coner" class="java.lang.String"/>
+	<field name="lastyearAchivmentrate" class="java.lang.Double"/>
+	<field name="lastyearSplan" class="java.lang.Double"/>
+	<field name="lastyearTry" class="java.lang.Double"/>
+	<field name="ddSplan" class="java.lang.Double"/>
+	<field name="mmSplan" class="java.lang.Double"/>
+	<field name="yySplan" class="java.lang.Double"/>
+	<field name="ddTry" class="java.lang.Double"/>
+	<field name="mmTry" class="java.lang.Double"/>
+	<field name="yyTry" class="java.lang.Double"/>
+	<field name="ddAchivmentrate" class="java.lang.Double"/>
+	<field name="mmAchivmentrate" class="java.lang.Double"/>
+	<field name="yyAchivmentrate" class="java.lang.Double"/>
+	<variable name="sumlastyearTry" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{lastyearTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{lastyearTry}]]></initialValueExpression>
+	</variable>
+	<variable name="sumlastyearSplan" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{lastyearSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{lastyearSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="sumlastyearAchivmentrate" class="java.lang.Double" resetType="Group" resetGroup="Group2">
+		<variableExpression><![CDATA[$V{sumlastyearSplan}/$V{sumlastyearTry}]]></variableExpression>
+	</variable>
+	<variable name="sumddTry" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{ddTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{ddTry}]]></initialValueExpression>
+	</variable>
+	<variable name="summmTry" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{mmTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{mmTry}]]></initialValueExpression>
+	</variable>
+	<variable name="sumyyTry" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{yyTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{yyTry}]]></initialValueExpression>
+	</variable>
+	<variable name="sumddSplan" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{ddSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{ddSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="summmSplan" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{mmSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{mmSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="sumyySplan" class="java.lang.Double" resetType="Group" resetGroup="Group2" calculation="Sum">
+		<variableExpression><![CDATA[$F{yySplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{yySplan}]]></initialValueExpression>
+	</variable>
+	<variable name="sumddAchivmentrate" class="java.lang.Double" resetType="Group" resetGroup="Group2">
+		<variableExpression><![CDATA[$V{sumddSplan}/$V{sumddTry}]]></variableExpression>
+	</variable>
+	<variable name="summmAchivmentrate" class="java.lang.Double" resetType="Group" resetGroup="Group2">
+		<variableExpression><![CDATA[$V{summmSplan}/$V{summmTry}]]></variableExpression>
+	</variable>
+	<variable name="sumyyAchivmentrate" class="java.lang.Double" resetType="Group" resetGroup="Group2">
+		<variableExpression><![CDATA[$V{sumyySplan}/$V{sumyyTry}]]></variableExpression>
+	</variable>
+	<variable name="totalsumlastyearTry" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{lastyearTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{lastyearTry}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumlastyearSplan" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{lastyearSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{lastyearSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumlastyearAchivmentrate" class="java.lang.Double">
+		<variableExpression><![CDATA[$V{totalsumlastyearSplan}/$V{totalsumlastyearTry}]]></variableExpression>
+	</variable>
+	<variable name="totalsumddTry" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{ddTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{ddTry}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsummmTry" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{mmTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{mmTry}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumyyTry" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{yyTry}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{yyTry}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumddSplan" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{ddSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{ddSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsummmSplan" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{mmSplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{mmSplan}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumyySplan" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{yySplan}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{yySplan}]]></initialValueExpression>
+	</variable>
+	<variable name="totalsumddAchivmentrate" class="java.lang.Double">
+		<variableExpression><![CDATA[$V{totalsumddSplan}/$V{totalsumddTry}]]></variableExpression>
+	</variable>
+	<variable name="totalsummmAchivmentrate" class="java.lang.Double">
+		<variableExpression><![CDATA[$V{totalsummmSplan}/$V{totalsummmTry}]]></variableExpression>
+	</variable>
+	<variable name="totalsumyyAchivmentrate" class="java.lang.Double">
+		<variableExpression><![CDATA[$V{totalsumyySplan}/$V{totalsumyyTry}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{buNm}]]></groupExpression>
+		<groupHeader>
+			<band height="2"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="79">
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="446" y="45" width="60" height="16" backcolor="#FFFFFF" uuid="479ae760-9942-4ae6-b25d-9169b69daebc">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsummmTry}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="506" y="45" width="58" height="16" backcolor="#FFFFFF" uuid="5cfbe14c-a70f-4ff8-ae10-17c71b3dfb90">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsummmSplan}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="564" y="45" width="46" height="16" backcolor="#FFFFFF" uuid="c3c1b6ce-cda5-495f-a104-c2d8631e4030">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsummmAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="610" y="45" width="60" height="16" backcolor="#FFFFFF" uuid="ab45bd03-806a-453f-85ae-6a4a1df72077">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumyyTry}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="282" y="45" width="60" height="16" backcolor="#FFFFFF" uuid="f6aff692-48f5-4f43-8530-7916f3ad1d2e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumddTry}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="730" y="45" width="44" height="16" backcolor="#FFFFFF" uuid="2f28dcf4-bc98-49ef-9deb-54997047ba96">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumyyAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="342" y="45" width="60" height="16" backcolor="#FFFFFF" uuid="195dbd82-7774-46ca-a115-63f794112c88">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumddSplan}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="118" y="45" width="61" height="16" backcolor="#FFFFFF" uuid="31b70e5a-d233-498c-bd3a-a149578c91af">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumlastyearTry}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="402" y="45" width="44" height="16" backcolor="#FFFFFF" uuid="5b51a37d-a69f-497a-a961-a8961c590227">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumddAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="1" y="14" width="117" height="47" backcolor="#3579E6" uuid="ac04b377-eee5-49ea-9a8a-3991eb104ea7">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="1">
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[팀   합   계]]></text>
+				</staticText>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="179" y="45" width="58" height="16" backcolor="#FFFFFF" uuid="2a54ae1b-fc3c-4276-800d-a6f9d57ef3b7">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumlastyearSplan}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="670" y="45" width="60" height="16" backcolor="#FFFFFF" uuid="0c1595b4-33c1-424d-8c35-d6a53dd42778">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumyySplan}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="237" y="45" width="45" height="16" backcolor="#FFFFFF" uuid="3932493b-6046-493a-8174-12251599455e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalsumlastyearAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="446" y="14" width="164" height="15" backcolor="#3579E6" uuid="ba096d3b-b680-4b32-93eb-fbfaaae6310c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+						<bottomPen lineWidth="1.0" lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당월현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="610" y="14" width="164" height="15" backcolor="#3579E6" uuid="4e892ede-adb0-429f-a428-055079ac5e41">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+						<bottomPen lineWidth="1.0" lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당년현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="118" y="14" width="164" height="16" backcolor="#3579E6" uuid="e5febd70-dd93-4985-8ed6-ce6ad648a854">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+						<bottomPen lineWidth="1.0" lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[전년당일현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="282" y="14" width="164" height="15" backcolor="#3579E6" uuid="b99ea01d-7284-4d2a-ad45-ea76fdef01f3">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+						<bottomPen lineWidth="1.0" lineStyle="Double"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당일현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="610" y="29" width="60" height="16" backcolor="#3579E6" uuid="9144a629-3ec9-4ac5-81df-d129dffc6236">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="179" y="29" width="58" height="16" backcolor="#3579E6" uuid="529e413a-e1cd-4837-a845-abaa1f5d4397">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="564" y="29" width="46" height="16" backcolor="#3579E6" uuid="2e9b0c7c-5b14-4b2d-86b4-4fbf0ba40e10">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="670" y="29" width="60" height="16" backcolor="#3579E6" uuid="814e1154-f7c8-42f4-928d-d243db148f1b">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="342" y="29" width="60" height="16" backcolor="#3579E6" uuid="cb99429e-6012-4fe0-8b37-99e3fbd063f4">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="402" y="29" width="44" height="16" backcolor="#3579E6" uuid="b7d55a20-c542-4f2a-ae89-2c8f5a696323">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="237" y="29" width="45" height="16" backcolor="#3579E6" uuid="5798bc75-47b2-44b4-8de0-958989906cb5">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="446" y="29" width="60" height="16" backcolor="#3579E6" uuid="90cb7403-75e1-42d5-bd68-1f81c8c6af57">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="730" y="29" width="44" height="16" backcolor="#3579E6" uuid="caf0d5f2-2962-4dc3-99bc-20f11b94e814">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="282" y="29" width="60" height="16" backcolor="#3579E6" uuid="75f735bc-12d3-4613-b485-c93fae280511">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="118" y="29" width="61" height="16" backcolor="#3579E6" uuid="3e356f5d-e426-4f83-b327-b026e23f1f9f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="506" y="29" width="58" height="16" backcolor="#3579E6" uuid="b06cbcc4-48dc-4c83-b2a8-acc587071db1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="Group2" isStartNewPage="true" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{pcNm}]]></groupExpression>
+		<groupHeader>
+			<band height="79">
+				<staticText>
+					<reportElement mode="Opaque" x="610" y="47" width="164" height="16" backcolor="#E6F6FC" uuid="081dd997-525d-4dcd-9f1a-41a49cc4d924">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당년현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="238" y="63" width="44" height="16" backcolor="#E6F6FC" uuid="db2b8a72-cffe-451f-8758-49899033c106">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="282" y="47" width="164" height="16" backcolor="#E6F6FC" uuid="09dce320-e7a1-4b55-82ca-7784069d1544">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당일현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="118" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="9a89fcad-28f1-4f27-a988-cddb30a74739">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="39" y="47" width="79" height="32" backcolor="#E6F6FC" uuid="14ea1660-030a-4572-af91-635866bb1b5d">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[코너명]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="446" y="47" width="164" height="16" backcolor="#E6F6FC" uuid="fa21d887-060a-4cb2-b7c9-ebfcc819df33">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[당월현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="1" y="47" width="38" height="32" backcolor="#E6F6FC" uuid="4ba031d5-af2f-4113-b981-620d90aad54f">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[코너]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="118" y="47" width="164" height="16" backcolor="#E6F6FC" uuid="50b9a675-7c9a-411e-a3a3-95ddf1664c26">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[전년당일현황]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="13" width="18" height="14" uuid="1d9b39dd-8be7-4bac-b2d2-47278668ba2f">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[부:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="20" y="13" width="79" height="14" uuid="430d5a0c-1174-4470-be4a-ff7e2a9829c8"/>
+					<textElement textAlignment="Left">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{buNm}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="20" y="-1" width="79" height="14" uuid="1e31fbe6-8a24-4d14-8347-8e90f81d402b"/>
+					<textElement textAlignment="Left">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{jumNm}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="2" y="27" width="18" height="14" uuid="54919a92-0d22-4934-9dad-647608f9762f">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[PC:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="2" y="-1" width="18" height="14" uuid="58ac4bd9-14e3-4e52-aeee-8c76ee694c67">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement>
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[점:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="20" y="27" width="79" height="14" uuid="fade4db7-a3ff-4b9b-b57c-9e935d21157e"/>
+					<textElement textAlignment="Left">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pcNm}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="178" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="29540a10-cc29-432c-b16e-6f051bc371d8">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="342" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="393d9385-6318-4589-bfd3-5d03afa15419">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="402" y="63" width="44" height="16" backcolor="#E6F6FC" uuid="cf08e0b7-2714-4c5a-bbcf-29a566b68e99">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="282" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="9185543e-05bc-4c94-ae4b-0cbf6ff00940">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="506" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="0b7e17a7-a581-405d-8e82-b7fe0badb3d1">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="566" y="63" width="44" height="16" backcolor="#E6F6FC" uuid="7946789e-03f6-44af-80e7-941d5cb5bd6d">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="446" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="edb33653-a68f-46ae-8906-a224b9f6aa1c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="670" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="532e6aee-7215-4016-8c9c-02d9d4006f60">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[실적]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="730" y="63" width="44" height="16" backcolor="#E6F6FC" uuid="0c27ab5e-2815-4464-a685-580373d9126c">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[달성율]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="610" y="63" width="60" height="16" backcolor="#E6F6FC" uuid="c98cfc99-505e-4c0e-a83c-027b10f84f30">
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box>
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[목표]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="238" y="0" width="44" height="16" backcolor="#DCE6F5" uuid="c8123bb5-131c-4440-b7d4-32eb80ec4976">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumlastyearAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="178" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="aaaf4740-0bba-4fc0-968c-bec26e5e1925">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumlastyearSplan}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="610" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="d279012a-1bbd-4073-a58f-c241b837a249">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumyyTry}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="118" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="d4b9990d-16f8-49c7-8b1b-de892621dd7f">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumlastyearTry}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="446" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="29349b66-36e1-4c4f-adc7-9e230a3993d4">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{summmTry}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="730" y="0" width="44" height="16" backcolor="#DCE6F5" uuid="a58c861b-1d2b-451d-b364-5f610e3e34ed">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumyyAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="282" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="29476077-6ab9-4c3a-aaf9-19074743e3cc">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumddTry}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="566" y="0" width="44" height="16" backcolor="#DCE6F5" uuid="388573ea-aff3-44c1-ae4b-046acc4cf477">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{summmAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="1" y="0" width="117" height="16" backcolor="#DCE6F5" uuid="dab99bed-83dd-4700-8565-891b891a2ec4">
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="1">
+						<pen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Ssof" size="7"/>
+					</textElement>
+					<text><![CDATA[합   계]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="670" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="cfc7d794-61d7-44b2-9d34-e64e8947b31b">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumyySplan}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0.##%">
+					<reportElement mode="Opaque" x="402" y="0" width="44" height="16" backcolor="#DCE6F5" uuid="806c2ee3-5f1b-4a71-b551-9b27070c4677">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumddAchivmentrate}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="506" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="3179eaa3-9d47-4e8a-b4fd-8fc02ab03646">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{summmSplan}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="Group2" pattern="#,##0;-#,##0">
+					<reportElement mode="Opaque" x="342" y="0" width="60" height="16" backcolor="#DCE6F5" uuid="792cd16a-abdc-4dc6-8a04-19be5202d00e">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+					</reportElement>
+					<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+						<pen lineWidth="0.5" lineStyle="Solid"/>
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sumddSplan}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="35" splitType="Stretch">
+			<textField>
+				<reportElement x="-20" y="-1" width="842" height="18" uuid="a31ab0a1-033d-4919-b3d0-207bd5e82b45"/>
+				<textElement textAlignment="Center">
+					<font fontName="Ssof" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["코너별 계획대비 매출실적 현황-순매출"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-20" y="21" width="150" height="14" uuid="43f294ee-85ae-49ed-a20f-9bbd72fb2a8e"/>
+				<textElement textAlignment="Center">
+					<font fontName="Ssof" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<<"+$P{pgId}+">>"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="-20" y="0" width="842" height="16" uuid="367a0515-5722-4635-86b1-3740df9e3494"/>
+				<textElement textAlignment="Center">
+					<font fontName="Ssof" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["매출일자 : " +$P{startDt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="10" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="702" y="0" width="72" height="10" uuid="4e82b81f-8c22-43ad-9bc8-3b1c8071e850">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Ssof" size="7"/>
+				</textElement>
+				<text><![CDATA[[단위: 건, 천원]]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isBlankWhenNull="true">
+				<reportElement key="" x="1" y="0" width="38" height="17" uuid="d96f5932-7cf1-4f75-9a81-5e338e8f1b5c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="979560b6-54cb-404c-ab39-7134425bb6c0"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{coner}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="39" y="0" width="79" height="17" uuid="1168cdf2-3c3c-43b9-8963-06a4ee20e62e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="979560b6-54cb-404c-ab39-7134425bb6c0"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" bottomPadding="0" rightPadding="0">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Ssof" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{conerNm}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="238" y="0" width="44" height="17" uuid="e48bcc69-a9d8-44d8-ad3f-429522c9bae9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lastyearAchivmentrate}+"%"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="118" y="0" width="60" height="17" uuid="c0973460-9d17-4629-93c0-ef7990f7f788">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lastyearTry}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="178" y="0" width="60" height="17" uuid="2e74f4a8-8d12-4e8e-ad6e-8fb9464fe762">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lastyearSplan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="402" y="0" width="44" height="17" uuid="a9617dab-d3dc-4e04-bf0a-91f6107b23e0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ddAchivmentrate}+"%"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="342" y="0" width="60" height="17" uuid="e0a81b92-129d-4141-9971-d05142d36c96">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ddSplan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="282" y="0" width="60" height="17" uuid="3bd788b1-7e9f-47d1-acac-5c80ff031792">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ddTry}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="566" y="0" width="44" height="17" uuid="d9190f31-17df-464e-8420-b13adc2f240e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mmAchivmentrate}+"%"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#">
+				<reportElement x="730" y="0" width="44" height="17" uuid="5f12dbb4-0e19-449c-9d31-a3f14d5181d9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4e71556f-e740-4098-8a1c-208f1dbdfec3"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{yyAchivmentrate}+"%"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="506" y="0" width="60" height="17" uuid="3266ff5b-584d-45ad-b2bb-d388072ed447">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mmSplan}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="446" y="0" width="60" height="17" uuid="e82fd2c1-14fa-4697-98f4-aae02f0cbae7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mmTry}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="610" y="0" width="60" height="17" uuid="c059749c-04ed-4220-8ac7-6e4a6cf35ca7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{yyTry}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0;-#,##0">
+				<reportElement x="670" y="0" width="60" height="17" uuid="f0cb34c2-2b7c-44eb-8aaa-1d07ecd31fd0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bfe65d8d-8073-47d2-8e08-7269cc896bfb"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="1">
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{yySplan}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="60">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField pattern="Y/MM/d" isBlankWhenNull="false">
+				<reportElement x="-2" y="6" width="22" height="16" uuid="e65bd4c8-b622-4b06-9385-b9aff505b862"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Ssof" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="6" width="78" height="16" uuid="0fd41d4e-c7f1-41a1-a58b-ceed85d5dfeb">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page: " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="408" y="6" width="100" height="16" uuid="f1dcbd9f-f022-406a-8a6f-2015ac95a5d1"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" / " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="y/M/d">
+				<reportElement x="20" y="6" width="100" height="16" uuid="da584efd-e8b0-420d-b455-af0453fca280"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch"/>
+	</summary>
+</jasperReport>

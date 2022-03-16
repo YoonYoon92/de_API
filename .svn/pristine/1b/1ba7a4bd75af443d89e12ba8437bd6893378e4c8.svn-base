@@ -1,0 +1,14 @@
+package com.saydept.api.login;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.saydept.api.login.model.LoginModel;
+
+@Mapper
+public interface LoginMapper {
+
+	List<LoginModel> selectGridList(LoginModel request);
+
+}

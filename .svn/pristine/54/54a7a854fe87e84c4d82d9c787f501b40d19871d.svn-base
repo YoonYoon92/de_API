@@ -1,0 +1,103 @@
+package com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel;
+import com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel;
+import com.saydept.utils.SayUtils;
+
+	@Service
+	public class PCLastYearCntstIncrsrateInqService {
+
+	@Autowired
+	private PCLastYearCntstIncrsrateInqMapper PCLastYearCntstIncrsrateInqMapper;
+	@Autowired
+	private SayUtils sayUtils;
+
+	public List<PCLastYearCntstIncrsrateInqModel> PCLastYearCntstIncrsrateInqList(PCLastYearCntstIncrsrateInqParamModel request) throws ParseException {
+		
+		
+		
+		List<PCLastYearCntstIncrsrateInqModel> resultList = new ArrayList<PCLastYearCntstIncrsrateInqModel>();
+		
+		PCLastYearCntstIncrsrateInqModel tempModel = null;		//전체결과
+		PCLastYearCntstIncrsrateInqModel resultModel = null;	//목표
+		PCLastYearCntstIncrsrateInqModel resultModel2 = null;	//전년실적
+		PCLastYearCntstIncrsrateInqModel resultModel3 = null;	//실적
+//		List<PCLastYearCntstIncrsrateInqParamModel> paramresultList = new ArrayList<PCLastYearCntstIncrsrateInqParamModel>();
+		
+		/**
+		 * 1. 해당 코너 리스트 조회
+		 */
+		List<PCLastYearCntstIncrsrateInqParamModel> CornerList = PCLastYearCntstIncrsrateInqMapper.getConerlist(request);
+		for( PCLastYearCntstIncrsrateInqParamModel data :  CornerList) {
+			
+			//전체결과값
+			tempModel = new PCLastYearCntstIncrsrateInqModel();
+			//목표
+			resultModel = new PCLastYearCntstIncrsrateInqModel();		
+			//전년실적
+			resultModel2 = new PCLastYearCntstIncrsrateInqModel();		
+			//실적
+			resultModel3 = new PCLastYearCntstIncrsrateInqModel();	
+			
+			data.setTim( request.getTim() );
+			data.setStartDt( request.getStartDt() );
+			data.setEndDt( request.getEndDt() );
+
+			
+			data.setLastyearstartDt( sayUtils.getCusomYear(request.getStartDt(), -1 ));
+			data.setLastyearendDt( sayUtils.getCusomYear(request.getEndDt(), -1 ));
+			
+			
+			resultModel = PCLastYearCntstIncrsrateInqMapper.getSaleGoal(data);
+			resultModel2 = PCLastYearCntstIncrsrateInqMapper.getlastyearSale(data);
+			resultModel3 = PCLastYearCntstIncrsrateInqMapper.getSale(data);
+			
+			tempModel.setConer( data.getConer() );
+			tempModel.setConerNm( data.getConerNm() );
+			tempModel.setTry( resultModel == null ? 0 : resultModel.getTry() );
+			tempModel.setLastyearSplan( resultModel2 == null? 0 : (resultModel2.getLastyearSplan())/1000 );
+			tempModel.setSplan( resultModel3 == null? 0 : (resultModel3.getSplan())/1000 );
+			tempModel.setIncrsrate((tempModel.getSplan()/tempModel.getLastyearSplan())*100);
+			tempModel.setAchivmentrate((tempModel.getSplan()/tempModel.getTry())*100);
+			resultList.add(tempModel);
+			
+//			data.setTim( request.getTim() );
+//			data.setStartDt( request.getStartDt() );
+//			data.setEndDt( request.getEndDt() );
+//			System.out.println(data);
+//			resultModel = PCLastYearCntstIncrsrateInqMapper.getSaleGoal(data); 
+//			
+//			resultModel2 = PCLastYearCntstIncrsrateInqMapper.getlastyearSale(data);
+//			if( resultModel != null ) {
+//				resultModel.setConerNm( data.getConerNm() );
+//				resultList.add(resultModel);
+//			}
+	
+//			resultModel = PCLastYearCntstIncrsrateInqMapper.getlastyearSale(data);
+//			if (resultModel !=null) {
+//				resultList.add(resultModel);
+//			}
+//		
+		}
+		
+		
+		
+//		
+//		for( PCLastYearCntstIncrsrateInqModel data: resultList ) {
+//			request.setConer( data.getConer() );
+//			PCLastYearCntstIncrsrateInqModel SaleGoal =  PCLastYearCntstIncrsrateInqMapper.getSaleGoal(request);
+//			data.setTry( SaleGoal == null ? 0 : SaleGoal.getTry() );
+//		}
+		
+		return resultList;
+
+		
+	}
+}

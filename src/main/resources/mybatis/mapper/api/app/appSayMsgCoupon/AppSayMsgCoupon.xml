@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.app.appSayMsgCoupon.AppSayMsgCouponMapper">
+
+<!-- null 단위 조회 -->
+
+	<select id="getAppSayMsgCouponlist"
+		parameterType="com.saydept.api.app.appSayMsgCoupon.model.AppSayMsgCouponParamModel"
+		resultType="com.saydept.api.app.appSayMsgCoupon.model.AppSayMsgCouponModel">
+
+
+WITH
+P01(JU1,JU2,WHENO)AS(
+SELECT P01JUMIN1,P01JUMIN2,P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK   
+		FROM SCDRDB.SCDP01PF 
+		WHERE P01JUM = #{jum} 
+		AND P01WHEGU = SUBSTR(#{onlineChk},1,2)
+		AND P01SEQNO = SUBSTR(#{onlineChk},3,6)
+		AND P01CHECK = SUBSTR(#{onlineChk},9,1)
+		--WHERE P01JUM = '01'
+		--AND P01WHEGU = SUBSTR('9020860160109266',1,2)
+		--AND P01SEQNO = SUBSTR('9020860160109266',3,6)
+		--AND P01CHECK = SUBSTR('9020860160109266',9,1)
+		)
+
+SELECT
+  	 C61JUM AS jum
+  	,trim(C61HPNO) AS cdNo 
+	,C61COUPON AS cpNo
+	,replace(C61CGBNNM,'　','') AS cpName
+	,C61DATE AS cpFdate1
+	,T63.C63FDATE AS cpFdate
+	,T63.C63TDATE AS cpTdate
+	,C61CGBN AS cpGubun
+	,C61DCGU AS cpType
+	,C61DCPER AS cpDcPer
+	,C61DCMNY AS cpDcWon
+	,C61CP_TNO AS cpTno
+	,C61CP_UNO AS cpUno
+	,C61CP_JNO AS cpJno
+--	,RIGHT('  '||C63BU0,2)||RIGHT('  '||C63BU1,2)||RIGHT('  '||C63BU2,2)||RIGHT('  '||C63BU3,2) as buNo
+--	,C63ZONE as zoneNo
+--	,RIGHT('     '||C63CLSNO1,5)||'-'||C63CLSNO2 as clsNo
+--	,MS0510 as clsNm
+
+FROM SCDRDB.SCDC61LF4
+	INNER JOIN P01
+	ON JU1 = C61JUMIN1 AND JU2 = C61JUMIN2
+	LEFT OUTER JOIN 
+	(SELECT DISTINCT C63JUM,C63CGBN,C63YY, C63SEQ,C63FDATE,C63TDATE 
+		FROM SCDRDB.SCDC63PF 
+	) T63
+	ON T63.C63JUM = C61JUM AND T63.C63CGBN = C61CGBN AND T63.C63YY = C61YY AND T63.C63SEQ = C61SEQ
+--	LEFT OUTER JOIN SPFRDB.SPFM05PF
+--	ON MS0501 = C63JUM AND MS0505 = C63CLSNO1
+--	WHERE C61DATE = '20200601' 
+	WHERE	C61DATE &gt;= #{frDate}
+	AND		C61DATE &gt;= #{toDate}
+
+	</select>
+
+</mapper>
+
+

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.dashboard.DashboardMapper">
+	
+	<!-- 종합  매출액, 목표액,  달성률 -->
+	<select id="selectAchiv" resultType="com.saydept.api.dashboard.model.AchivModel" parameterType="com.saydept.api.dashboard.model.RequestModel">
+		/*selectAchiv*/
+		WITH
+	/* day Data */
+		TA1(dayNetTry,dayNetSale) AS(		
+			SELECT 	sum(TB1.IS05106*1000) 		AS dayNetTry
+			, 		0 							
+			FROM 	SPFRDB.SPFI05PF1 TB1
+			WHERE	TB1.IS05101 = #{saleDate}
+			AND 	TB1.IS05102 = #{jum}
+		),
+		TA2(dayNetTry,dayNetSale) AS(
+			SELECT 	0 							
+			, 		sum(TB1.IS0129) 			AS dayNetSale
+			FROM	SPFRDB.SPFI01PF	TB1
+			WHERE	TB1.IS0102 = #{saleDate}
+			AND     TB1.IS0103 = #{jum}
+		),
+		TA3(dayNetTry,dayNetSale) AS(
+			SELECT dayNetTry,dayNetSale FROM TA1
+			UNION 
+			SELECT dayNetTry,dayNetSale FROM TA2
+		),
+		
+		TA11(dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate) AS(
+			SELECT	SUM(dayNetSale) 										AS dayNetSale
+			, 		SUM(dayNetTry)	 										AS dayNetTry
+			,       (SUM(float(dayNetSale)) / SUM(float(dayNetTry))) * 100  AS dayAchivRate
+			,0,0,0,0,0,0
+			FROM 	TA3
+		),
+		
+	/* month Data */
+		TA4(monthNetTry,monthNetSale) AS(		
+			SELECT 	sum(TB1.IS05106*1000) 	AS monthNetTry
+			, 		0 
+			FROM 	SPFRDB.SPFI05PF1 TB1
+			WHERE	TB1.IS05101  &gt;= SUBSTR(#{saleDate},1,6)||'01'
+			AND     TB1.IS05101 &lt;= #{saleDate}
+			AND 	TB1.IS05102 = #{jum}
+		),
+		TA5(monthNetTry,monthNetSale) AS(
+			SELECT 	0 
+			, 		sum(TB1.IS0129) 		AS monthNetSale
+			FROM	SPFRDB.SPFI01PF	TB1
+			WHERE	TB1.IS0102  &gt;= SUBSTR(#{saleDate},1,6)||'01'
+			AND     TB1.IS0102 &lt;= #{saleDate}
+			AND     TB1.IS0103 = #{jum}
+		),
+		TA6(monthNetTry,monthNetSale) AS(
+			SELECT monthNetTry,monthNetSale FROM TA4
+			UNION 
+			SELECT monthNetTry,monthNetSale FROM TA5
+		),
+		
+		TA22(dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate)	AS(
+			SELECT	0,0,0
+			,		SUM(monthNetSale) 												AS monthNetSale
+			, 		SUM(monthNetTry)	 											AS monthNetTry
+			,       (SUM(float(monthNetSale))  / SUM(float(monthNetTry))) * 100   	AS monthchivRate
+			,0,0,0
+			FROM 	TA6
+		),
+		
+		
+	/* year Data */
+		TA7(yearNetTry,yearNetSale) AS(		
+			SELECT 	sum(TB1.IS05106*1000) 	AS yearNetTry
+			, 		0 
+			FROM 	SPFRDB.SPFI05PF1 TB1
+			WHERE	TB1.IS05101 &gt;= SUBSTR(#{saleDate},1,4)||'0101'
+			AND     TB1.IS05101 &lt;= #{saleDate}
+			AND 	TB1.IS05102 = #{jum}
+		),
+		TA8(yearNetTry,yearNetSale) AS(
+			SELECT 	0 
+			, 		sum(TB1.IS0129) 		AS yearNetTry
+			FROM	SPFRDB.SPFI01PF	TB1
+			WHERE	TB1.IS0102 &gt;= SUBSTR(#{saleDate},1,4)||'0101'
+			AND     TB1.IS0102 &lt;= #{saleDate}
+			AND     TB1.IS0103 = #{jum}
+		),
+		TA9(yearNetTry,yearNetSale) AS(
+			SELECT yearNetTry,yearNetSale FROM TA7
+			UNION 
+			SELECT yearNetTry,yearNetSale FROM TA8
+		),
+				
+		TA33(dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate)	AS(
+			SELECT	0,0,0,0,0,0
+			,		SUM(yearNetSale) 											AS yearNetSale
+			, 		SUM(yearNetTry)	 											AS yearNetTry
+			,       (SUM(float(yearNetSale)) / SUM(float(yearNetTry))) * 100   	AS yearAchivRate
+			FROM 	TA9
+		),
+		
+	/* online Data */
+			TAon1(onNetSaleDay,onNetSaleMonth,onNetSaleYear) AS(
+				SELECT 	sum(TB1.IS0129), 0, 0
+				FROM	SPFRDB.SPFI01PF	TB1
+				WHERE	TB1.IS0102 = #{saleDate}
+				AND     TB1.IS0103 = #{jum}
+				AND 	SUBSTR(TB1.IS0104,1,1) &lt; '0'
+			),
+			
+			TAon2(onNetSaleDay,onNetSaleMonth,onNetSaleYear) AS(
+				SELECT 	0, sum(TB1.IS0129), 0
+				FROM	SPFRDB.SPFI01PF	TB1
+				WHERE	TB1.IS0102 &gt;= SUBSTR(#{saleDate},1,6)||'01'
+				AND     TB1.IS0102 &lt;= #{saleDate}
+				AND     TB1.IS0103 = #{jum}
+				AND 	SUBSTR(TB1.IS0104,1,1) &lt; '0'
+			),
+			
+			TAon3(onNetSaleDay,onNetSaleMonth,onNetSaleYear) AS(
+				SELECT 	0, 0, sum(TB1.IS0129)
+				FROM	SPFRDB.SPFI01PF	TB1
+				WHERE	TB1.IS0102 &gt;= SUBSTR(#{saleDate},1,4)||'0101'
+				AND     TB1.IS0102 &lt;= #{saleDate}
+				AND     TB1.IS0103 = #{jum}
+				AND 	SUBSTR(TB1.IS0104,1,1) &lt; '0'
+			),
+			
+			TAon4(dayOnlineNetSale,monthOnlineNetSale,yearOnlineNetSale) AS(
+				SELECT onNetSaleDay,onNetSaleMonth,onNetSaleYear FROM TAon1
+				UNION
+				SELECT onNetSaleDay,onNetSaleMonth,onNetSaleYear FROM TAon2
+				UNION
+				SELECT onNetSaleDay,onNetSaleMonth,onNetSaleYear FROM TAon3				
+			),
+			
+			TA44(dayOnlineNetSale,monthOnlineNetSale,yearOnlineNetSale) AS(			
+				SELECT 	SUM(dayOnlineNetSale)   	AS dayOnlineNetSale
+				,		SUM(monthOnlineNetSale)     AS monthOnlineNetSale
+				,		SUM(yearOnlineNetSale)      AS yearOnlineNetSale
+				FROM    TAon4
+			),
+				
+		
+		
+		/* ALL Data Union */
+		TA99(dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate,dayOnlineNetSale ) AS(
+			SELECT 	dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate,0  	FROM TA11
+			UNION
+			SELECT 	dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate,0  	FROM TA22
+			UNION 	
+			SELECT 	dayNetSale,dayNetTry,dayAchivRate,monthNetSale,monthNetTry,monthAchivRate,yearNetSale,yearNetTry,yearAchivRate,0 	FROM TA33
+			UNION
+			SELECT 	0,0,0,0,0,0,0,0,0, dayOnlineNetSale  FROM TA44
+		)
+		
+		/* Final Data */
+		SELECT 		SUM(dayNetSale)						AS dayNetSale
+		,			SUM(dayNetTry)     					AS dayNetTry
+		,			ROUND( SUM(dayAchivRate), 2)		AS dayAchivRate
+		,			SUM(monthNetSale)					AS monthNetSale
+		,			SUM(monthNetTry)					AS monthNetTry
+		,			ROUND( SUM(monthAchivRate), 2)		AS monthAchivRate
+		,			SUM(yearNetSale)					AS yearNetSale
+		,			SUM(yearNetTry)						AS yearNetTry
+		,			ROUND( SUM(yearAchivRate), 2)		AS yearAchivRate
+		,			SUM(dayOnlineNetSale)   			AS dayOnlineNetSale
+		FROM TA99
+		
+	</select>
+	
+	<!-- 시간대별 매출조회-->
+	<select id="selectTimeZoneList" resultType="com.saydept.api.dashboard.model.TimeZoneUnitModel" parameterType="com.saydept.api.dashboard.model.TimeZoneModel">
+		/*selectDashboard*/
+		WITH 
+		/**
+		 * 시간대별 실적(당일)
+		 */                         
+		TA01A AS (
+			SELECT 	CASE  WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END 
+																											AS TIMEZONE,
+					SUM(IS5012) AS SALEAMOUNT					
+			FROM	SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{saleDate}			
+			AND 	IS5003 = '01'
+			GROUP BY CASE WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END  
+			ORDER BY TIMEZONE
+		)
+
+		/**
+		 * 시간대별 실적(전주동요일)
+		 */
+		,
+		TA01B AS (
+			SELECT 	CASE  WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END 
+																											AS TIMEZONE,
+					SUM(IS5012) AS SALEAMOUNT					
+			FROM	SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{oldWeekSaleDate}			
+			AND 	IS5003 = '01'
+			GROUP BY CASE WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END  
+			ORDER BY TIMEZONE
+		)
+		
+		/**
+		 * 시간대별 실적(전년동요일)
+		 */
+		,
+		TA01C AS (
+			SELECT 	CASE  WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END 
+																											AS TIMEZONE,
+					SUM(IS5012) AS SALEAMOUNT					
+			FROM	SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{oldYearSaleDate}			
+			AND 	IS5003 = '01'
+			GROUP BY CASE WHEN (IS5007 &lt;='10') 						THEN '~11시'
+					      WHEN (IS5007 &gt;='11' AND IS5007 &lt;='12')  THEN '~13시'
+					      WHEN (IS5007 &gt;='21') 						THEN '~24시'
+					      ELSE												 '~'||SUBSTR(DIGITS(IS5007+1),9,2)||'시' END
+			ORDER BY TIMEZONE
+		)
+		
+	/**
+	 * DASHBOARD 시간대별 속보 화면 JOIN 
+	 */
+	SELECT  TA01A.TIMEZONE,
+			TA01A.SALEAMOUNT AS saleAmount,
+			TA01B.SALEAMOUNT AS oldWeekSaleAmount,
+			TA01C.SALEAMOUNT AS oldYearSaleAmount		
+	FROM 	TA01A
+			INNER JOIN TA01B
+			ON 	TA01A.TIMEZONE=TA01B.TIMEZONE
+			INNER JOIN TA01C
+			ON 	TA01A.TIMEZONE=TA01C.TIMEZONE
+	ORDER BY TA01A.TIMEZONE
+		
+	</select>
+	
+	<!-- 행사장 매출 조회 -->
+	<select id="selectEventSaleList" resultType="com.saydept.api.dashboard.model.EventSaleUnitModel" parameterType="com.saydept.api.dashboard.model.DashboardModel">
+		/*selectEventSaleList*/
+		SELECT 
+				TB1.IS0901||TB1.IS0902||TB1.IS0903 saleDate
+				,TB2.MS4103	eventNm
+				,SUM(TB1.IS0929) 			netSale
+		FROM SPFRDB.SPFI09PF   			TB1
+		LEFT OUTER JOIN SPFRDB.SPFM41PF TB2
+		ON TB2.MS4101 = TB1.IS0904 AND TB2.MS4102 = TB1.IS0905
+	WHERE TB1.IS0901 = SUBSTR(#{saleDate},1,4)
+	AND TB1.IS0902 = SUBSTR(#{saleDate},5,2) 
+	AND TB1.IS0903 = SUBSTR(#{saleDate},7,2)
+	GROUP BY 	TB1.IS0901 || TB1.IS0902 || TB1.IS0903
+	,	TB2.MS4103
+	</select>
+	
+	<!-- 공지사항 -->
+	<select id="selectNoticeList" resultType="com.saydept.api.dashboard.model.NoticeModel" parameterType="com.saydept.api.dashboard.model.RequestModel">
+		/*selectNoticeList*/
+		SELECT 	MS81MYY  	AS NoticeDate 	/*년도*/
+		,		MS81MID		AS Seq			/*순번*/
+		,		MS81TITLE	AS Title		/*제목*/
+		,		MS82RCHK	AS ReadYn		/*읽음여부*/
+		,		MS81MSG  	AS desc
+		FROM	SPFRDB.SPFM81PF
+		INNER JOIN SPFRDB.SPFM82PF 
+		ON	MS82RSABUN = #{userId}
+		AND	MS82MYY=MS81MYY 
+		AND	MS82MID=MS81MID
+		WHERE MS81MYY=SUBSTR(#{saleDate},1,4)
+		ORDER BY MS81MYY DESC
+		,		 MS81MID DESC
+	</select>
+	
+	<!-- 컴플레인 조회 -->
+	<select id="selectComplainList" resultType="com.saydept.api.dashboard.model.ComplainModel" parameterType="com.saydept.api.dashboard.model.RequestModel">
+		/*selectComplainList*/
+		select 	CJ0101||CJ0102||CJ0103 	AS RcpDate /*접수일*/
+		,		CJ0104					AS RcpSeq  /*접수번호*/
+		,  	 	CJ0129||CJ0130||CJ0131	AS EndDate /*종료일*/
+		,		CJ0208					AS Title   /*내용*/
+		
+		FROM SCSRDB.SCCJ01PF
+		INNER JOIN SCSRDB.SCCJ02PF
+		ON	CJ0200 ='01' 			/*점*/
+		AND CJ0201 = CJ0101 		/*년*/
+		AND	CJ0202 = CJ0102			/*월*/
+		AND	CJ0203 = CJ0103			/*일*/
+		AND CJ0204 = CJ0104			/*접수번호*/
+		AND     CJ0205= '1'
+        AND     CJ0206= 'H'
+        AND     CJ0207= 1
+		WHERE	CJ0101||CJ0102||CJ0103 &lt;= #{saleDate}
+		ORDER BY RcpDate DESC, RcpSeq DESC
+		fetch first 20 rows only
+	</select>
+</mapper>

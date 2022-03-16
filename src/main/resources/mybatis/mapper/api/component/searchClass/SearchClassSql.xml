@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.component.searchClass.SearchClassMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="BuyReqDocRegistModel" type="com.saydept.api.component.searchClass.model.SearchClassModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSearchClass" resultType="com.saydept.api.component.searchClass.model.SearchClassModel" parameterType="com.saydept.api.component.searchClass.model.SearchClassParamModel" fetchSize="1000">
+		/*selectSearchClass*/
+		SELECT  MS0601 			AS jum
+		,		MS0606			AS featureCd
+		,		MS0618			AS bu
+		,		MS0619			AS team
+		,		MS0620			AS pc
+		,		MS0607			AS partner
+		,		MS0609			AS purchaseMargin
+		,		trim(MS0617)			AS jumName
+		,		trim(MS0621)			AS buName
+		,		trim(MS0622)			AS teamName
+		,		trim(MS0623)			AS pcName
+		,		MS0602||MS0603	AS classNo 
+		,		TRIM(SUBSTR(MS0604,1,23))||X'0F'	AS className
+		,       MS0625          AS codeCrtDate
+		,       MS0627          AS codeDispDate
+		FROM 	${dbType}SPFRDB.SPFM06PF  
+		WHERE	
+				MS0601 = #{jum} 
+		AND    (MS0602||MS0603 LIKE '%${searchClass}%'	   
+		OR		UPPER(MS0604) LIKE UPPER('%${searchClassFullCharUpper}%')
+		OR		LOWER(MS0604) LIKE LOWER('%${searchClassFullCharLower}%')
+		OR		UPPER(MS0604) LIKE UPPER('%${searchClassUpper}%') 
+		OR		LOWER(MS0604) LIKE LOWER('%${searchClassLower}%')
+		OR		MS0604 LIKE '%${searchClassFullChar}%'
+		OR		MS0604 LIKE '%${searchClass}%'
+		OR		MS0604 LIKE LOWER('%${searchClass}%')
+		OR		MS0604 LIKE UPPER('%${searchClass}%')
+		) 
+				
+		ORDER BY MS0602||MS0603
+	</select>
+
+</mapper>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.scd.custmer.dmEventHisInq.DmEventHisInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDmEventHisInqList" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" fetchSize="1000">
+		/*selectDmEventHisInqList*/		
+		SELECT  T02HSF                         AS EVENTSTARTDT 
+		,		T02HST                         AS EVENTENDDT
+		,		T02JUM||T02BU||T02TIM||T02PC   AS ORGCD
+		,		T02CONO                        AS CORNO
+		,       CASE WHEN MS0510 IS NOT NULL THEN MS0510 ELSE '' END  AS CORNM
+		,		T02HSGU1||T02HSGU2||DIGITS(T02HSSEQ)   AS EVENTNO
+		,		T02HSNAME                      AS EVENTNM
+		,		CASE WHEN T02DMGU='1' THEN 'DM'
+		             WHEN T02DMGU='2' THEN 'SMS'
+		             WHEN T02DMGU='3' THEN 'LIST'
+		             WHEN T02DMGU='4' THEN 'EMAIL'
+		             				  ELSE '기타' END AS DMSORTATION
+		,		T02BALIL                       AS SENDDT
+		,		T02BALCNT                      AS SENDCNT
+		, 		CASE WHEN T02WSTS=''  THEN '작업대기|blue'
+		             WHEN T02WSTS='P' THEN '작업중|red'
+		             WHEN T02WSTS='E' THEN '작업완료|black'
+		             WHEN T02WSTS='X' THEN '전산작업|orange'
+		             END                       AS EVENTSTS
+		,		T02INDATE                      AS REGIDT
+		,		T02UPDATE                      AS UPDDT
+		FROM 	${dbType}SCDRDB.SCDT02PF sp 
+				LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+				ON MS0501=T02JUM AND MS0505=T02CONO
+		WHERE 	T02JUM = #{jum} 
+		AND 	T02HSF &gt;= #{startDt}
+		AND 	T02HSF &lt;= #{endDt}
+	    ORDER BY EVENTSTARTDT, ORGCD, CORNO, EVENTNO
+	</select>
+	
+	
+	
+	
+	<!-- DM행사내역 마감처리(E) update  SCDT02PF -->
+	<update id="updateDmEventT02End" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--상태코드가  발송가능(작업) "P"인경우 완료처리(E)
+		UPDATE	${dbType}SCDRDB.SCDT02PF
+		SET		T02WSTS='E'
+		,       T02FIL1=SUBSTR(CHAR(CURTIME()),1,2)||SUBSTR(CHAR(CURTIME()),4,2)||SUBSTR(CHAR(CURTIME()),7,2)
+						||TO_CHAR(CURDATE() , 'YYYYMMDD') 
+		WHERE   T02JUM=#{jum} 
+		AND     T02HSF=#{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,5))		
+		AND     (T02WSTS='P')
+	</update>
+	
+	<!-- DM행사내역 재전송처리(E,X -> P) update  SCDT02PF -->
+	<update id="updateDmEventT02ReWork" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--발생완료 처리된 DM행사내역을 재발송 가능도록 변경
+		UPDATE	${dbType}SCDRDB.SCDT02PF
+		SET		T02WSTS='P'
+		,       T02FIL1=SUBSTR(CHAR(CURTIME()),1,2)||SUBSTR(CHAR(CURTIME()),4,2)||SUBSTR(CHAR(CURTIME()),7,2)
+						||TO_CHAR(CURDATE() , 'YYYYMMDD') 
+		WHERE   T02JUM=#{jum} 
+		AND     T02HSF=#{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+		AND     (T02WSTS='X' OR T02WSTS='E')
+	</update>
+	
+	<!-- DM행사내역 전산작업(X) update  SCDT02PF -->
+	<update id="updateDmEventT02XWork" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--발생완료 처리된 DM행사내역을 재발송 가능도록 변경
+		UPDATE	${dbType}SCDRDB.SCDT02PF
+		SET		T02WSTS='X'
+		,       T02FIL1=SUBSTR(CHAR(CURTIME()),1,2)||SUBSTR(CHAR(CURTIME()),4,2)||SUBSTR(CHAR(CURTIME()),7,2)
+						||TO_CHAR(CURDATE() , 'YYYYMMDD') 
+		WHERE   T02JUM=#{jum} 
+		AND     T02HSF=#{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+	</update>
+	
+	<!-- DM행사내역 발송대상자 초기화 update  SCDT02PF -->
+	<update id="updateDmEventT02Init" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--완료(E)전, 발송대상자가 생성된 DM행사내역을 초기화해 발송대상자생전으로 변경
+		UPDATE	${dbType}SCDRDB.SCDT02PF
+		SET		T02WSTS=CASE WHEN T02WSTS &lt;&gt; 'X' THEN '' ELSE 'X' END
+		,       T02FIL1=''
+		,		T02BALCNT=0
+		WHERE   T02JUM=#{jum} 
+		AND     T02HSF=#{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+		AND     (T02WSTS='X' OR T02WSTS='P')
+	</update>
+	
+	<!-- DM행사 대상자(T04) 초기화 update  SCDT04PF -->
+	<delete id="deleteDmEventT04Init" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--DM행사내역(T02) 초기화후 생성된 발생대상자(T04)를 삭제 처리
+		DELETE	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+	</delete>
+
+	<!-- DM행사 대상자 상권분석 (T05) 초기화 update  SCDT05PF -->
+	<delete id="deleteDmEventT05Init" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--DM행사내역(T02) 초기화후 생성된 DM대상자 상권분석(T05)를 삭제 처리
+		DELETE	${dbType}SCDRDB.SCDT05PF
+		WHERE   T05JUM=#{jum} 
+		AND     T05HSF=#{eventStartDt}
+		AND     T05HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T05HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T05HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+	</delete>
+	
+	<!-- DM행사 대상자(T04) 상위 N개 DELETE  SCDT04PF -->
+	<delete id="deleteDmEventT04DelUp" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--DM대상자(T04) 선정금액,건수 상위순 정렬후 상위 N개 삭제 처리
+		DELETE	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,2)
+		AND     T04HSSEQ=SUBSTR(#{eventNo},5,3)
+		AND     T04JUMIN1||T04JUMIN2
+		 		IN (SELECT  T04JUMIN1||T04JUMIN2
+					FROM 	${dbType}SCDRDB.SCDT04PF sp 
+					WHERE 	T04JUM =#{jum} 
+					AND     T04HSF=#{eventStartDt}
+					AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+					AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+					AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+					ORDER BY T04YMCNT DESC, T04YMGUM DESC
+					FETCH FIRST #{SELCNT} ROWS ONLY)
+					
+	</delete>
+	
+	<!-- DM행사 대상자(T04) 하위 N개 DELETE  SCDT04PF -->
+	<delete id="deleteDmEventT04DelDown" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--DM대상자(T04) 선정금액,건수 하위순 정렬후 상위 N개 삭제 처리
+		DELETE	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,2)
+		AND     T04HSSEQ=SUBSTR(#{eventNo},5,3)
+		AND     T04JUMIN1||T04JUMIN2
+		 		IN (SELECT  T04JUMIN1||T04JUMIN2
+					FROM 	${dbType}SCDRDB.SCDT04PF sp 
+					WHERE 	T04JUM =#{jum} 
+					AND     T04HSF=#{eventStartDt}
+					AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+					AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+					AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+					ORDER BY T04YMCNT ASC, T04YMGUM ASC
+					FETCH FIRST #{SELCNT} ROWS ONLY)
+					
+	</delete>
+	
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDmEventHisInqT04Count" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" fetchSize="1000">
+	--발송대상자(T04) 건수
+		/*selectDmEventHisInqT04Count*/		
+		SELECT  COUNT(*) AS T04BALCNT
+		FROM 	${dbType}SCDRDB.SCDT04PF sp 
+		WHERE 	T04JUM =#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+	</select>
+	
+	<!-- DM행사내역 발송대상자 update(T04대상자기준)  SCDT02PF -->
+	<update id="updateDmEventT02SendCnt" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel">
+	--T04발송대상자 기준 발송대상자수 UPDATE
+		UPDATE	${dbType}SCDRDB.SCDT02PF
+		SET		T02BALCNT= CASE WHEN ${T04BALCNT}>=99999 THEN 99999 ELSE ${T04BALCNT} END
+		WHERE   T02JUM=#{jum} 
+		AND     T02HSF=#{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+		AND     (T02WSTS='X' OR T02WSTS='P')
+	</update>
+	
+	
+	<!-- DM행사 세부내역 (T03)-->
+	<select id="selectDmEventHisInqT03" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqT03Model">
+		SELECT 	T03HJONO        AS COND
+		,       T03HSNM         AS CONDNM
+		,		T03HJOGUN       AS CONDDTL
+		FROM 	${dbType}SCDRDB.SCDT03PF
+		WHERE   T03JUM=#{jum} 
+		AND     T03HSF=#{eventStartDt}
+		AND     T03HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T03HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T03HSSEQ=INT(SUBSTR(#{eventNo},6,5))		
+		ORDER BY T03HJONO, T03HJOGUN 
+	</select>
+	
+	<!-- DM행사 대상자 생성 내역 -->
+	<select id="selectDmEventHisInqT04CrtPson" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqT04Model">
+		SELECT  
+				T04JUMIN1||T04JUMIN2        AS JUMIN
+		,		T04WHENO                    AS MEMBERNO
+		,		SUBSTR(T04HNAME,1,9)        AS MEMBERNM
+		,       T04YMCNT                    AS SELCNT
+		,       T04YMGUM                    AS SELAMT		
+		FROM 	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))
+		ORDER BY SELAMT DESC, T04YMCNT DESC 		
+	</select>
+	
+	<!-- 목록조회 fetchSize="2000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDmEventHisInqT02" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" fetchSize="2000">
+		/*selectDmEventHisInqT02*/		
+		SELECT  T02HSF                                 AS EVENTSTARTDT 
+		,		T02HSGU1||T02HSGU2||DIGITS(T02HSSEQ)   AS EVENTNO
+		,		T02HSNAME                              AS EVENTNM
+		FROM 	${dbType}SCDRDB.SCDT02PF sp 
+		WHERE 	T02JUM = #{jum} 
+		AND 	T02HSF = #{eventStartDt}
+		AND     T02HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T02HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T02HSSEQ=INT(SUBSTR(#{eventNo},6,3))
+	</select>
+	
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDmEventHisInqM12" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqModel" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" fetchSize="1000">
+		/*selectDmEventHisInqM12*/		
+		SELECT  M12GUBUN                               AS COMMERDISTCD
+		,		M12SNAM                                AS COMMERDISTNM
+		,		M12GNAM                                AS COMMERDISTARNM
+		FROM 	${dbType}SCDRDB.SCDM12PF sp 
+		WHERE 	M12GUBUN = #{commerDistCd}
+	</select>
+	
+	<!-- DM행사 세부내역 (T04) 매출액 최대/최소-->
+	<select id="selectDmEventHisInqT04MaxMin" parameterType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqParamModel" resultType="com.saydept.api.scd.custmer.dmEventHisInq.model.DmEventHisInqT03Model">
+		SELECT 	'0A'                     AS COND
+		,       '선정매출액(MAX)'          AS CONDNM
+		,		CASE WHEN MAX(T04YMGUM) IS NULL THEN 0 ELSE DIGITS(MAX(T04YMGUM)) END   AS CONDDTL
+		FROM 	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))		
+		UNION ALL
+		SELECT 	'0B'                     AS COND
+		,       '선정매출액(MIN)'          AS CONDNM
+		,		CASE WHEN MIN(T04YMGUM) IS NULL THEN 0 ELSE DIGITS(MIN(T04YMGUM)) END  AS CONDDTL
+		FROM 	${dbType}SCDRDB.SCDT04PF
+		WHERE   T04JUM=#{jum} 
+		AND     T04HSF=#{eventStartDt}
+		AND     T04HSGU1=SUBSTR(#{eventNo},1,2)
+		AND     T04HSGU2=SUBSTR(#{eventNo},3,3)
+		AND     T04HSSEQ=INT(SUBSTR(#{eventNo},6,5))		
+	</select>
+</mapper>

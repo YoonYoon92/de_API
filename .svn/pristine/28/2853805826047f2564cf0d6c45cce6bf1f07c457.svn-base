@@ -1,0 +1,25 @@
+package com.saydept.api.spf.saleNews.weekTimeSaleNews;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsModel;
+import com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsParamModel;
+
+@Mapper
+public interface WeekTimeSaleNewsMapper {
+
+	WeekTimeSaleNewsModel selectWeekTimeSaleNews(WeekTimeSaleNewsModel request);
+
+	List<WeekTimeSaleNewsModel> selectWeekTimeSaleNewsList(WeekTimeSaleNewsParamModel request);
+
+	int updateWeekTimeSaleNews(WeekTimeSaleNewsModel request);
+
+	int insertWeekTimeSaleNews(WeekTimeSaleNewsModel request);
+
+	int saveWeekTimeSaleNews(WeekTimeSaleNewsModel request);
+
+	int deleteWeekTimeSaleNews(WeekTimeSaleNewsModel request);
+
+}

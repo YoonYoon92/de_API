@@ -1,0 +1,85 @@
+package com.saydept.api.dashboard;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.dashboard.model.DashboardModel;
+
+@Service
+public class DashboardService {
+	
+	@Autowired
+	private DashboardMapper dashboardMapper;
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public DashboardModel selectDashboard(DashboardModel request)throws Exception {
+		// TODO Auto-generated method stub
+		DashboardModel result = dashboardMapper.selectDashboard(request);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public List<DashboardModel> selectDashboardList(DashboardModel request)throws Exception {
+		// TODO Auto-generated method stub
+		List<DashboardModel> result = dashboardMapper.selectDashboardList(request);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateDashboard(DashboardModel request)throws Exception {
+		// TODO Auto-generated method stub
+		int result = dashboardMapper.updateDashboard(request);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public int insertDashboard(DashboardModel request) {
+		// TODO Auto-generated method stub
+		int result = dashboardMapper.insertDashboard(request);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public int saveDashboard(DashboardModel request) {
+		// TODO Auto-generated method stub
+		int result = dashboardMapper.saveDashboard(request);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public int deleteDashboard(DashboardModel request) {
+		// TODO Auto-generated method stub
+		int result = dashboardMapper.deleteDashboard(request);
+		return result;
+	}
+
+}

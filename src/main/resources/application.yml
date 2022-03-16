@@ -1,0 +1,54 @@
+#spring: 
+#  http:
+#    encoding:
+#      charset: UTF-8
+#      force: true
+#      force-request: true
+#      force-response: true
+#logging:
+#  config: classpath:logback-spring.xml
+#  
+##내장 톰켓 설정
+#server:
+#  port: 8080  #원하는 포트로 변경
+#  servlet:
+#    session:
+#      timeout: 7200 #session timeout 2시간, 별도의 WAS 서버를 설치해서 배포하는 경우는 해당 WAS 서버에서 session timeout 설정해야함
+#
+
+
+spring: 
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      force-request: true
+      force-response: true
+logging:
+  config: classpath:logback-spring.xml
+
+---
+#운영 환경 셋팅
+spring:
+  profiles: real
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 7200 #session timeout 2시간, 별도의 WAS 서버를 설치해서 배포하는 경우는 해당 WAS 서버에서 session timeout 설정해야함
+env:
+  dbType : 
+  desc : 'real server'
+---
+#개발환경 셋팅
+spring:
+  profiles: dev
+server:
+  port: 8000
+  servlet:
+    session:
+      timeout: 7200 #session timeout 2시간, 별도의 WAS 서버를 설치해서 배포하는 경우는 해당 WAS 서버에서 session timeout 설정해야함
+env:
+  dbType : TS
+  desc : 'Test server'
+

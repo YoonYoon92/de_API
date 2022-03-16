@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.puchas.buyReqManagement.BuyReqManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="buyReqManagementModel" type="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectBuyReqManagement" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		/*selectBuyReqManagement*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectBuyReqManagementList" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		/*selectBuyReqManagementList*/
+		SELECT ...
+	</select>
+	<!-- 전표년도 -->
+	<select id="chitYearList" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT DISTINCT (OS0101) as chitYear 
+		FROM ${dbType}SPFRDB.SPFO01PF
+		ORDER BY OS0101 DESC
+
+	</select>
+	<select id="chitSearchResult" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT OS0101       	as	chitYear
+				,OS0102      	as	chitNum
+				,OS0103      	as	orderDt
+				,OS0104      	as	jum
+				,OS0105      	as	bu
+				,OS0106      	as	tim
+				,OS0107      	as	pc
+				,OS0108||OS0109	as cls
+				,OS0108||OS0109||'('||tRIM(MS0604)||')' as clsNm
+				,OS0110      							as	partner
+				,OS0110||'('||tRIM(MS0804)||')'      	as	partnerNm	     
+				,OS0111      	as	featureCd
+				,OS0112      	as	payDt
+				,OS0117      	as	totCost
+				,OS0118      	as	totPrice
+				,MS0609			AS purchaseMargin
+			--	,MS0606			AS featureCd
+			
+		FROM ${dbType}SPFRDB.SPFO01PF
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM06PF
+		ON MS0601='01' AND MS0602=OS0108 AND MS0603=OS0109
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM08PF
+		ON MS0801='01' AND MS0802=OS0110 
+
+		
+		where OS0101=#{chitYear} and OS0102=#{chitNum}
+		
+		
+
+	</select>
+		
+		<select id="chitSearchResultDetail" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+				select 	trim(OS0203)  		as itemsCd
+						,trim(OS0204) 		as itemCd
+						,trim(OS0205) 		as itemsNm
+						,OS0206        		as num
+						,OS0207        		as cost
+						,OS0208        		as totCost
+						,OS0209        		as price
+						,OS0210        		as totPrice
+						,OS0218        		as userId
+					
+				FROM ${dbType}SPFRDB.SPFO02PF
+				WHERE OS0200=#{chitYear} and OS0201=#{chitNum}
+	
+	
+	
+	</select>
+	
+	
+		<select id="checkChitNum" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT OS0303 as chitNum 
+		FROM ${dbType}SPFRDB.SPFO03PF
+		WHERE OS0301=#{chitYear} AND OS0302='O'
+
+	</select>
+	
+	
+	
+	<select id="itemList" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT MS0703 as itemCd
+				,MS0706||'('||MS0703||')' as itemNm
+				,MS0708 as itemsCd
+		FROM ${dbType}SPFRDB.SPFM07LF8
+		WHERE MS0701=#{jum} AND MS0702=#{bu} AND MS0704=substr(#{cls},1,5) AND MS0705=substr(#{cls},6,2) AND MS0738=''
+		ORDER BY MS0703
+
+	</select>
+	<select id="itemDetail" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT MS0703 as itemCd
+				,MS0706||'('||MS0703||')' as itemNm
+				,MS0708 as itemsCd
+				,MS0713 as cost
+				,MS0714 as price
+				,MS0727 as emptyCost
+		FROM ${dbType}SPFRDB.SPFM07LF8
+		WHERE MS0701=#{jum} AND MS0702=#{bu} AND MS0703=#{itemCd} AND MS0738=''
+		ORDER BY MS0703
+
+	</select>
+	<select id="checkPartner" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT 	MS0839 AS partnerStatus
+		FROM ${dbType}SPFRDB.SPFM08PF
+		WHERE MS0801=#{jum} and MS0802=#{partner}
+
+	</select>
+	<select id="itemsCdCheck" resultType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		SELECT MS1308 AS itemsCd
+				,trim(MS1309)	AS itemsNm 
+		FROM ${dbType}SPFRDB.SPFM13LF1
+		WHERE  MS1308=#{itemsCd}
+
+	</select>
+	
+	<!-- 전표번호찾아 없으면 1 -->
+	<insert id="insertChitNum" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+			INSERT INTO ${dbType}SPFRDB.SPFO03PF
+		(OS0301
+		,OS0302
+		,OS0303
+		)
+		VALUES
+		(
+		#{chitYear}
+		,'O'
+		,1
+		)
+	</insert>
+	<insert id="insertSpfo01pf" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+			INSERT INTO ${dbType}SPFRDB.SPFO01PF
+		(	OS0101  
+			,OS0102  
+			,OS0103  
+			,OS0104  
+			,OS0105  
+			,OS0106  
+			,OS0107  
+			,OS0108  
+			,OS0109  
+			,OS0110 
+			 
+			,OS0111  
+			,OS0112  
+			,OS0117  
+			,OS0118  
+			,OS0122  
+			,OS0124  
+		)
+		VALUES
+		(
+		#{chitYear}
+		,#{chitNum}
+		,#{orderDt}
+		,#{jum}
+		,#{bu}
+		,#{tim}
+		,#{pc}
+		,substr(#{cls},1,5)
+		,substr(#{cls},6,2)
+		,#{partner}
+		
+		,#{featureCd}
+		,#{payDt}
+		,#{totCost}
+		,#{totPrice}
+		,'1'
+		,#{writeTime}
+		)
+	</insert>
+		<insert id="insertSpfo02pf" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		INSERT INTO ${dbType}SPFRDB.SPFO02PF
+		(	OS0200
+			,OS0201
+			,OS0202
+			,OS0203
+			,OS0204
+			,OS0205
+			,OS0206
+			,OS0207
+			,OS0208
+			,OS0209
+			,OS0210
+			,OS0218
+		)
+		VALUES
+		(
+		#{chitYear}
+		,#{chitNum}
+		,#{chitCount}
+		,#{itemsCd}
+		,#{itemCd}
+		,#{itemsNm}
+		,#{num}
+		,#{cost}
+		,#{totCost}
+		,#{price}
+		,#{totPrice}
+		,#{userId}
+		)
+	</insert>
+	
+	<!-- 전표번호찾아 +1 -->
+	<update id="updateChitNum" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		/*updateBuyReqManagement*/
+		UPDATE ${dbType}SPFRDB.SPFO03PF 
+		SET OS0303=OS0303+1
+		WHERE OS0301=#{chitYear} AND OS0302='O'
+	</update>
+
+	<update id="updateSpfo01pf" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		/*updateBuyReqManagement*/
+		UPDATE ${dbType}SPFRDB.SPFO01PF 
+		SET OS0117=#{totCost}
+			,OS0118=#{totPrice}
+		where OS0101=#{chitYear} and OS0102=#{chitNum}
+	</update>
+	<!-- 등록 -->
+	<insert id="insertBuyReqManagement" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+	
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteBuyReqManagement" parameterType="com.saydept.api.spf.puchas.buyReqManagement.model.BuyReqManagementModel">
+		
+		delete ${dbType}SPFRDB.SPFO02PF
+		WHERE OS0200=#{chitYear} and OS0201=#{chitNum}
+	</delete>
+
+</mapper>

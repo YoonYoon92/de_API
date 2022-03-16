@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.conerBestSaleInq.ConerBestSaleInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="conerBestSaleInqModel" type="com.saydept.api.spf.selng.conerBestSaleInqInq.model.ConerBestSaleInqModel"/>
+	-->
+
+	<!-- 코너 리스트 템프 테이블 생성 (gubun=1 일반코너, gubun=2 재사용코너 -->
+	<select id="createConerBestSaleInqTempTable1" >	
+	DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB1(
+		gubun				char(1),		/* 구분  : 1 일반코너, 2 재사용코너 */
+		pcno				char(2),		/* pc */
+		pcnm				char(20),		/* pc명 */
+		corno				char(5),		/* 코너번호 */
+		cornm				char(20),		/* 코너명 */		
+		inDate				char(8),		/* 입점일(계약시작일 SPFM05PF1-MS05103)) */
+		outDate             char(8)			/* 퇴점일 */
+	)	NOT LOGGED                   
+	   	WITH REPLACE	
+	</select>
+	
+	<!-- 코너별 월별 매출 템프 테이블 생성 -->
+	<select id="createConerBestSaleInqTempTable2" >	
+	DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB2(
+		baseCorno           char(5),
+		corno				char(5),		
+		saleYYMM			char(6),
+		netSale		        double,
+		totalSale	        double						
+	)	NOT LOGGED                   
+	   	WITH REPLACE	
+	</select>
+		
+	<!-- 코너별 기네스 매출 템프 테이블 생성 -->
+	<select id="createConerBestSaleInqTempTable3" >	
+	DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB3(
+		pcNo				char(2),
+		pcNm				char(20),			
+		corNo				char(5),
+		corNm				char(20),		
+		bestYYMM			char(6),
+		bestSale	        double,
+		inDate              char(8),
+		standardSale		double		
+	)	NOT LOGGED                   
+	   	WITH REPLACE	
+	</select>	
+	
+	<!-- 재사용코너 : 코너번호 코너명 입점일  -->
+	<select id="insertConerBestSaleInqTempTable11" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[		
+	INSERT INTO SESSION.TEMP_TB1
+		SELECT 	
+			'2'
+			,CAST(MS0504 AS CHAR(2))
+			,CAST(MS0509 AS CHAR(20))
+			,CAST(MS0505 AS CHAR(5))
+			,CAST(MS0510 AS CHAR(20))			
+			,CAST((SELECT MIN(MS05103) FROM ${dbType}SPFRDB.SPFM05PF1 WHERE MS0501=MS05101 AND MS0505=MS05102) AS CHAR(8))
+			,CAST(MS0515 AS CHAR(8))
+		FROM	${dbType}SPFRDB.SPFM33PF
+				INNER JOIN ${dbType}SPFRDB.SPFM05PF
+					ON	MS3301=MS0501 AND MS3305=MS0505	AND MS3315='' 				
+		WHERE	MS3301 = #{jum}
+			AND	MS3302 = substr(#{bu},3,2)
+			AND	MS3303 = substr(#{tim},5,2)		
+		AND MS0515=''	
+	]]>
+	</select>
+
+	<!--일반 코너 : 코너번호 코너명 입점일(계약일-SPFM05PF1)  -->
+	<select id="insertConerBestSaleInqTempTable12" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[		
+	INSERT INTO SESSION.TEMP_TB1
+		SELECT 	
+			'1'
+			,CAST(MS0504 AS CHAR(2))
+			,CAST(MS0509 AS CHAR(20))
+			,CAST(MS0505 AS CHAR(5))
+			,CAST(MS0510 AS CHAR(20))		
+			,CAST((SELECT MIN(MS05103) FROM ${dbType}SPFRDB.SPFM05PF1 WHERE MS0501=MS05101 AND MS0505=MS05102) AS CHAR(8))
+			,CAST(MS0515 AS CHAR(8))
+		FROM	${dbType}SPFRDB.SPFM05PF
+		WHERE	MS0501 = #{jum}
+			AND	MS0502 = substr(#{bu},3,2)
+			AND	MS0503 = substr(#{tim},5,2)			
+			AND NOT EXISTS (SELECT 	* 	
+							FROM 	${dbType}SPFRDB.SPFM33PF	
+							WHERE MS3301=MS0501 AND MS3305=MS0505 AND MS3315='')
+		AND MS0515=''
+	]]>
+	</select>
+	
+	<!--위에서 입력된 일반코너의 종속 온라인코너 입력  -->
+	<select id="insertConerBestSaleInqTempTable13" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[		
+		INSERT INTO SESSION.TEMP_TB1
+		SELECT 	
+			'3'
+			,''
+			,''
+			,CAST(MS05803 AS CHAR(5))
+			,CAST(MS05802 AS CHAR(5)) -- 코너명에 주코너번호 임시저장
+			,''
+			,''
+		FROM	${dbType}SPFRDB.SPFM05PF8
+		WHERE	MS05801 = '01'		
+			AND EXISTS (SELECT * FROM SESSION.TEMP_TB1 WHERE CORNO=MS05802)	
+	]]>
+	</select>
+	
+	
+	
+	<!-- 폐점코너들 삭제 : 위에서 애초에 거르려 했으나 SQL에서 " AND( 조건 OR 조건) " 시에 알수없는 에러발생 DBEVER에서는 발생하지않는 에러 -->
+	<select id="insertConerBestSaleInqTempTable14" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	DELETE FROM SESSION.TEMP_TB1
+	WHERE 	outDate >= #{selectDay}
+			AND outDate != '' 
+	</select>
+	
+	<!-- 계약일(SPFM05PF1)이 입력안된 코너들은 등록일(SPFM05PF)을 입점일로  -->
+	<select id="insertConerBestSaleInqTempTable15" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	UPDATE SESSION.TEMP_TB1
+	SET INDATE = (SELECT MS0516 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501='01' AND MS0505=CORNO)
+	WHERE 	INDATE IS NULL 
+		OR 	INDATE = ''
+	</select>
+	
+	
+	
+    <!-- ///////////////////////////// 매출 루틴 //////////////////////////////////// 매출 루틴 ///////////////////////////// 매출 루틴 ////////////////////////////////////// -->
+    <!-- ///////////////////////////// 매출 루틴 //////////////////////////////////// 매출 루틴 ///////////////////////////// 매출 루틴 ////////////////////////////////////// -->
+    <!-- ///////////////////////////// 매출 루틴 //////////////////////////////////// 매출 루틴 ///////////////////////////// 매출 루틴 ////////////////////////////////////// -->
+    
+
+
+	<!-- 코너 일별 매출데이터 -->
+	<select id="insertConerBestSaleInqTempTable21" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[		
+	INSERT INTO SESSION.TEMP_TB2	
+	SELECT 	IS0104 	as baseCorno
+			,IS0104 as corno	
+			,SUBSTR(IS0102,1,6) as saleYYMM 
+			,SUM(IS0129) 		as netSale
+			,SUM(IS0131) 		as totalSale
+	FROM 	${dbType}SPFRDB.SPFI01PF sp 
+	WHERE	IS0103 = #{jum} 
+			AND	EXISTS (SELECT 	* 	FROM 	SESSION.TEMP_TB1
+								WHERE 	IS0102>=inDate AND IS0104=corno	)
+	GROUP BY IS0104, SUBSTR(IS0102,1,6)
+	]]>
+	</select>
+	
+	<!-- 재사용코너의 경우 입점된월(계약월)은 매출데이터 삭제 (일단 보류)-->
+	<select id="insertConerBestSaleInqTempTable22" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[	
+
+	]]>
+	</select>
+	
+	<!-- 종속코너의 주코너 코너번호 업데이트 -->
+	<select id="insertConerBestSaleInqTempTable23" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[	
+	UPDATE 	SESSION.TEMP_TB2 a
+	SET		BASECORNO = (SELECT MS05102 FROM ${dbType}SPFRDB.SPFM051PF WHERE MS05101='01' AND MS05103=CORNO)
+	WHERE 	EXISTS (SELECT * 	FROM 	SESSION.TEMP_TB1 b 
+							WHERE 	a.corno = b.corno  AND 	b.gubun<>'3'	)
+	]]>
+	</select>
+	
+	<!-- 온라인코너의 주코너 코너번호 업데이트 -->
+	<select id="insertConerBestSaleInqTempTable24" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[	
+	UPDATE 	SESSION.TEMP_TB2 a
+	SET		BASECORNO = ( SELECT 	SUBSTR(cornm,1,5) 
+							FROM 	SESSION.TEMP_TB1 b 
+							WHERE 	a.corno = b.corno 	AND 	b.gubun='3'	 )	
+	WHERE 	EXISTS (SELECT 	* 	FROM 	SESSION.TEMP_TB1 b 
+								WHERE 	a.corno = b.corno  AND b.gubun='3'	)
+	]]>
+	</select>
+	
+	<!-- 종속코너가 아니면 그냥 코너번호를 주코너번호로 업데이트 -->
+	<select id="insertConerBestSaleInqTempTable25" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[	
+	UPDATE 	SESSION.TEMP_TB2
+	SET 	BASECORNO = CORNO 
+	WHERE 	BASECORNO IS NULL OR BASECORNO=''
+	]]>
+	</select>
+
+	
+	
+	
+	<!-- 코너별 기네스월 데이터 추출 -->
+	<select id="insertConerBestSaleInqTempTable31" parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">
+	<![CDATA[				
+		
+	INSERT INTO SESSION.TEMP_TB3	   	
+	WITH	
+	TA1(saleYYMM,baseCorno,bestSale) AS(
+	SELECT 
+		saleYYMM
+		,baseCorno
+		,SUM(CASE WHEN trim(${gubun})='totalSale' 	THEN totalSale 
+									  				ELSE netSale    END)  as bestSale
+	FROM 	SESSION.TEMP_TB2
+	WHERE	saleYYMM <= SUBSTR(#{selectDay},1,6)
+	GROUP BY baseCorno,saleYYMM	
+	)	
+	
+	SELECT 	tb1.pcno        AS pcno
+			,tb1.pcnm       AS pcnm	
+			,tb1.corno		AS corno			
+			,tb1.cornm		AS cornm			
+			,t.saleYYMM		AS bestYYMM		
+			,t.bestSale		AS bestSale	    
+			,tb1.inDate		AS inDate          
+			,(SELECT bestSale 	FROM  TA1	WHERE TA1.saleYYMM = SUBSTR(#{selectDay},1,6) AND TA1.baseCorno=tb1.corno) 	AS standardSale
+	FROM (
+			SELECT 
+				saleYYMM				
+				,baseCorno
+				,bestSale
+				,ROW_NUMBER () OVER (PARTITION BY baseCorno ORDER BY bestSale DESC) AS RANKNO
+			FROM TA1	
+		) T
+		INNER JOIN SESSION.TEMP_TB1 tb1
+			ON	tb1.corno = t.baseCorno
+	WHERE RANKNO = 1
+	
+	]]>
+	</select>
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectConerBestSaleInqList" resultType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqModel" 
+										parameterType="com.saydept.api.spf.selng.conerBestSaleInq.model.ConerBestSaleInqParamModel">		
+										
+	SELECT 	pcNo  		AS pcNo
+		,	trim(pcNm)  AS pcNm
+		,	corNo 		AS corNo
+		,	trim(corNm) AS corNm
+		,	substr(inDate,1,4)||'/'||substr(inDate,5,2)||'/'||substr(inDate,7,2) AS inDate
+		,	substr(bestYYMM,1,4)||'/'||substr(bestYYMM,5,2) AS bestYYMM
+		,	bestSale 
+		,	standardSale
+		
+	FROM	SESSION.TEMP_TB3
+	WHERE	standardSale >= #{saleLimit}
+	ORDER BY pcNo,corNo
+
+ <!-- 
+	SELECT 	trim(pcno)  AS pcNo
+		,	trim(pcnm)  AS pcNm
+		,	corno 		AS corNo
+		,	trim(cornm) AS corNm
+		,	substr(inDate,1,4)||'/'||substr(inDate,5,2)||'/'||substr(inDate,7,2) AS inDate
+		,	''
+		,	0
+		,	0
+	FROM	SESSION.TEMP_TB1
+	WHERE	 pcno!=''
+	ORDER BY pcno,corno
+
+-->
+	</select>	
+										
+
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.sda.sleManageCt.ledgrSbManageCt.LedgrSbManageCtMapper">
+
+
+	<select id="selectLedgrSbManageCtlist" parameterType="com.saydept.api.sda.sleManageCt.ledgrSbManageCt.model.LedgrSbManageCtParamModel" 
+							resultType="com.saydept.api.sda.sleManageCt.ledgrSbManageCt.model.LedgrSbManageCtModel">
+
+					
+					/**
+					*보조원장 전표내역
+					*/
+					
+					SELECT  A03ACTCD1||A03ACTCD2||A03ACTCD3 AS actCdDetail
+					        ,REPLACE(A.M01ACTNME,'　','') AS actNm1
+        					,REPLACE(B.M01ACTNME,'　','') AS actNm2
+					        ,A03ACCTYY||'-'||A03BALPAT||'-'||A03SLIPNO AS slpNo
+					        ,A03SEQNBR AS slpSeq
+					        ,A03BALPAT AS buCd
+					        ,M06BNM AS buNm
+					        ,A03BALYM||RIGHT('0'||A03BALDD,2) AS balYmd
+					        ,A03ACTYM||RIGHT('0'||A03ACTDD,2) AS actYmd
+					        ,A03CUSTNO AS custNo
+					        ,M08COMNME AS custNm
+					        ,A03SAGUB AS saGu
+					        ,A03DCKIND AS dcKind
+					        ,A03AMOUNT AS slpAmt
+					        ,A03REMARK AS reMark
+					        ,CASE WHEN A03DCKIND='D' THEN A03AMOUNT END AS ildAmt
+					        ,CASE WHEN A03DCKIND!='D' THEN A03AMOUNT END AS ilcAmt
+					FROM    ${dbType}SDARDB.SDAA03LF2
+					        LEFT OUTER JOIN ${dbType}SDARDB.SDAM01PF A
+					        ON A.M01ACTCD1 = A03ACTCD1 AND A.M01ACTCD2 = '00' AND A.M01ACTCD3 = '00'
+					        LEFT OUTER JOIN ${dbType}SDARDB.SDAM01PF B
+					        ON B.M01ACTCD1 = A03ACTCD1 AND B.M01ACTCD2 = A03ACTCD2 AND B.M01ACTCD3 = A03ACTCD3
+					        LEFT OUTER JOIN ${dbType}SDARDB.SDAM08PF
+					        ON M08CUSTNO = A03CUSTNO
+					        LEFT OUTER JOIN ${dbType}SPSRDB.SPSM06PF
+					        ON M06BU1 = '01'
+					        AND M06BU2 = CASE WHEN A03BALPAT = '0171' THEN '71' WHEN A03BALPAT = '0172' THEN '72' ELSE SUBSTRING(A03BALPAT,1,2) END
+					        AND M06BU3 = CASE WHEN A03BALPAT = '0171' THEN '00' WHEN A03BALPAT = '0172' THEN '00' ELSE SUBSTRING(A03BALPAT,3,2) END
+					WHERE A03BALYM||RIGHT('0'||A03BALDD,2) &gt;= ${frDate} AND  A03BALYM||RIGHT('0'||A03BALDD,2) &lt;= ${toDate}
+					ORDER BY A03ACTCD1||A03ACTCD2||A03ACTCD3,
+					        A03ACCTYY,A03BALPAT,A03SLIPNO, A03SEQNBR
+					
+					/**
+					*        AND A03ACTCD2 != '91'--대손충당금제외
+					*        AND A03ACTCD1||A03ACTCD2||A03ACTCD3 IN ('430180104','430180201','430189001')
+					*        AND SUBSTRING(A03ACTCD1,1,2) = '81'
+					*/
+
+		                
+	</select>
+		
+	
+</mapper>

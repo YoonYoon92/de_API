@@ -1,0 +1,10 @@
+package com.saydept.api.comm.model;
+
+import lombok.Data;
+
+@Data
+public class UserModel {
+
+	private String userId;
+	private String userNm;
+}

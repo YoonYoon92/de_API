@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.clsInq.ClsInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="classInqModel" type="com.saydept.api.tasks.classInq.model.ClassInqModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+
+	<select id="selectClassInqList" resultType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" 
+									parameterType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" fetchSize="1000">
+		SELECT		MS0601||MS0618||MS0619||MS0620 AS orgCode 
+				,	MS0621	AS	buNm
+				,	MS0622	AS	timNm
+				, 	MS0623	AS	pcNm
+				,	MS0602||'-'||MS0603 AS cls
+				,	MS0602 AS cls1
+				,	MS0603 AS cls2
+				,	trim(MS0604) AS clsNm
+				,	MS0607 AS partner
+				,	trim(MS0804) AS partnerNm
+				,	MS0609 AS fee
+				,	CASE WHEN MS0625!='' THEN substr(MS0625,1,4)||'년'||substr(MS0625,5,2)||'월'||substr(MS0625,7,2)||'일' 
+					ELSE MS0625 END AS giveDt
+				,	CASE WHEN MS0627!='' THEN substr(MS0627,1,4)||'년'||substr(MS0627,5,2)||'월'||substr(MS0627,7,2)||'일'
+					ELSE MS0627 END AS duseDt 
+				,   CASE WHEN MS0627='' 
+							AND A2.STARTDATE&lt;=YEAR(CURRENT DATE)||MONTH(CURRENT DATE)||DAY(CURRENT DATE)
+							AND A2.ENDDATE&gt;=YEAR(CURRENT DATE)||MONTH(CURRENT DATE)||DAY(CURRENT DATE)
+					THEN 'ON' ELSE 'OFF' END AS status
+				,MS0617||MS0618||MS0619||MS0620 as orgCode
+				,MS0621
+				,MS0622
+				,MS0623
+				
+				
+				
+				
+			FROM ${dbType}SPFRDB.SPFM06PF 
+				
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM08PF
+			ON MS0801 =MS0601 AND MS0802 =MS0607 
+			
+			LEFT OUTER JOIN( SELECT 	MS2604
+									,	MS2605
+									,	MAX(MS2601) AS  YY
+									,	MAX(MS2602)	AS	MM
+									,	MAX(MS2603)	AS  DD	
+									,	MAX(MS2608)	AS  STARTDATE
+									,	MAX(MS2609)	AS  ENDDATE
+								FROM ${dbType}SPFRDB.SPFM26LF2 
+								
+							GROUP BY MS2604,MS2605
+							) A2
+					ON A2.MS2604=MS0602 AND A2.MS2605=MS0603
+		<where>	
+			<choose>
+				<when test="coner != '' ">
+					 MS0601=#{jum} AND ((MS0602 like '%' || '${coner}' || '%') OR (MS0604 like '%' || '${conerNm}' || '%') )
+				</when>
+				<when test="partner != '' ">
+					 MS0601=#{jum} AND MS0607 like '%' || '${partner}' || '%' 
+				</when>
+			</choose>
+		</where>
+		order by MS0627,CASE WHEN MS0602&gt;='A' AND MS0602&lt;='Z' THEN '99999' ELSE MS0602 END  
+	</select>
+	
+	<select id="selectConerList" resultType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" 
+									parameterType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" fetchSize="1000">
+				SELECT	MS0505			as	coner
+					,	MS0505||'('||trim(MS0510)||')'	as	conerNm
+					
+		 		FROM ${dbType}SPFRDB.SPFM05PF 
+				WHERE MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515=''
+				ORDER BY MS0505
+			
+	</select>
+	
+	<select id="selectDetailClsList" resultType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" 
+									parameterType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" fetchSize="1000">
+			
+				SELECT	trim(MS0604)	AS clsNm
+					,	MS0605 			AS coner
+					,	trim(MS0624)	AS conerNm	
+					,	CASE WHEN MS0606='1' THEN  MS0606||'.일차 식품' 
+							 WHEN MS0606='2' THEN  MS0606||'.특정수수료' 
+							 WHEN MS0606='3' THEN  MS0606||'.특정 수탁' 
+							 WHEN MS0606='4' THEN  MS0606||'.판매분매입' 
+							 WHEN MS0606='5' THEN  MS0606||'.체육 기금' 
+							 WHEN MS0606='6' THEN  MS0606||'.문화 기금' 
+							 WHEN MS0606='7' THEN  MS0606||'.공 병' 
+							 WHEN MS0606='8' THEN  MS0606||'.식자재' 
+							 WHEN MS0606='9' THEN  MS0606||'.비과세MD' 
+						 	 ELSE ' ' END	AS code
+					,	MS0607 			AS trade
+					,	MS0618			AS bu
+					,	MS0619			AS tim
+					,	MS0620			AS pc
+					,	trim(MS0621)	AS buNm
+					,	trim(MS0622)	AS timNm
+					,	trim(MS0623)	AS pcNm
+					,	trim(MS0803)	AS busiNum
+					,	trim(MS0804)	AS busiNm
+					,	MS0608 			AS lossRate
+					,	MS0609 			AS marginRate
+					,	CASE WHEN MS0613='1' THEN  MS0613||'.정상' 
+							 WHEN MS0613='2' THEN  MS0613||'.행사' 
+							 WHEN MS0613='3' THEN  MS0613||'.균일' 
+							 ELSE ' ' END AS eventDiv
+					,	MS0630			AS tagDiv
+					,	MS0625			AS regiDt
+					,	MS0626			AS changeDt
+					,	MS0632			AS stopDt
+					,	MS0627			AS delDt
+					
+					---협력업체 정보
+					,	TRIM(MS0802)	AS 		partnerNm
+					,	TRIM(MS0805)	AS	owner
+					,	MS0806||'-'||MS0807	AS	jumin
+					,	MS0808||'-'||MS0809||'-'||MS0810 AS tel
+					,	MS0811||'-'||MS0812	AS address
+					,	TRIM(MS0813)||' '||TRIM(MS0814)||' '||TRIM(MS0815)	AS addressNm
+					,	TRIM(MS0816)	AS 	service
+					,	TRIM(MS0836)	AS	serviceSect 
+					,	MS0818 	AS	imprest
+					,	MS0819	AS	payment
+					,	MS0820	AS	paymentCode
+					,	MS0821	AS	billDt
+					,	MS0824	AS	paymentLateCode
+					,	MS0827	AS	bankDiv
+					,	MS0828	AS	bankCode
+					,	MS0829	AS	bankNum
+					,	TRIM(MS0830)	AS	bankNm
+					,	MS0831  AS 	paymentCondition
+					,	MS0834	AS	calcdiv
+					,	MS0832	AS	openDt
+					,	MS0835	AS	endCode
+					,	MS0817	AS	areaDiv
+					,	MS0823	AS 	manageBu
+					,	MS0833	AS	tradeStop
+					,	MS0839	AS	ParterdelDt
+					,	MS0825||'-'||MS0826	AS	fax
+					FROM ${dbType}SPFRDB.SPFM06PF 
+					
+					LEFT OUTER JOIN ${dbType}SPFRDB.SPFM08PF 
+					ON	MS0801=MS0601 AND MS0802 =MS0607
+				WHERE MS0601=#{jum} AND MS0602=#{cls1} AND MS0603=#{cls2}
+			
+	</select>
+	
+	<select id="selectDetailClsMargin" resultType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" 
+									parameterType="com.saydept.api.spf.goods.clsInq.model.ClsInqModel" fetchSize="1000">
+			
+				SELECT	MS1601	AS 	marginChangeDt
+					,	MS1609	AS	beforeMargin
+					,	MS1610	AS	afterMagin
+					,	MS1611	AS	endDt
+					,	MS1607	AS	eventCode
+				 FROM ${dbType}SPFRDB.SPFM16LF2 
+				WHERE MS1602=#{jum} AND MS1603=#{cls1} AND MS1604=#{cls2}
+				ORDER BY MS1601 DESC
+	</select>
+</mapper>	

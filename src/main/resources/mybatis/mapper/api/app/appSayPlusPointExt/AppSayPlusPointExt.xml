@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.app.appSayPlusPointExt.AppSayPlusPointExtMapper">
+
+
+	<select id="getAppSayPlusPointExtlist"
+		parameterType="com.saydept.api.app.appSayPlusPointExt.model.AppSayPlusPointExtParamModel"
+		resultType="com.saydept.api.app.appSayPlusPointExt.model.AppSayPlusPointExtModel">
+
+/*소멸예상포인트*/
+/*AppSayPlusPointExt*/
+
+SELECT P02MAEY1||P02MAEY2||P02MAEM maedate -- 소멸대상월
+--      , SUBSTR(CHAR(DATE(
+--               DAYS(DATE(P02MAEY1||P02MAEY2   ||'-'||P02MAEM||'-'||'01'))
+--              +DAYS(DATE('0003-02-01')))),1,5)||'-'||              '01' AS PLUS321
+        , SUBSTR(CHAR(DATE(DAYS(DATE(P02MAEY1||P02MAEY2||'-'||P02MAEM||'-'||'01'))+DAYS(DATE('0003-02-01')))),1,4)||SUBSTR(CHAR(DATE(DAYS(DATE(P02MAEY1||P02MAEY2||'-'||P02MAEM||'-'||'01'))+DAYS(DATE('0003-02-01')))),6,2)||'01' AS extdate
+      , SUM(DECIMAL((P02MPOINT-P02DPOINT)*100,9,1)) extpoint
+      , 0 usedpoint
+      , 0 extrealpoint
+FROM   SCDRDB.SCDP02LF1
+WHERE  P02JUM='01' AND
+       P02WHEGU='90'
+       AND P02SEQNO='253999'
+       AND P02CHECK='8'
+       AND P02UPTCOD=''
+       AND P02MAEGU IN ('1','2')
+       AND P02SLPSEQ=1
+       AND (P02USEYMD='' OR P02RPOINT>0)
+GROUP BY P02MAEY1||P02MAEY2||P02MAEM
+--      , SUBSTR(CHAR(DATE(
+--               DAYS(DATE(P02MAEY1||P02MAEY2||'-'||P02MAEM||'-'||'01'
+--              ))
+--        +DAYS(DATE('0003-02-01')))),1,5)||'-'||'01'
+        ,SUBSTR(CHAR(DATE(DAYS(DATE(P02MAEY1||P02MAEY2||'-'||P02MAEM||'-'||'01'))+DAYS(DATE('0003-02-01')))),1,4)||SUBSTR(CHAR(DATE(DAYS(DATE(P02MAEY1||P02MAEY2||'-'||P02MAEM||'-'||'01'))+DAYS(DATE('0003-02-01')))),6,2)||'01'
+ORDER BY P02MAEY1||P02MAEY2||P02MAEM
+
+
+
+
+
+
+/*
+
+SELECT SUM(DECIMAL((P02MPOINT*100),9,1)) * -1 --INTO :MUPNT
+FROM   SCDRDB.SCDP02LF1
+WHERE  P02JUM='01' AND
+       P02WHEGU='90' AND
+       P02SEQNO='253999' AND
+       P02CHECK='8' AND
+       P02MAEY1=SUBSTR('20201224',1,2) AND
+       P02MAEY2=SUBSTR('20201224',3,2) AND
+       P02MAEM =SUBSTR('20201224',5,2) AND
+       (P02UPTCOD='1' OR P02MAEGU='P') AND
+       P02SLPSEQ=1
+
+*/
+
+	</select>
+
+</mapper>
+
+

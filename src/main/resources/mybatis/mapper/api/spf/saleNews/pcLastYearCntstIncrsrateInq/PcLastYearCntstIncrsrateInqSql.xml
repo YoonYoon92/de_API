@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.pcLastYearCntstIncrsrateInq.PcLastYearCntstIncrsrateInqMapper">
+  
+   <select id="selectzoneStoreList" parameterType="com.saydept.api.spf.saleNews.pcLastYearCntstIncrsrateInq.model.PcLastYearCntstIncrsrateInqParamModel" 
+						resultType="com.saydept.api.spf.saleNews.pcLastYearCntstIncrsrateInq.model.PcLastYearCntstIncrsrateInqParamModel">
+						
+	SELECT 	MS2105 as zoneCd
+			,MS2106 as zoneNm
+	FROM SPFRDB.SPFM21PF
+	WHERE MS2101=SUBSTR(#{bu},1,2)
+	AND	  MS2102=SUBSTR(#{bu},3,2)
+	
+	</select>				
+	<select id="getAll" parameterType="com.saydept.api.spf.saleNews.pcLastYearCntstIncrsrateInq.model.PcLastYearCntstIncrsrateInqParamModel" 
+						resultType="com.saydept.api.spf.saleNews.pcLastYearCntstIncrsrateInq.model.PcLastYearCntstIncrsrateInqModel">
+WITH
+		/*주코너합산*/
+		TA1(coner ,conernm,LTry,Try,LSplan,Splan,LDcnt,Dcnt,LCo,Co)AS(
+		SELECT  TB1.MS0505
+		        ,TRIM(TB1.MS0510)
+		        ,SUM(B1)
+		        ,SUM(B2)
+		        ,SUM(A1)
+		        ,SUM(A2)
+		        ,SUM(A3)
+		        ,SUM(A4)
+		        ,SUM(C1)
+		        ,SUM(C2)
+		FROM    ${dbType}SPFRDB.SPFM05PF TB1
+		LEFT OUTER JOIN
+		                (SELECT IS0104
+                        ,SUM(CASE WHEN IS0102 &gt;= #{LastyearstartDt} AND IS0102 &lt;= #{LastyearendDt} THEN   IS0129 ELSE 0 END)/1000 AS A1
+                        ,SUM(CASE WHEN IS0102 &gt;= #{startDt} AND IS0102 &lt;= #{endDt} THEN   IS0129 ELSE 0 END)/1000  AS A2
+                        ,SUM(CASE WHEN IS0102 &gt;= #{LastyearstartDt} AND IS0102 &lt;= #{LastyearendDt} THEN   IS0130 ELSE 0 END)/1000 AS A3
+                        ,SUM(CASE WHEN IS0102 &gt;= #{startDt} AND IS0102 &lt;= #{endDt} THEN   IS0130 ELSE 0 END)/1000  AS A4
+                        FROM ${dbType}SPFRDB.SPFI01PF
+                        WHERE ((IS0102 &gt;= #{LastyearstartDt} and IS0102 &lt;= #{LastyearendDt})or(IS0102 &gt;= #{startDt} and IS0102 &lt;= #{endDt}))
+                        GROUP BY IS0104) A
+                        ON A.IS0104 = TB1.MS0505
+
+		LEFT OUTER JOIN
+		                (SELECT IS0707
+                        ,SUM(CASE WHEN IS0702 &gt;= #{LastyearstartDt} AND IS0702 &lt;= #{LastyearendDt} THEN   IS0709 ELSE 0 END) AS B1
+                        ,SUM(CASE WHEN IS0702 &gt;= #{startDt} AND IS0702 &lt;= #{endDt} THEN   IS0709 ELSE 0 END) AS B2
+                        FROM ${dbType}SPFRDB.SPFI07LF2
+                        WHERE ((IS0702 &gt;= #{LastyearstartDt} and IS0702 &lt;= #{LastyearendDt})or(IS0702 &gt;= #{startDt} and IS0702 &lt;= #{endDt}))
+                        GROUP BY IS0707) B
+                        ON B.IS0707 = TB1.MS0505
+                        
+        LEFT OUTER JOIN
+		                (SELECT JR1302
+                        ,SUM(CASE WHEN JR1303 &gt;= #{LastyearstartDt} AND JR1303 &lt;= #{LastyearendDt} THEN   JR1309 ELSE 0 END) AS C1
+                        ,SUM(CASE WHEN JR1303 &gt;= #{startDt} AND JR1303 &lt;= #{endDt} THEN JR1309 ELSE 0 END) AS C2
+                        FROM ${dbType}SPORDB.SPOJ13PF
+                        WHERE ((JR1303 &gt;= #{LastyearstartDt} and JR1303 &lt;= #{LastyearendDt})or(JR1303 &gt;= #{startDt} and JR1303 &lt;= #{endDt}))
+                        GROUP BY JR1302) C
+                        ON C.JR1302 = TB1.MS0505
+		<where>
+			<choose>
+				<when test="tim != null and tim != '' and (zoneCd =='' or zoneCd==null)">
+					TRIM(TB1.MS0501)=SUBSTR(#{tim},1,2) AND TRIM(TB1.MS0502)=SUBSTR(#{tim},3,2) AND TRIM(TB1.MS0503)=SUBSTR(#{tim},5,2)
+				</when>
+				<when test="bu != null and bu != '' and (zoneCd =='' or zoneCd==null)">
+					TRIM(TB1.MS0501)=SUBSTR(#{bu},1,2) and TRIM(TB1.MS0502)=SUBSTR(#{bu},3,2)
+				</when>
+				<when test="zoneCd!=null and zoneCd!=''">
+					TB1.MS0518=#{zoneCd}
+				</when>
+				<otherwise>
+					TRIM(TB1.MS0501)=#{jum}
+				</otherwise>
+			</choose>
+		</where>
+		
+		        AND MS0515='' AND SUBSTR(MS0521,2,1)='Y'
+		        /*관리코너 CHECK*/
+		        AND MS0502||MS0503||MS0504 !='727571'
+		        AND MS0505!='20195'
+		        AND MS0505!='27815'
+		        AND MS0505!='27817'
+		         /*외식건강，세이문고，유니클로　제외 CHECK*/
+		        AND NOT EXISTS (SELECT MS05103 FROM ${dbType}SPFRDB.SPFM051PF WHERE MS05103=MS0505)
+		GROUP BY MS0505,MS0510
+		HAVING SUM(B.B2) &gt; 0 OR SUM(A.A1) &gt;0 OR SUM(A.A2) &gt;0
+		ORDER BY MS0505
+		
+		)
+		,
+		/*종속코너 합산*/
+		TA2(coner,conernm,LTry,Try,LSplan,Splan,LDcnt,Dcnt,LCo,Co)AS(
+		
+		SELECT  TB3.MS05102
+		        ,TB4.MS0510
+		        ,SUM(B1)
+		        ,SUM(B2)
+		        ,SUM(A1)
+		        ,SUM(A2)
+		        ,SUM(A3)
+		        ,SUM(A4)
+		        ,SUM(C1)
+		        ,SUM(C2)
+		FROM    ${dbType}SPFRDB.SPFM05PF TB1
+		
+				LEFT OUTER JOIN
+		                       (SELECT IS0104
+		                        ,SUM(CASE WHEN IS0102 &gt;= #{LastyearstartDt} AND IS0102 &lt;= #{LastyearendDt} THEN   IS0129 ELSE 0 END)/1000 AS A1
+		                        ,SUM(CASE WHEN IS0102 &gt;= #{startDt} AND IS0102 &lt;= #{endDt} THEN   IS0129 ELSE 0 END)/1000 AS A2
+		                        ,SUM(CASE WHEN IS0102 &gt;= #{LastyearstartDt} AND IS0102 &lt;= #{LastyearendDt} THEN   IS0130 ELSE 0 END)/1000 AS A3
+                      			,SUM(CASE WHEN IS0102 &gt;= #{startDt} AND IS0102 &lt;= #{endDt} THEN   IS0130 ELSE 0 END)/1000  AS A4
+		                        FROM ${dbType}SPFRDB.SPFI01PF
+		                        WHERE ((IS0102 &gt;= #{LastyearstartDt} and IS0102 &lt;= #{LastyearendDt})or(IS0102 &gt;= #{startDt} and IS0102 &lt;= #{endDt}))
+		                        GROUP BY IS0104) A
+		                        ON A.IS0104 = TB1.MS0505
+		
+				LEFT OUTER JOIN
+		                (SELECT IS0707
+                        ,SUM(CASE WHEN IS0702 &gt;= #{LastyearstartDt} AND IS0702 &lt;= #{LastyearendDt} THEN   IS0709 ELSE 0 END) AS B1
+                        ,SUM(CASE WHEN IS0702 &gt;= #{startDt} AND IS0702 &lt;= #{endDt} THEN   IS0709 ELSE 0 END)  AS B2
+                        FROM ${dbType}SPFRDB.SPFI07LF2
+                        WHERE ((IS0702 &gt;= #{LastyearstartDt} and IS0702 &lt;= #{LastyearendDt})or(IS0702 &gt;= #{startDt} and IS0702 &lt;= #{endDt}))
+                        GROUP BY IS0707) B
+                        ON B.IS0707 = TB1.MS0505
+                        
+               LEFT OUTER JOIN
+		                (SELECT JR1302
+                        ,SUM(CASE WHEN JR1303 &gt;= #{LastyearstartDt} AND JR1303 &lt;= #{LastyearendDt} THEN   JR1309 ELSE 0 END) AS C1
+                        ,SUM(CASE WHEN JR1303 &gt;= #{startDt} AND JR1303 &lt;= #{endDt} THEN   JR1309 ELSE 0 END) AS C2
+                        FROM ${dbType}SPORDB.SPOJ13PF
+                        WHERE ((JR1303 &gt;= #{LastyearstartDt} and JR1303 &lt;= #{LastyearendDt})or(JR1303 &gt;= #{startDt} and JR1303 &lt;= #{endDt}))
+                        GROUP BY JR1302) C
+                        ON C.JR1302 = TB1.MS0505
+                                   
+		LEFT OUTER JOIN
+		       ${dbType}SPFRDB.SPFM051PF TB3
+		       ON MS05103=TB1.MS0505
+		LEFT OUTER JOIN
+		       ${dbType}SPFRDB.SPFM05PF  TB4
+		       ON TB4.MS0501='01' AND TB4.MS0505=TB3.MS05102
+
+		       <where>
+			<choose>
+				<when test="tim != null and tim != '' and (zoneCd =='' or zoneCd==null)">
+					TRIM(TB1.MS0501)=SUBSTR(#{tim},1,2) AND TRIM(TB1.MS0502)=SUBSTR(#{tim},3,2) AND TRIM(TB1.MS0503)=SUBSTR(#{tim},5,2)
+				</when>
+				<when test="bu != null and bu != '' and (zoneCd =='' or zoneCd==null)">
+					TRIM(TB1.MS0501)=SUBSTR(#{bu},1,2) and TRIM(TB1.MS0502)=SUBSTR(#{bu},3,2)
+				</when>
+				<when test="zoneCd!=null and zoneCd!=''">
+					TB1.MS0518=#{zoneCd}		
+
+				</when>
+				<otherwise>
+					TRIM(TB1.MS0501)=#{jum}
+				</otherwise>
+			</choose>
+		</where>
+		        AND TB1.MS0515='' AND SUBSTR(TB1.MS0521,2,1)='Y'
+		        AND TB1.MS0502||TB1.MS0503||TB1.MS0504 !='727571'
+		        AND TB1.MS0505!='20195'
+		        AND TB1.MS0505!='27815'
+		        AND TB1.MS0505!='27817'
+		        AND EXISTS (SELECT MS05103 FROM ${dbType}SPFRDB.SPFM051PF WHERE MS05103=TB1.MS0505)
+		GROUP BY MS05102,TB4.MS0510
+		HAVING SUM(B.B2) &gt; 0 OR SUM(A.A1) &gt;0 OR SUM(A.A2) &gt;0
+		ORDER BY MS05102
+		)
+		,
+		
+		TA3(coner ,conernm,LTry,Try,LastyearSplan,Splan,LDcnt,Dcnt,LCo,Co) as(
+		select   
+				<choose>
+			<when test="onlinechk =='ONFS'">
+			   	CASE WHEN(SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' ) THEN MS05802 ELSE coner END		AS	coner 	
+			  	</when>		
+			  	<otherwise>
+			  	coner
+			  	</otherwise>
+			  	</choose>																								
+				,conernm 
+				,sum(LTry) as LTry
+				,sum(Try) as Try
+				,sum(LSplan) as LSplan
+				,sum(float(Splan)) as Splan
+				,sum(LDcnt)		as LDcnt
+				,sum(Dcnt)		as	Dcnt
+				,sum(Lco)		as LCo
+				,sum(Co)		as	Co
+          from (
+                select * from ta1
+                union all
+                select * from ta2
+                )
+          		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF8
+				ON  MS05803=coner	
+			
+			<where>
+			<choose>
+				<when test="onlinechk =='OFF'">
+			   	coner &gt;= '10000' and coner &lt;= '99999' 	 
+			  	</when>
+			   <when test ="onlinechk == 'ON'" >
+			 	coner &gt;= 'A0000' and coner &lt;= 'Z9999' 	
+			    </when>
+			  	<otherwise>
+			  	</otherwise>
+			  	</choose>
+			 </where>
+				 
+			 <choose>
+			 <when test="onlinechk =='ONFS'">
+			   	group by CASE WHEN(SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' ) THEN MS05802 ELSE coner END 
+			   	,conernm
+			  	</when>		
+			  	<otherwise>
+				group by	coner,conernm
+			  	</otherwise>
+			  	</choose>		
+
+         )
+		,
+		TA4(coner,conernm,LTry,Try,LastyearSplan,Splan,LDcnt,Dcnt,LCo,Co,LastyearAchivmentrate,Achivmentrate,Achivmentrateorder,Incrsrate,Incrsrateorder) AS(
+		select  coner										
+				,TRIM(conernm)	
+				,LTry								
+				,Try										
+				,LastyearSplan								
+				,Splan		
+				,LDcnt
+				,Dcnt
+				,LCo
+				,Co
+				,ROUND((FLOAT(LastyearSplan))/(FLOAT(LTry))*100,2) 									
+				,ROUND((FLOAT(Splan))/(FLOAT(Try))*100,2) 	
+				,ROUND((FLOAT(Splan))/(FLOAT(Try))*100,2) 	
+				,ROUND(FLOAT((Splan-LastyearSplan)/FLOAT(ABS(LastyearSplan)))*100,2)
+				,ROUND(FLOAT((Splan-LastyearSplan)/FLOAT(ABS(LastyearSplan)))*100,2)
+			
+		from TA3
+				
+				where  Splan != 0	
+	
+		
+		)
+	    SELECT   coner					AS 	coner				
+				,CASE WHEN(SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' ) THEN TRIM('온)'||conernm) ELSE TRIM(conernm) END			AS	conerNm        			 				
+				,LTry					AS  LastyearTry
+				,Try					AS	Try          					
+				,LastyearSplan			AS	LastyearSplan       					
+				,Splan					AS	Splan	
+				,LDcnt					AS	LastyearDcnt
+				,Dcnt					AS  Dcnt
+				,LCo					AS	LastyearCo
+				,Co						AS	Co
+				,LastyearAchivmentrate  AS  LastyearAchivmentrate 	
+				,Achivmentrate          AS  Achivmentrate 	
+				,CASE WHEN (Try =0 OR Splan =0 OR Try IS NULL)  THEN 0  ELSE ROUND(Achivmentrate) END		AS Achivmentrateorder
+				,Incrsrate				AS Incrsrate            
+				,CASE WHEN (LastyearSplan =0 OR Splan =0)   THEN 0  ELSE ROUND(Incrsrate) END		AS Incrsrateorder
+				
+		FROM TA4
+			
+				<where>
+				<choose>
+					<when test='achivmentrateCheck=="Y"'>
+						 CASE WHEN (Try =0 OR Splan =0 OR Try IS NULL)  THEN 0  ELSE ROUND(Achivmentrate) END &lt; 100
+					</when>
+					<when test='achivmentrateCheck=="N"'>
+	
+					</when>
+				</choose>
+			</where>
+		ORDER BY Incrsrateorder DESC , Splan DESC
+		
+			</select>	
+
+</mapper>

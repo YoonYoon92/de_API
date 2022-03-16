@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.spf.saleNews.clsSaleNews.ClsSaleNewsMapper">
+
+
+	<select id="getClsSaleNewslistA" parameterType="com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsParamModel" 
+							resultType="com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsModel">
+		
+ 
+		SELECT
+                          'jm'		as	jum
+                        , 'jumNm'	as	jumNm
+                        , CASE WHEN substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z' THEN TB3.MS05802 ELSE TB1.IS0104 END as cls
+                        , TB2.MS0510 as clsNm
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0131 ELSE 0 END) AS ddTotsale
+						, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0130 ELSE 0 END) AS ddDsicount
+						, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) AS ddNetsale
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,6) &gt;= SUBSTR(#{searchDay}, 1,6) AND TB1.IS0102 &lt;= SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) as mmNetsale
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,4) &gt;= SUBSTR(#{searchDay}, 1,4) AND TB1.IS0102 &lt;= SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) as yyNetsale
+                        
+                FROM ${dbType}SPFRDB.SPFI01LF1 TB1
+                        LEFT OUTER JOIN SPFRDB.SPFM05PF8L TB3
+						ON TB3.MS05801 = '01' AND TB3.MS05803 = TB1.IS0104 
+                        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF TB2
+                        ON TB2.MS0501 = '01' AND TB2.MS0505 = CASE WHEN substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z' THEN TB3.MS05802 ELSE TB1.IS0104 END
+	
+                
+
+	<where>
+         <choose>
+            <when test="tim != ''">
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TRIM(TB1.IS0103)=SUBSTR(#{tim},1,2) AND TRIM(TB1.IS0106)=SUBSTR(#{tim},3,2) AND TRIM(TB1.IS0107)=SUBSTR(#{tim},5,2)
+            </when>
+            <when test="bu != ''">
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TRIM(TB1.IS0103)=SUBSTR(#{bu},1,2)  AND TRIM(TB1.IS0106)=SUBSTR(#{bu},3,2)
+            </when>
+            <otherwise>
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TB1.IS0103 = #{jum}
+            </otherwise>
+         </choose>
+      </where>
+	
+
+	AND (
+		   (#{onlineChk} = 'N' AND substring(TB1.IS0104,1,1) &gt;= '1' AND substring(TB1.IS0104,1,1) &lt;= '9') -- 온라인 제외
+		or (#{onlineChk} = 'Y' AND substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z') -- 온라인 전용
+		or (#{onlineChk} = 'A'                                                                                ) -- 온라인 공용
+		)
+	
+	--AND substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z' -- 온라인 전용
+				
+                GROUP BY TB2.MS0510, CASE WHEN substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z' THEN TB3.MS05802 ELSE TB1.IS0104 END
+                
+
+                
+	</select>
+	
+	
+
+<select id="getClsSaleNewslist" parameterType="com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsParamModel" 
+							resultType="com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsModel">
+		
+ 
+		SELECT
+                          'jm'		as	jum
+                        , 'jumNm'	as	jumNm
+                        , TB1.IS0104 as cls
+                        , TB2.MS0510 as clsNm
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0131 ELSE 0 END) AS ddTotsale
+						, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0130 ELSE 0 END) AS ddDsicount
+						, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) AS ddNetsale
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,6) &gt;= SUBSTR(#{searchDay}, 1,6) AND TB1.IS0102 &lt;= SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) as mmNetsale
+                        , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,4) &gt;= SUBSTR(#{searchDay}, 1,4) AND TB1.IS0102 &lt;= SUBSTR(#{searchDay}, 1,8) THEN TB1.IS0129 ELSE 0 END) as yyNetsale
+                        
+                FROM ${dbType}SPFRDB.SPFI01LF1 TB1
+                        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF TB2
+                        ON TB2.MS0501 = '01' AND TB2.MS0505 = TB1.IS0104
+                
+
+	<where>
+         <choose>
+            <when test="tim != ''">
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TRIM(TB1.IS0103)=SUBSTR(#{tim},1,2) AND TRIM(TB1.IS0106)=SUBSTR(#{tim},3,2) AND TRIM(TB1.IS0107)=SUBSTR(#{tim},5,2)
+            </when>
+            <when test="bu != ''">
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TRIM(TB1.IS0103)=SUBSTR(#{bu},1,2)  AND TRIM(TB1.IS0106)=SUBSTR(#{bu},3,2)
+            </when>
+            <otherwise>
+				SUBSTRING(TB1.IS0102,1,4) = SUBSTR(#{searchDay}, 1,4)
+				AND TB1.IS0103 = #{jum}
+            </otherwise>
+         </choose>
+      </where>
+	
+
+	AND (
+		   (#{onlineChk} = 'N' AND substring(TB1.IS0104,1,1) &gt;= '1' AND substring(TB1.IS0104,1,1) &lt;= '9') -- 온라인 제외
+		or (#{onlineChk} = 'Y' AND substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z') -- 온라인 전용
+		or (#{onlineChk} = 'A'                                                                                ) -- 온라인 공용
+		)
+	
+	--AND substring(TB1.IS0104,1,1) &gt;= 'A' AND substring(TB1.IS0104,1,1) &lt;= 'Z' -- 온라인 전용
+				
+                GROUP BY TB2.MS0510, TB1.IS0104
+                
+
+                
+	</select>
+
+
+	
+		
+	
+</mapper>

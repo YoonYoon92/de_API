@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.rtngud.rtnReqFormInq.RtnReqFormInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="rtnReqFormInqModel" type="com.saydept.api.spf.rtngud.rtnReqFormInq.model.RtnReqFormInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectRtnReqFormInqList" resultType="com.saydept.api.spf.rtngud.rtnReqFormInq.model.RtnReqFormInqModel" 
+										parameterType="com.saydept.api.spf.rtngud.rtnReqFormInq.model.RtnReqFormInqModel" >
+		/*selectRtnReqFormInqList*/
+		SELECT 	CS0103  AS  juDt
+		    ,   CS0101 	AS	chit
+			,	CS0102	AS	chitNum
+			,	cs0104	AS	jum
+			,	CS0105 	AS	bu
+			,	CS0106 	AS	tim
+			,	CS0107 AS	pc
+			,	CS0108 AS	cls1
+			,	CS0109 AS	cls2
+			,	CS0108||'-'||CS0109	AS	cls
+			,	trim(MS0604) AS	clsNm
+			,	cs0110 AS	partner
+			,	trim(MS0804)	AS	partnerNm
+			,	CASE WHEN CS0116!='' THEN '확정' ELSE '미확정' END AS CONF
+			,	CS0113 AS cost
+			,	CS0114 AS price
+		FROM ${dbType}SPFRDB.SPFC01PF 
+		
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM08PF
+		ON MS0801=CS0104 AND MS0802=CS0110
+		
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM06PF 
+		ON MS0601=CS0104 AND MS0602=CS0108 AND MS0603=CS0109
+		
+		WHERE CS0103&gt;=#{startDt} AND CS0103&lt;=#{endDt} 
+		ORDER BY CS0103, CS0101,CS0102
+	</select>
+		
+		<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDetailList" resultType="com.saydept.api.spf.rtngud.rtnReqFormInq.model.RtnReqFormInqModel" 
+										parameterType="com.saydept.api.spf.rtngud.rtnReqFormInq.model.RtnReqFormInqModel" >
+		/*selectRtnReqFormInqList*/
+			
+			SELECT 	CS0203 AS partner
+			,	MS1307 AS partnerNm
+			,	CS0206 AS itemNum
+			,	CS0209 AS cost
+			,	CS0210 AS sumCost
+			,	CS0211 AS price
+			,	CS0212 AS sumPrice
+			FROM ${dbType}SPFRDB.SPFC02PF 
+		 
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM13LF1 
+			ON MS1308=CS0203 
+		
+			WHERE CS0200=#{chit} AND CS0201=#{chitNum}
+
+	</select>
+
+
+</mapper>

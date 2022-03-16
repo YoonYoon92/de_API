@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.onHandTimeSaleNews.OnHandTimeSaleNewsMapper">
+
+	<!-- 일 목표, 실적, 달성율 조회 -->
+	<select id="selectOnHandTimeSaleNews" resultType="com.saydept.api.spf.saleNews.onHandTimeSaleNews.model.OnHandTimeSaleNewsTotalModel" parameterType="com.saydept.api.spf.saleNews.onHandTimeSaleNews.model.OnHandTimeSaleNewsParamModel">
+		/*selectOnHandTimeSaleNews*/
+		/**
+		 * 일 실적 합계
+		 */
+		WITH
+		
+		TA01 AS (
+			SELECT  
+			        SUM(IS5012) AS DAYSALEAMOUNT
+			FROM 	${dbType}SPFRDB.SPFI50PF 
+			WHERE 	IS5001 = #{startDate}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+		)
+		
+		/**
+		 * 일 목표
+		 */
+		,
+		TA02 AS ( 
+			SELECT 	 					 
+					SUM(IS05106*1000) AS DAYGOAL
+			FROM	${dbType}SPFRDB.SPFI05PF1  
+			WHERE 	IS05101 = #{startDate}
+			AND 	IS05102 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS05103 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS05104 = SUBSTR(#{tim},5,2)
+			</if>
+		)
+		
+		/**
+		 * 시간대별 속보 화면 cross join
+		 */
+		 
+		 
+		SELECT  
+			CASE WHEN TA02.DAYGOAL IS NULL 
+				 THEN 0 
+				 ELSE TA02.DAYGOAL END            					 AS DAYGOAL,
+			CASE WHEN TA01.DAYSALEAMOUNT IS NULL 
+				 THEN 0 
+				 ELSE TA01.DAYSALEAMOUNT END                         AS DAYSALEAMOUNT,
+			FLOAT(TA01.DAYSALEAMOUNT)/FLOAT(TA02.DAYGOAL)*100        AS ACHIEVEMENTRATE 		
+		FROM TA01, TA02
+		
+		
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectOnHandTimeSaleNewsList" resultType="com.saydept.api.spf.saleNews.onHandTimeSaleNews.model.OnHandTimeSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.onHandTimeSaleNews.model.OnHandTimeSaleNewsParamModel" fetchSize="1000">
+		/*selectOnHandTimeSaleNewsList*/
+		WITH 
+		
+		/**
+		 * 시간대별 실적(11시이전)
+		 */                         
+		TA01A AS (
+			SELECT 	'11'        AS NO1, 
+					'~11:00'    AS DIVISION, 
+					SUM(IS5008) AS CASHAMOUNT,         
+					SUM(IS5009) AS CARDAMOUNT,         
+					SUM(IS5010) AS GIFTAMOUNT,         
+					SUM(IS5011) AS ETCAMOUNT,          
+					SUM(IS5012) AS NETSALEAMOUNT,      
+					SUM(IS5013) AS DISCOUNTAMOUNT,     
+				 	SUM(IS5014) AS TOTALSALEAMOUNT,    
+				 	SUM(IS5015) AS CUSTOMCOUNT	       	
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{startDate}		
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &lt;= '10'
+		)
+		
+		/**
+		 * 시간대별 실적(11~12시)
+		 */
+		,                         
+		TA01B AS (
+			SELECT 	'13'        AS NO1, 
+					'~13:00'    AS DIVISION, 
+					SUM(IS5008) AS CASHAMOUNT,         
+					SUM(IS5009) AS CARDAMOUNT,         
+					SUM(IS5010) AS GIFTAMOUNT,         
+					SUM(IS5011) AS ETCAMOUNT,          
+					SUM(IS5012) AS NETSALEAMOUNT,      
+					SUM(IS5013) AS DISCOUNTAMOUNT,     
+				 	SUM(IS5014) AS TOTALSALEAMOUNT,    
+				 	SUM(IS5015) AS CUSTOMCOUNT	       
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{startDate}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &lt;= '12'
+			AND     IS5007 &gt;= '11'
+		)
+		
+		/**
+		 * 시간대별 실적 (13~21)
+		 */  
+		,                        
+		TA01C AS (
+			SELECT 	IS5007      AS NO1, 
+					'~'||SUBSTR(DIGITS(IS5007+1),9,2)||':00' AS DIVISION, 
+					SUM(IS5008) AS CASHAMOUNT,         
+					SUM(IS5009) AS CARDAMOUNT,         
+					SUM(IS5010) AS GIFTAMOUNT,         
+					SUM(IS5011) AS ETCAMOUNT,          
+					SUM(IS5012) AS NETSALEAMOUNT,      
+					SUM(IS5013) AS DISCOUNTAMOUNT,     
+				 	SUM(IS5014) AS TOTALSALEAMOUNT,    
+				 	SUM(IS5015) AS CUSTOMCOUNT	       
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{startDate}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &gt;= '13'
+			AND     IS5007 &lt;= '20'
+			GROUP BY IS5007, IS5007
+		)
+		
+		/**
+		 * 시간대별 실적(22시이후)
+		 */
+		,                          
+		TA01D AS (
+			SELECT 	'23'        AS NO1, 
+					'~24:00'    AS DIVISION, 
+					SUM(IS5008) AS CASHAMOUNT,         
+					SUM(IS5009) AS CARDAMOUNT,         
+					SUM(IS5010) AS GIFTAMOUNT,         
+					SUM(IS5011) AS ETCAMOUNT,          
+					SUM(IS5012) AS NETSALEAMOUNT,      
+					SUM(IS5013) AS DISCOUNTAMOUNT,     
+				 	SUM(IS5014) AS TOTALSALEAMOUNT,    
+				 	SUM(IS5015) AS CUSTOMCOUNT	       
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{startDate}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &gt;= '21'
+		)
+		
+		/**
+		 * 실적액
+		 */
+		,                          
+		TA02 AS (
+			SELECT 	'30'        AS NO1, 
+					'합계'      AS DIVISION, 
+					SUM(IS5008) AS CASHAMOUNT,         
+					SUM(IS5009) AS CARDAMOUNT,         
+					SUM(IS5010) AS GIFTAMOUNT,         
+					SUM(IS5011) AS ETCAMOUNT,          
+					SUM(IS5012) AS NETSALEAMOUNT,      
+					SUM(IS5013) AS DISCOUNTAMOUNT,     
+				 	SUM(IS5014) AS TOTALSALEAMOUNT,    
+				 	SUM(IS5015) AS CUSTOMCOUNT	       
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 = #{startDate}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			GROUP BY '30', '실적액'
+		)
+		
+		/**
+		 * 구성비
+		 */
+		,                          
+		TA03 AS (
+			SELECT 	'31'        						AS NO1, 
+					'구성비'      						AS DIVISION, 
+				    FLOAT(CASHAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100 		AS CASHRATE,         
+					FLOAT(CARDAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100		AS CARDRATE,         
+					FLOAT(GIFTAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100 		AS GIFTAMOUNT,         
+					FLOAT(ETCAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100 		AS ETCAMOUNT,          
+					FLOAT(NETSALEAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100     AS NETSALERETE,      
+					FLOAT(DISCOUNTAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100    AS DISCOUNTRATE,     
+				 	FLOAT(TOTALSALEAMOUNT)/FLOAT(TOTALSALEAMOUNT)*100   AS TOTALSALERATE,    
+				 	0	       							AS NULLVALUE
+			FROM	TA02
+		)
+		
+		
+	
+		
+		
+		/**
+		 * 시간대별 속보 화면 union 
+		 */
+		 
+		 
+		SELECT * FROM TA01A 
+		UNION ALL
+		SELECT * FROM TA01B 
+		UNION ALL
+		SELECT * FROM TA01C
+		UNION ALL
+		SELECT * FROM TA01D 
+		UNION ALL
+		SELECT * FROM TA02
+		UNION ALL 
+		SELECT * FROM TA03
+		ORDER BY NO1
+	</select>
+
+</mapper>

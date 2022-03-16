@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.jumManagement.JumManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectJumManagement" resultType="com.saydept.api.spf.org.jumManagement.model.JumManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.jumManagement.model.JumManagementSaveModel" fetchSize="1000">
+		 SELECT
+         MS0101 as ms01Jum
+        ,TRIM(MS0102) as ms01JumNm
+        ,MS0103 as ms01Sano
+        ,TRIM(MS0104) as ms01Dname
+        ,LEFT(MS0105||'      ',6)||LEFT(MS0106||'       ',7) as ms01Juno1
+        --,MS0106 as ms01Juno2
+        ,LEFT(MS0107||'   ',3)||LEFT(MS0108||'   ',3) as ms01Post1
+        --,MS0108 as ms01Post2
+        ,TRIM(MS0113) as ms01Address
+        ,RIGHT('000'||TRIM(MS0110),3)||RIGHT('000'||TRIM(MS0111),3)||RIGHT('0000'||TRIM(MS0112),4) as ms01Phone1
+        --,TRIM(MS0110)||TRIM(MS0111)||TRIM(MS0112) as ms01Phone1
+        --,MS0110||MS0111||MS0112 as ms01Phone1
+        --,MS0111 as ms01Phone2
+        --,MS0112 as ms01Phone3
+        ,MS0114 as ms01Crdate
+        ,MS0115 as ms01Camonth
+        ,MS0116 as ms01Deldate
+        ,MS0117 as ms01Adddate
+        ,MS0121 as ms01Uptdate
+        ,MS0122 as ms01Adduser
+		,MS0123 as ms01Uptuser
+
+	FROM SPFRDB.SPFM01PX
+        WHERE MS0101 = #{ms01Jum}
+	</select> 
+	
+	<!-- 부서조회  -->
+	<select id="selectJumList" resultType="com.saydept.api.spf.org.jumManagement.model.JumManagementModel" 
+				parameterType="com.saydept.api.spf.org.jumManagement.model.JumManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0101) 	AS jum /*점*/
+				,TRIM(TB1.MS0102 ) 	AS jumNm			/* 조직명 */
+				,TRIM(TB1.MS0101)||' - '||TRIM(TB1.MS0102) AS jumCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM01PF TB1
+		WHERE  	TB1.MS0116 = ''
+				ORDER BY TRIM(TB1.MS0101)
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updateJumManagement"  
+				parameterType="com.saydept.api.spf.org.jumManagement.model.JumManagementSaveModel">
+         UPDATE  SPFRDB.SPFM01PF SET
+          MS0102 = VARGRAPHIC(#{ms01JumNm})
+         ,MS0103 = #{ms01Sano}
+         ,MS0104 = VARGRAPHIC(#{ms01Dname})
+         ,MS0105 = SUBSTR(#{ms01Juno1},1,6)
+         ,MS0106 = SUBSTR(#{ms01Juno1},7,7)
+         ,MS0107 = SUBSTR(#{ms01Post1},1,3)
+         ,MS0108 = SUBSTR(#{ms01Post1},4,3)
+         
+         ,MS0110 = SUBSTR(#{ms01Phone1},1,3)
+         ,MS0111 = SUBSTR(#{ms01Phone1},4,3)
+         ,MS0112 = SUBSTR(#{ms01Phone1},7,4)
+         ,MS0113 = VARGRAPHIC(#{ms01Address})
+         ,MS0114 = #{ms01Crdate}
+         ,MS0115 = #{ms01Camonth}
+         ,MS0116 = #{ms01Deldate}
+         ,MS0117 = #{ms01Adddate}
+         ,MS0121 = #{ms01Uptdate}
+         
+         WHERE MS0101 = #{ms01Jum}
+	</update> 
+	
+	
+<!-- 인서트 1행  -->
+	<insert id="insertJumManagement"  
+				parameterType="com.saydept.api.spf.org.jumManagement.model.JumManagementSaveModel">
+         INSERT INTO  SPFRDB.SPFM01PF VALUES
+         (
+          #{ms01Jum}
+         ,#{ms01JumNm}
+         ,#{ms01Sano}
+         ,#{ms01Dname}
+         ,#{ms01Juno1}
+         ,#{ms01Juno2}
+         ,#{ms01Post1}
+         ,#{ms01Post2}
+         ,#{ms01Phone1}
+         ,#{ms01Phone2}
+         ,#{ms01Phone3}
+         ,#{ms01Address}
+         ,#{ms01Crdate}
+         ,#{ms01Camonth}
+         ,#{ms01Deldate}
+         ,#{ms01Adddate}
+         ,#{ms01Uptdate}
+		 ,#{ms01Adduser}
+		 ,#{ms01Uptuser}
+		 )
+	</insert>
+		
+</mapper>

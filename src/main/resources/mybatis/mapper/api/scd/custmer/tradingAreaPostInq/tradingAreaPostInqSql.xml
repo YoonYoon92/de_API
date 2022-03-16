@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.scd.custmer.tradingAreaPostInq.TradingAreaPostInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="tradingAreaPostInqModel" type="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectTradingAreaPostInq" resultType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel">
+		/*selectTradingAreaPostInq*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectTradingAreaPostInqList" resultType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel" fetchSize="1000">
+		SELECT 	 M11POST1||'-'||M11POST2	AS address
+				,CASE WHEN M11AGUBUN=' ' THEN TRIM(SUBSTR(M11POSTNM,1,61)) ELSE TRIM(SUBSTR(M11APTNAME,1,29)) END AS addressNm
+				,M11DPOST2 AS repAddress
+				,CASE WHEN M11COUNT=0 THEN '' ELSE M11COUNT END    AS houseNum
+				,M11AGUBUN AS apartDiv
+	
+		FROM SCDRDB.SCDM11PF
+		WHERE M11GUBUN=#{tradingAreaCd}
+		ORDER BY  M11POST1,M11POST2
+
+	</select>
+
+	<select id="tradingAreaCdList" resultType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaPostInq.model.TradingAreaPostInqModel" fetchSize="1000">
+		SELECT 	 DISTINCT(M11GUBUN) AS tradingAreaCd
+				,CASE WHEN M11GUBUN='' THEN '대전외 상권' ELSE SUBSTR(M11GUBUN,1,1)||'차상권('||M11GUBUN||')' END AS tradingAreaNm
+		FROM SCDRDB.SCDM11PF
+					
+		ORDER BY M11GUBUN
+	</select>
+	
+
+</mapper>

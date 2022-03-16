@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration>
+
+  	<logger name="org.springframework" level="INFO"/> 
+  	<logger name="sun.rmi.transport.tcp" level="ERROR"/>
+  	<logger name="sun.rmi.loader" level="ERROR"/>
+  	<logger name="javax.management.mbeanserver" level="ERROR"/>
+  	<logger name="javax.management.remote.rmi" level="ERROR"/>
+  	<logger name="sun.rmi.server.call" level="ERROR"/>
+  	<logger name="org.apache.catalina.session.ManagerBase" level="ERROR"/>
+  	<logger name="org.apache.coyote.http11.Http11Processor" level="ERROR"/>
+  	<logger name="org.apache.coyote.http11.Http11InputBuffer" level="ERROR"/>
+  	
+	<!-- 개발 -->
+	<springProfile name="dev">
+		<include resource="org/springframework/boot/logging/logback/base.xml"/>
+		<root level="DEBUG"/>
+	</springProfile>
+	
+	<!-- 운영 -->
+	<springProfile name="default">
+		<appender name="logFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	  		<prudent>false</prudent>
+	  		<file>/say/logs/api.log</file>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>/say/logs/api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>100MB</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+				<maxHistory>15</maxHistory>
+			</rollingPolicy>
+			<encoder>
+				<charset>UTF-8</charset>
+				<pattern>%d{yyyy:MM:dd HH:mm:ss.SSS} %-5level --- [%thread] %logger{35} : %msg %n</pattern>
+			</encoder>
+		</appender>
+		
+		<!-- log file  -->
+	  	<root level="DEBUG">
+	  		<appender-ref ref="logFile" />
+	  	</root>
+	</springProfile>
+	
+</configuration>
+

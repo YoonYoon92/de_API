@@ -1,0 +1,25 @@
+package com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel;
+import com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel;
+
+
+@Mapper
+public interface PCLastYearCntstIncrsrateInqMapper {
+
+
+	//코너 목록 조회
+	List<PCLastYearCntstIncrsrateInqParamModel> getConerlist(PCLastYearCntstIncrsrateInqParamModel storeParam);
+	// 목표 조회
+	PCLastYearCntstIncrsrateInqModel getSaleGoal(PCLastYearCntstIncrsrateInqParamModel data);
+	//전년실적조회
+	PCLastYearCntstIncrsrateInqModel getlastyearSale(PCLastYearCntstIncrsrateInqParamModel data);
+	//실적조회
+	PCLastYearCntstIncrsrateInqModel getSale(PCLastYearCntstIncrsrateInqParamModel data);
+	//종속코너조회
+	PCLastYearCntstIncrsrateInqModel getSubordconerlist(PCLastYearCntstIncrsrateInqModel data);
+}

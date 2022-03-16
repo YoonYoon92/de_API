@@ -1,0 +1,12 @@
+package com.saydept.api.dashboard.model;
+
+import lombok.Data;
+
+@Data
+public class RequestModel {
+
+	private String saleDate;	//영업일
+	private String userId;		//사번
+	private String jum;			//점
+	
+}

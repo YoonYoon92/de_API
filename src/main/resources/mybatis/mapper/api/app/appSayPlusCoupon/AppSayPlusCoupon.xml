@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.app.appSayPlusCoupon.AppSayPlusCouponMapper">
+
+	<select id="getAppSayPlusCouponlist"
+		parameterType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponParamModel"
+		resultType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponModel">
+WITH
+P01(JU1,JU2,WHENO)AS(
+SELECT P01JUMIN1,P01JUMIN2,P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK
+                FROM SCDRDB.SCDP01PF
+                WHERE P01JUM = '01'
+--                AND P01WHEGU = SUBSTR('9108488550113025',1,2)
+--                AND P01SEQNO = SUBSTR('9108488550113025',3,6)
+--                AND P01CHECK = SUBSTR('9108488550113025',9,1)
+                AND P01WHEGU = SUBSTR(${onlineChk},1,2)
+                AND P01SEQNO = SUBSTR(${onlineChk},3,6)
+                AND P01CHECK = SUBSTR(${onlineChk},9,1)
+                )
+
+SELECT
+         C51JUM AS jum
+    --,trim(C51CARDNO) AS cdNo
+    ,trim(WHENO) AS cdNo
+        ,C51COUPON AS cpNo
+        ,C51FDATE AS cpFdate
+        ,C51TDATE AS cpTdate
+        ,C51CGBN AS cpGubun
+        ,replace(C51CGBNNM,'　','') AS cpName
+        ,C51DCGU AS cpType
+        ,C51DCPER AS cpDcPer
+        ,C51DCMNY AS cpDcWon
+        ,C51CP_TNO AS cpTno
+        ,C51CP_UNO AS cpUno
+        ,C51CP_JNO AS cpJno
+
+FROM SCDRDB.SCDC51PF
+        INNER JOIN P01
+--      AND             JU2 = SUBSTR(C51CARDNO,7,7)
+        ON              C51CARDNO = JU1||JU2
+
+WHERE C51JUM = '01'
+        AND C51FDATE &lt;= ${toDate}
+        AND C51TDATE &gt;= ${frDate}
+--        AND C51TDATE &lt;= ${toDate}
+		AND SUBSTR(C51CGBN,1,1)!='A'
+		--AND C51CP_JNO &gt; 0
+
+ORDER BY cpJno DESC, cpDcPer DESC, cpDcWon DESC
+--ORDER BY cpJno , cpDcPer , cpDcWon 
+	</select>
+	
+	<select id="getAppSayPlusCouponlistA"
+	parameterType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponParamModel"
+	resultType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponModel">
+WITH
+P01(JU1,JU2,WHENO)AS(
+SELECT P01JUMIN1,P01JUMIN2,P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK
+                FROM SCDRDB.SCDP01PF
+                WHERE P01JUM = '01'
+--                AND P01WHEGU = SUBSTR('9108488550113025',1,2)
+--                AND P01SEQNO = SUBSTR('9108488550113025',3,6)
+--                AND P01CHECK = SUBSTR('9108488550113025',9,1)
+                AND P01WHEGU = SUBSTR(${onlineChk},1,2)
+                AND P01SEQNO = SUBSTR(${onlineChk},3,6)
+                AND P01CHECK = SUBSTR(${onlineChk},9,1)
+                )
+
+SELECT
+         C51JUM AS jum
+    --,trim(C51CARDNO) AS cdNo
+    ,trim(WHENO) AS cdNo
+        ,C51COUPON AS cpNo
+        ,C51FDATE AS cpFdate
+        ,C51TDATE AS cpTdate
+        ,C51CGBN AS cpGubun
+        ,replace(C51CGBNNM,'　','') AS cpName
+        ,C51DCGU AS cpType
+        ,C51DCPER AS cpDcPer
+        ,C51DCMNY AS cpDcWon
+        ,C51CP_TNO AS cpTno
+        ,C51CP_UNO AS cpUno
+        ,C51CP_JNO AS cpJno
+
+FROM SCDRDB.SCDC51PF
+        INNER JOIN P01
+--      AND             JU2 = SUBSTR(C51CARDNO,7,7)
+        ON              C51CARDNO = JU1||JU2
+
+WHERE C51JUM = '01'
+        AND C51FDATE &lt;= ${toDate}
+        AND C51TDATE &gt;= ${frDate}
+--        AND C51TDATE &lt;= ${toDate}
+		--AND C51CP_JNO &gt; 0
+		AND SUBSTR(C51CGBN,1,1)='A'
+ORDER BY cpJno DESC, cpDcPer DESC, cpDcWon DESC
+--ORDER BY cpJno , cpDcPer , cpDcWon 
+	</select>
+	
+	<update id="getUseCoupon"
+	parameterType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponModel">
+	UPDATE SCDRDB.SCDC51LF3 SET C51CP_UNO=C51CP_UNO+1 ,C51CP_JNO=C51CP_JNO-1
+	WHERE C51JUM='01' AND C51COUPON=#{cpNo}
+	</update>
+	
+	<select id="getcpJnoCheck"
+	parameterType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponModel"
+	resultType="com.saydept.api.app.appSayPlusCoupon.model.AppSayPlusCouponModel">
+	SELECT 	C51COUPON AS cpNo
+			,C51CP_JNO AS cpJno
+	FROM SCDRDB.SCDC51LF3
+	WHERE C51JUM='01' AND C51COUPON=#{cpNo}
+	</select>
+</mapper>
+
+

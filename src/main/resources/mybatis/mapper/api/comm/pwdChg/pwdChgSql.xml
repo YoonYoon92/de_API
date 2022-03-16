@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.comm.pwdChg.PwdChgMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="pwdChgModel" type="com.saydept.api.comm.pwdChg.model.PwdChgModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectPwdChg" resultType="Integer" parameterType="com.saydept.api.comm.pwdChg.model.PwdChgModel">
+		/*selectPwdChg*/
+      SELECT 	count(*)
+      FROM		${dbType}WEBRDB.WEBY02PF
+      WHERE		WBY02SABUN = #{userId}
+      		AND WBY02PW = #{password}
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectPwdChgList" resultType="com.saydept.api.comm.pwdChg.model.PwdChgModel" parameterType="com.saydept.api.comm.pwdChg.model.PwdChgModel" fetchSize="1000">
+		/*selectPwdChgList*/
+      SELECT 	TRIM(SUBSTR(WBY02NAME,1,11))||X'0F' as userName
+      FROM		${dbType}WEBRDB.WEBY02PF
+      WHERE		WBY02SABUN = #{userId}
+	</select>
+
+	<!-- 수정 -->
+	<update id="updatePwdChg" parameterType="com.saydept.api.comm.pwdChg.model.PwdChgModel">
+		/*updatePwdChg*/
+      UPDATE 	${dbType}WEBRDB.WEBY02PF
+      SET		WBY02PW = #{chgPw}
+      WHERE		WBY02SABUN = #{userId}
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertPwdChg" parameterType="com.saydept.api.comm.pwdChg.model.PwdChgModel">
+		/*insertPwdChg*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deletePwdChg" parameterType="com.saydept.api.comm.pwdChg.model.PwdChgModel">
+		/*deletePwdChg*/
+		DELETE ...
+	</delete>
+
+</mapper>

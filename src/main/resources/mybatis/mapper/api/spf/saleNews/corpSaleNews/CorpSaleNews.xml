@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.spf.saleNews.corpSaleNews.CorpSaleNewsMapper">
+
+
+	<select id="getBulistCorp" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getBulistCorp*/
+		SELECT 	TB1.MS0201		AS jum
+		,			TB1.MS0203	AS jumNm
+		,			TB1.MS0202 	AS bu
+		,			TB1.MS0204 	AS buNm
+		,			TB1.MS0202 	AS buCode
+		,			trim(TB1.MS0204) 	AS buName		
+		FROM 	${dbType}SPFRDB.SPFM02PF TB1
+		
+		 LEFT OUTER JOIN SPFRDB.SPFM02PF2
+                        ON      MS02201=TB1.MS0201 AND MS02202=TB1.MS0202
+		WHERE EXISTS 
+		(
+			SELECT 'X'
+			FROM 	${dbType}SPFRDB.SPFM04PF2 TB2
+			WHERE 	TB2.MS04221 = 'Y'
+			AND 	TB1.MS0201 = TB2.MS04201
+			AND 	TB1.MS0202 = TB2.MS04202
+		)
+		AND		TB1.MS0201 = #{jum}
+		AND MS02200&lt;=6
+		
+		ORDER BY MS02200
+                
+	</select>
+
+	<select id="getTimlistCorp" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getBulistCorp*/
+		SELECT 	TB1.MS0301		AS jum
+		,			TB1.MS0304	AS jumNm
+		,			TB1.MS0302 	AS bu
+		,			TB1.MS0305 	AS buNm
+		,			TB1.MS0303 	AS tim
+		,			TB1.MS0306 	AS timNm	
+		,			TB1.MS0303 	AS buCode
+		,			trim(TB1.MS0306) 	AS buName	
+		FROM 	${dbType}SPFRDB.SPFM03PF TB1
+		WHERE EXISTS 
+		(
+			SELECT 'X'
+			FROM 	${dbType}SPFRDB.SPFM04PF2 TB2
+			WHERE 	TB2.MS04221 = 'Y'
+			AND 	TB1.MS0301 = TB2.MS04201
+			AND 	TB1.MS0302 = TB2.MS04202
+			AND 	TB1.MS0303 = TB2.MS04203
+		)
+		AND		TB1.MS0301 = #{jum}
+		AND		TB1.MS0302 = SUBSTR(#{bu},3,2)
+		
+		ORDER BY TB1.MS0301
+		,		 TB1.MS0302       
+		,		 TB1.MS0303      
+                
+	</select>
+
+	<select id="getPclistCorp" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getBulistCorp*/
+		SELECT 	TB1.MS0401		AS jum
+		,			TB1.MS0405	AS jumNm
+		,			TB1.MS0402 	AS bu
+		,			TB1.MS0406 	AS buNm
+		,			TB1.MS0403 	AS tim
+		,			TB1.MS0407 	AS timNm
+		,			TB1.MS0404 	AS pc
+		,			TB1.MS0408 	AS pcNm	
+		,			TB1.MS0404 	AS buCode
+		,			trim(TB1.MS0408) 	AS buName	
+		FROM 	${dbType}SPFRDB.SPFM04PF TB1
+		WHERE EXISTS 
+		(
+			SELECT 'X'
+			FROM 	${dbType}SPFRDB.SPFM04PF2 TB2
+			WHERE 	TB2.MS04221 = 'Y'
+			AND 	TB1.MS0401 = TB2.MS04201
+			AND 	TB1.MS0402 = TB2.MS04202
+			AND 	TB1.MS0403 = TB2.MS04203
+			AND 	TB1.MS0404 = TB2.MS04204
+		)
+		AND		TB1.MS0401 = #{jum}
+		AND		TB1.MS0402 = SUBSTR(#{tim},3,2)
+		AND		TB1.MS0403 = SUBSTR(#{tim},5,2)
+		
+		ORDER BY TB1.MS0401
+		,		 TB1.MS0402       
+		,		 TB1.MS0403      
+        ,        TB1.MS0404
+	</select>
+	
+		
+	<!-- 실적 한번에 조회 -->
+	<select id="getTotalSalePerCorp" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getTotalSalePerCorp*/
+				
+		SELECT 
+			  TB2.MS0510 as clsNm
+			, TB1.IS0104 as cls
+			, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = #{searchDay} THEN TB1.IS0131 ELSE 0 END) AS ddTotsale
+			, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = #{searchDay} THEN TB1.IS0130 ELSE 0 END) AS ddDsicount
+			, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,8) = #{searchDay} THEN TB1.IS0129 ELSE 0 END) AS ddNetsale
+			<!-- , SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,6) = #{searchDay}   AND SUBSTRING(TB1.IS0102,1,8) <= #{searchDay} THEN TB1.IS0129 ELSE 0 END) AS mmNetsale			
+			, SUM(CASE WHEN SUBSTRING(TB1.IS0102,1,4) = #{searchDay}     AND SUBSTRING(TB1.IS0102,1,8) <= #{searchDay} THEN TB1.IS0129 ELSE 0 END) AS yyNetsale -->
+			,0 AS mmNetsale
+			,0 AS yyNetsale
+ 		FROM ${dbType}SPFRDB.SPFI01LF6 TB1
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF TB2
+			ON TB2.MS0501 = '01' AND TB2.MS0505 = TB1.IS0104
+	
+		WHERE TB1.IS0103 = #{jum}
+		AND TB1.IS0106 = #{bu}
+		AND TB1.IS0107 = #{tim}
+		AND TB1.IS0108 = #{pc}
+		AND SUBSTRING(TB1.IS0102,1,4) = '2020' -- INPUT DATE
+		--AND TB1.IS0104 = '62543' -- TEST
+
+		GROUP BY TB2.MS0510, TB1.IS0104	
+	</select>
+	
+	
+	
+		<!-- 일 목표 조회 --> 
+	<select id="getDaySaleGoal" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getDaySaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS dayTry	/*일매출계획*/
+		FROM 	${dbType}SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	= #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+	</select>
+
+	<!-- 월 목표 조회 조회일까지 -->
+	<select id="getMonthSaleGoal" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getMonthSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS mmTry	/*월매출계획*/
+		FROM 	${dbType}SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	BETWEEN SUBSTR(#{searchDay}, 1,6)||'01' AND #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>		
+	</select>
+	<!-- 월 목표 조회 해당월 전체-->
+	<select id="getMonthSaleGoalMax" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getMonthSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS mmTryMax	/*월매출계획*/
+		FROM 	${dbType}SPFRDB.SPFI05PF1 TB1
+		WHERE 	SUBSTR(TB1.IS05101,1,6)	= SUBSTR(#{searchDay}, 1,6)
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>		
+	</select>
+
+	<!-- 년 목표 조회 조회일까지 -->
+	<select id="getYearSaleGoal" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getYearSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS yyTry	/*년매출계획*/
+		FROM 	${dbType}SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	BETWEEN SUBSTR(#{searchDay}, 1,4)||'0101' AND #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+	</select>
+	<!-- 년 목표 조회 해당년 전체-->
+	<select id="getYearSaleGoalMax" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getYearSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS yyTryMax	/*년매출계획*/
+		FROM 	${dbType}SPFRDB.SPFI05PF1 TB1
+		WHERE 	SUBSTR(TB1.IS05101,1,4)	= SUBSTR(#{searchDay}, 1,4)
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+	</select>
+	<!-- 일 실적 조회 -->
+	<select id="getDaySalePer" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getDaySalePer*/
+		SELECT 	TB1.IS5203				AS jum			/*점*/
+		,			TB1.IS5204			AS bu			/*부*/
+		<if test="tim != null and tim != ''">
+		,			TB1.IS5205			AS tim			/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,			TB1.IS5206			AS pc			/*세분류*/
+		</if>
+		,			TRIM(SUM(TB1.IS5213)/1000)		AS dayNetsale	/*순매출*/
+		,			TRIM(SUM(TB1.IS5214)/1000)		AS dayDsicount	/*할인*/
+		FROM 	${dbType}SPFRDB.SPFI52PF TB1 
+		WHERE 	TB1.IS5201 	= #{searchDay}
+		AND		TB1.IS5203 	= #{jum}
+		AND		TB1.IS5204	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS5205 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS5206 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS5203 
+		,			TB1.IS5204 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS5205 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS5206
+		</if>
+		
+	</select>
+
+	<!-- 당월 실적 조회 -->
+	<select id="getMonthSalePer" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		/*getMonthSalePer*/
+		SELECT 	TB1.IS5303				AS jum			/*점*/
+		,			TB1.IS5304			AS bu			/*부*/
+		<if test="tim != null and tim != ''">
+		,			TB1.IS5305			AS tim			/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,			TB1.IS5306			AS pc			/*세분류*/
+		</if>
+		,			TRIM(SUM(TB1.IS5309)/1000)		AS mmNetsale	/*순매출*/
+		,			TRIM(SUM(TB1.IS5310)/1000)		AS mmDsicount	/*할인*/
+		,			TRIM(SUM(TB1.IS5315)/1000)		AS yyNetsale	/*순매출*/
+		,			TRIM(SUM(TB1.IS5316)/1000)		AS yyDsicount	/*할인*/
+		FROM 	${dbType}SPFRDB.SPFI53PF TB1 
+		WHERE 	TB1.IS5301 	= #{searchDay}
+		AND		TB1.IS5303 	= #{jum}
+		AND		TB1.IS5304	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS5305 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS5306 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS5303 
+		,			TB1.IS5304 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS5305 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS5306
+		</if>
+	</select>
+
+
+
+	<!-- 코너 당일 총매출 조회 -->
+	<select id="getConerlistTotal" parameterType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel" resultType="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel">
+		WITH
+		TA1(jum,jumNm,bu,buNm,tim,timNm,pc,pcNm,coner,conerNm) AS(
+			SELECT 	TB1.MS0501		AS jum
+			,			TB1.MS0506	AS jumNm
+			,			TB1.MS0502 	AS bu
+			,			TB1.MS0507 	AS buNm
+			,			TB1.MS0503 	AS tim
+			,			TB1.MS0508 	AS timNm	
+			,			TB1.MS0504 	AS pc
+			,			TB1.MS0509 	AS pcNm
+			,			TB1.MS0505 	AS coner
+			,			trim(TB1.MS0510) 	AS conerNm	
+			FROM 	${dbType}SPFRDB.SPFM05PF TB1
+			WHERE EXISTS 
+			(
+				SELECT 'X'
+				FROM 	${dbType}SPFRDB.SPFM04PF2 TB2
+				WHERE 	TB2.MS04221 = 'Y'
+				AND 	TB1.MS0501 = TB2.MS04201
+				AND 	TB1.MS0502 = TB2.MS04202
+				AND 	TB1.MS0503 = TB2.MS04203
+				AND 	TB1.MS0504 = TB2.MS04204
+			)
+			AND		TB1.MS0501 = #{jum}
+			AND		TB1.MS0502 = SUBSTR(#{pc},3,2)
+			AND		TB1.MS0503 = SUBSTR(#{pc},5,2)
+			AND		TB1.MS0504 = SUBSTR(#{pc},7,2)
+			AND		TB1.MS0515 = ''
+			ORDER BY TB1.MS0501
+			,		 TB1.MS0502       
+			,		 TB1.MS0503   
+			,		 TB1.MS0504  
+			,		 TB1.MS0505  DESC  		
+		),
+		TA22(coner,dayNetsale,dayDiscount) AS(
+			SELECT 
+				CASE 
+				WHEN MS05102 != '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0104  AS CHAR(5))  
+		 		END			AS coner
+			,	IS0129	AS dayNetsale
+			,	IS0130	AS dayDiscount
+ 		FROM ${dbType}SPFRDB.SPFI01LF3 TB1
+	 		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+				ON	MS05101=IS0103 AND MS05103=IS0104
+ 		WHERE 	
+ 			IS0102 = #{searchDay}
+ 		AND	IS0103 = #{jum}
+ 		AND IS0106 = SUBSTR(#{pc},3,2)
+ 		AND IS0107 = SUBSTR(#{pc},5,2)
+ 		AND IS0108 = SUBSTR(#{pc},7,2)
+		),
+		TA2(coner,dayNetsale,dayDiscount) AS(
+			SELECT 
+				coner
+			,	SUM(dayNetsale)	
+			,	SUM(dayDiscount)
+ 		FROM TA22
+ 		GROUP BY	coner 			
+		),		
+		
+		TA33(coner,monthNetsale,monthDiscount) AS(
+			SELECT 
+				CASE 
+				WHEN MS05102 != '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0104  AS CHAR(5))  
+		 		END			AS coner
+			,	IS0129	AS monthNetsale
+			,	IS0130	AS monthDiscount
+ 		FROM ${dbType}SPFRDB.SPFI01LF3 TB1
+ 		LEFT OUTER JOIN		SPFRDB.SPFM051PF
+			ON	MS05101=IS0103 AND MS05103=IS0104
+ 		WHERE 	
+ 			IS0102 &gt;= SUBSTR(#{searchDay},1,6)||'01'  AND IS0102 &lt;= #{searchDay}
+ 		AND	IS0103 = #{jum}
+ 		AND IS0106 = SUBSTR(#{pc},3,2)
+ 		AND IS0107 = SUBSTR(#{pc},5,2)
+ 		AND IS0108 = SUBSTR(#{pc},7,2)
+		),
+		TA3(coner,monthNetsale,monthDiscount) AS(
+			SELECT 
+				coner
+			,	SUM(monthNetsale)	
+			,	SUM(monthDiscount)
+ 		FROM TA33
+ 		GROUP BY	coner 			
+		),			
+		
+		TA44(coner,yearNetsale,yearDiscount) AS(
+			SELECT 
+				CASE 
+				WHEN MS05102 != '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0204  AS CHAR(5))  
+		 		END			AS coner
+			,	IS0229	AS yearNetsale
+			,	IS0230	AS yearDiscount
+ 		FROM ${dbType}SPFRDB.SPFI02PF TB1
+ 		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+			ON	MS05101=IS0203 AND MS05103=IS0204
+ 		WHERE 	
+ 			IS0201 = SUBSTR(#{searchDay},1,4)  AND IS0202 &lt; SUBSTR(#{searchDay},5,2)
+ 		AND	IS0203 = #{jum}
+ 		AND IS0206 = SUBSTR(#{pc},3,2)
+ 		AND IS0207 = SUBSTR(#{pc},5,2)
+ 		AND IS0208 = SUBSTR(#{pc},7,2)
+		),				
+		TA4(coner,yearNetsale,yearDiscount) AS(
+			SELECT 
+				coner
+			,	SUM(yearNetsale)	
+			,	SUM(yearDiscount)
+ 		FROM TA44
+ 		GROUP BY	coner 			
+		),				
+		
+		TA5(jum,jumNm,bu,buNm,tim,timNm,pc,pcNm,coner,conerNm,buCode,buName,dayNetsale,dayDiscount,daySale,mmNetsale,mmDiscount,mmSale,yyNetsale,yyDiscount,yySale,space) AS(
+		SELECT  
+				TA1.jum			AS jum
+		,		TA1.jumNm    	AS jumNm
+		,		TA1.bu       	AS bu
+		,		TA1.buNm     	AS buNm
+		,		TA1.tim      	AS tim
+		,		TA1.timNm		AS timNm	
+		,		TA1.pc       	AS pc
+		,		TA1.pcNm     	AS pcNm
+		,		TA1.coner  	 	AS coner
+		,		TA1.conerNm		AS conerNm
+		,		TA1.coner  	 	AS buCode
+		,		TA1.conerNm		AS buName
+		,		NVL(TA2.dayNetsale,0)	AS dayNetsale
+		,		NVL(TA2.dayDiscount,0)  AS dayDiscount
+		,		dayNetsale + dayDiscount AS daySale
+		,		NVL(TA3.monthNetsale,0)	AS monthNetsale
+		,		NVL(TA3.monthDiscount,0)	AS monthDiscount
+		,		monthNetsale + monthDiscount AS monthSale
+		,		(NVL(TA4.yearNetsale,0) + NVL(TA3.monthNetsale,0)) AS yearNetsale
+		,		(NVL(TA4.yearDiscount,0) + NVL(TA3.monthDiscount,0)) AS yearDiscount
+		,		yearNetsale + yearDiscount AS yearSale
+		,		'|'	AS space
+		FROM 	TA1
+			LEFT OUTER JOIN TA2
+				ON TA1.coner = TA2.coner
+			LEFT OUTER JOIN TA3
+				ON TA1.coner = TA3.coner
+			LEFT OUTER JOIN TA4
+				ON TA1.coner = TA4.coner
+		)
+		
+		SELECT 	* 
+		FROM 	TA5
+		WHERE	yyNetsale != 0		
+		ORDER BY <!-- coner desc --> dayNetsale desc
+		
+	</select>
+
+	
+	
+</mapper>

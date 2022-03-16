@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.app.appSaySignUp.AppSaySignUpMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="appSaySignUpModel" type="com.saydeptapi.app.appSaySignUp.model.AppSaySignUpModel"/>
+	-->
+	
+
+	<select id="selectJuminchk"
+		parameterType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel"
+		resultType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel">
+		SELECT LM00SEQ+1 as juminserial
+		FROM SCDRDB.SCDLM00PF
+		WHERE LM00YYMM=SUBSTR(${birthday},1,4) AND LM00SEX=${sDiv}
+		</select>
+		
+	<!-- 등록 -->
+	<insert id="insertAppSaySignUp" parameterType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel">
+		INSERT INTO WEBRDB.WEBA01PF
+		(
+		 WA01INDATE
+		 ,WA01INTIME
+		 ,WA01HNAME
+		 ,WA01BIRTH
+		 ,WA01HPTEL
+		 ,WA01CARD
+		 ,WA01SEX
+		 ,WA01DPOST
+		 ,WA01ADDRA
+		 ,WA01ADDR1
+		 ,WA01ADDR2
+		 ,WA01ADDR3
+		 ,WA01ADDR4
+		 ,WA01ADDR5
+		 ,WA01ADDR6
+		 ,WA01ADDR7
+		 ,WA01ADDR8
+		 ,WA01ADDRCD
+		 ,WA01BUIDCD
+		 ,WA01EXTCD
+		 ,WA01IP
+		 ,WA01DM    
+		 ,WA01CREDIT
+		 ,WA01LG    
+		 ,WA01FIL1
+		 ,WA01FIL2	
+		 ,WA01FIL3
+		 ,WA01ID		 
+		)
+		VALUES(
+		 #{joinDate}
+		,#{joinTime}
+		,#{name}
+		,#{birthday}
+		,#{hptel}
+		,#{selCard}
+		,#{gender}
+		,#{postAddr}
+		,#{allAddr}
+		,#{addr1}
+		,#{addr2}
+		,#{addr3}
+		,#{addr4}
+		,#{addr5}
+		,#{addr6}
+		,#{addr7}
+		,#{addr8}
+		,#{addrCode}
+		,#{buildCode}
+		,#{extCarnum}
+		,#{ip}
+		,#{creditAgree}
+		,#{smsAgree}
+		,#{DmAgree}
+		,#{fill}
+		,#{fill}
+		,#{fill}
+		,#{id}
+		)
+	</insert>
+	<insert id="logAppSaySignUp" parameterType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel">
+		INSERT INTO WEBRDB.WEBA00PF
+		(
+		 WA00INDATE
+		 ,WA00INTIME
+		 ,WA00HNAME
+		 ,WA00BIRTH
+		 ,WA00HPTEL
+		 ,WA00CARD
+		 ,WA00SEX
+		 ,WA00DPOST
+		 ,WA00ADDRA
+		 ,WA00ADDR1
+		 ,WA00ADDR2
+		 ,WA00ADDR3
+		 ,WA00ADDR4
+		 ,WA00ADDR5
+		 ,WA00ADDR6
+		 ,WA00ADDR7
+		 ,WA00ADDR8
+		 ,WA00ADDRCD
+		 ,WA00BUIDCD
+		 ,WA00EXTCD
+		 ,WA00IP
+		 ,WA00DM    
+		 ,WA00CREDIT
+		 ,WA00LG    
+		 ,WA00FIL1
+		 ,WA00FIL2	
+		 ,WA00FIL3
+		 ,WA00ID
+		)
+		VALUES(
+		 #{joinDate}
+		,#{joinTime}
+		,#{name}
+		,#{birthday}
+		,#{hptel}
+		,#{selCard}
+		,#{gender}
+		,#{postAddr}
+		,#{allAddr}
+		,#{addr1}
+		,#{addr2}
+		,#{addr3}
+		,#{addr4}
+		,#{addr5}
+		,#{addr6}
+		,#{addr7}
+		,#{addr8}
+		,#{addrCode}
+		,#{buildCode}
+		,#{extCarnum}
+		,#{ip}
+		,#{creditAgree}
+		,#{smsAgree}
+		,#{DmAgree}
+		,#{fill}
+		,#{fill}
+		,#{fill}
+		,#{id}
+		)
+	</insert>
+<select id="getAppSayPlusMemInfoCheck"
+		parameterType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel"
+		resultType="com.saydept.api.app.appSaySignUp.model.AppSaySignUpModel">
+
+	SELECT 	
+			--,NVL(CASE WHEN P01WHEGU=${selCard} THEN MAX(P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK) ELSE '' END,'')  as carnum
+			--,NVL(CASE WHEN P01WHEGU IN('01','11','21','90','91','92','98','99') THEN max(P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK) ELSE '' END,'')  AS extCarnum
+			--,NVL(max(P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK),'') AS extCarnum
+			NVL(MAX(CASE WHEN P01WHEGU=${selCard} THEN P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK ELSE '' END),'')  as carnum
+			,NVL(max(P01WHEGU||P01SEQNO||P01CHECK||P01RBALNO||P01BALYM||P01CHK),'') AS extCarnum
+	        FROM SCDRDB.SCDLM01PF
+	        LEFT OUTER JOIN SCDRDB.SCDP01PF
+	        ON P01JUM = '01'   AND P01JUMIN1 = LM01JUMIN1 AND P01JUMIN2 = LM01JUMIN2 AND P01CARDST = '' AND P01REBIL != '' AND P01HEIL = ''  
+	       
+	       
+	
+	        WHERE LM01JUMIN1 = ${birthday} AND LM01HPTEL = SUBSTR(${hptel},1,3)||' '||SUBSTR(${hptel},4,8) AND UPPER(LM01HNAME) LIKE UPPER('%${name}%')
+			AND P01CARDST = ''
+			--GROUP BY P01WHEGU
+	
+	</select>
+	
+</mapper>

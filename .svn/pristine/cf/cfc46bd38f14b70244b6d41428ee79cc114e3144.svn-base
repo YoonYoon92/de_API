@@ -1,0 +1,151 @@
+package com.saydept.api.comm;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.comm.model.CommModel;
+import com.saydept.api.comm.model.ProgModel;
+import com.saydept.api.comm.model.StoreModel;
+
+@Service
+public class CommService {
+
+	@Autowired
+	private CommMapper commMapper;
+
+	//공통코드 조회
+	public List<CommModel> selectCommCodeList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommCodeList(request);
+	}
+
+	//매장목록 조회
+	public List<CommModel> selectCommStoreList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommStoreList(request);
+	}
+
+	//POS목록 조화
+	public List<CommModel> selectCommPosList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommPosList(request);
+	}
+
+	//프로그램 목록
+	public void selectProgList(ProgModel request) {
+		// TODO Auto-generated method stub
+
+		List<ProgModel> menuLvList = commMapper.selectMenuList(request);
+		List<ProgModel> progLvList = commMapper.selectProgList(request);
+
+		menuLvList.addAll(progLvList);
+
+		request.setChildren(menuLvList);
+		for( ProgModel menuLv :  menuLvList) {
+			if( !menuLv.getLeaf() ) {
+				selectProgList(menuLv);
+			}
+
+		}
+	}
+
+	//조직조회(점)
+	public void selectStoreList(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv1List(request);
+
+		request.setChildren(storeLvList);
+		for( StoreModel storeLv :  storeLvList) {
+			selectStoreLv2List(storeLv);
+		}
+	}
+
+	//조직조회(부)
+	public void selectStoreLv2List(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv2List(request);
+
+		request.setChildren(storeLvList);
+		for( StoreModel storeLv :  storeLvList) {
+			selectStoreLv3List(storeLv);
+		}
+	}
+
+	//조직조회(팀)
+	public void selectStoreLv3List(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv3List(request);
+
+		request.setChildren(storeLvList);
+		for( StoreModel storeLv :  storeLvList) {
+			selectStoreLv4List(storeLv);
+		}
+	}
+
+	//조직조회(세분류)
+	public void selectStoreLv4List(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv4List(request);
+
+		request.setChildren(storeLvList);
+		//		for( StoreModel storeLv :  storeLvList) {
+		//			selectStoreLv5List(storeLv);
+		//		}
+	}
+
+	//조직조회(코너)
+	public void selectStoreLv5List(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv5List(request);
+
+		request.setChildren(storeLvList);
+		for( StoreModel storeLv :  storeLvList) {
+			selectStoreLv6List(storeLv);
+		}
+	}
+
+	//조직조회(클래스)
+	public void selectStoreLv6List(StoreModel request) {
+		// TODO Auto-generated method stub
+		List<StoreModel> storeLvList = commMapper.selectStoreLv6List(request);
+		request.setChildren(storeLvList);
+	}
+
+	//조직조회(점) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv1List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv1List(request);
+	}
+
+	//조직조회(부) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv2List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv2List(request);
+	}
+
+	//조직조회(팀) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv3List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv3List(request);
+	}
+
+	//조직조회(PC) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv4List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv4List(request);
+	}
+
+	//조직조회(코너) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv5List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv5List(request);
+	}
+
+	//조직조회(class) 콤보박스 조회
+	public List<CommModel> selectStoreComboLv6List(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectStoreComboLv6List(request);
+	}
+}

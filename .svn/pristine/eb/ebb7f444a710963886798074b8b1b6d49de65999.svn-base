@@ -1,0 +1,69 @@
+package com.saydept.utils;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class SayUtils {
+	
+	static final Logger logger = LoggerFactory.getLogger(SayUtils.class);
+
+
+	/**
+	 * 2020.04.16 최용권
+	 * 처리결과 전달(@RestController 미사용 일경우 공통으로 사용)
+	 * @param response
+	 * @param data
+	 * @throws IOException
+	 */
+	public void sendResponse(HttpServletResponse response, Object data) throws IOException {
+
+		response.setContentType("application/json; charset=UTF-8");
+		PrintWriter printWriter = response.getWriter();
+		printWriter.print(data);
+		printWriter.flush();
+		printWriter.close();
+
+		return;
+	}
+
+	/**
+	 * 2020.04.16 최용권
+	 * 에러 로그 공통 처리
+	 * @param e
+	 * @param respones
+	 * @param errCode	[01: DB관련], [02: Null], [03: IO], [04: JSON], [05: ArrayIndex], [99: 미정의된 오류]
+	 * @param message
+	 * @throws IOException 
+	 */
+	public void errorLogger(Exception e, HttpServletResponse response, String errCode, String message) {
+
+		//로그 파일 처리
+		logger.error("\n************************************************ERROR START************************************************");
+		logger.error("",e);
+		logger.error("\n************************************************ERROR E N D************************************************");
+		e.printStackTrace();
+		
+		//클라이언트에게 전송할 메세지
+		JSONObject errorJson = new JSONObject();
+		errorJson.put("errCode", errCode);
+		errorJson.put("errMsg", e.getMessage());
+		errorJson.put("message", message);
+		
+		try {
+			response.setStatus(500);
+			sendResponse(response, errorJson);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+}

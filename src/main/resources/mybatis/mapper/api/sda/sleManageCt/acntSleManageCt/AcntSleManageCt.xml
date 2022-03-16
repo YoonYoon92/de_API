@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.sda.sleManageCt.acntSleManageCt.AcntSleManageCtMapper">
+
+
+	<select id="selectAcntSleManageCtlist" parameterType="com.saydept.api.sda.sleManageCt.acntSleManageCt.model.AcntSleManageCtParamModel" 
+							resultType="com.saydept.api.sda.sleManageCt.acntSleManageCt.model.AcntSleManageCtModel">
+
+		SELECT A03ACTCD1||'-'||A03ACTCD2||'-'||A03ACTCD3 as actCdDetail
+		        ,A.M01ACTSUB as actNm1
+		        ,B.M01ACTSUB as actNm2
+		        ,M06BNM as buNm
+		        ,A03SAGUB as saGu
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '01' THEN A03AMOUNT ELSE 0 END) as balM01
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '02' THEN A03AMOUNT ELSE 0 END) as balM02
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '03' THEN A03AMOUNT ELSE 0 END) as balM03
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '04' THEN A03AMOUNT ELSE 0 END) as balM04
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '05' THEN A03AMOUNT ELSE 0 END) as balM05
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '06' THEN A03AMOUNT ELSE 0 END) as balM06
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '07' THEN A03AMOUNT ELSE 0 END) as balM07
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '08' THEN A03AMOUNT ELSE 0 END) as balM08
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '09' THEN A03AMOUNT ELSE 0 END) as balM09
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '10' THEN A03AMOUNT ELSE 0 END) as balM10
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '11' THEN A03AMOUNT ELSE 0 END) as balM11
+		        ,SUM(CASE WHEN SUBSTRING(A03BALYM,5,2) = '12' THEN A03AMOUNT ELSE 0 END) as balM12
+		        ,SUM(A03AMOUNT) as balMTot
+		FROM ${dbType}SDARDB.SDAA03PF
+		        LEFT OUTER JOIN ${dbType}SDARDB.SDAM01PF A
+		        ON A.M01ACTCD1 = A03ACTCD1 AND A.M01ACTCD2 = '00' AND A.M01ACTCD3 = '00'
+		        LEFT OUTER JOIN ${dbType}SDARDB.SDAM01PF B
+		        ON B.M01ACTCD1 = A03ACTCD1 AND B.M01ACTCD2 = A03ACTCD2 AND B.M01ACTCD3 = A03ACTCD3
+		        LEFT OUTER JOIN ${dbType}SPSRDB.SPSM06PF
+		        ON M06BU1 = '01'
+		        AND M06BU2 = CASE WHEN A03BALPAT = '0171' THEN '71' WHEN A03BALPAT = '0172' THEN '72' ELSE SUBSTRING(A03BALPAT,1,2) END
+		        AND M06BU3 = CASE WHEN A03BALPAT = '0171' THEN '00' WHEN A03BALPAT = '0172' THEN '00' ELSE SUBSTRING(A03BALPAT,3,2) END
+		        LEFT OUTER JOIN ${dbType}SDARDB.SDAD10PF
+		        ON D10ACCTYY = A03ACCTYY AND D10ACTCD1 = A03ACTCD1 AND D10ACTCD2 = A03ACTCD2 AND D10ACTCD3 = A03ACTCD3 AND D10BUCODE = M06BU1||M06BU2||M06BU3
+		
+
+		<where>
+	         <choose>
+	            <when test="onlineChk != ''">
+				    A03ACCTYY &gt;= SUBSTR(${frDate},1,4) -- 시작년도
+				AND A03ACCTYY &lt;= SUBSTR(${toDate},1,4) -- 종료년도
+				AND A03BALYM||RIGHT('0'||A03BALDD,2) &gt;= ${frDate} -- 시작년월일
+				AND A03BALYM||RIGHT('0'||A03BALDD,2) &lt;= ${toDate} -- 종료년월일
+				AND SUBSTRING(A03ACTCD1||A03ACTCD2||A03ACTCD3,1,LENGTH(TRIM(${onlineChk}))) = ${onlineChk} -- 계정과목
+	            </when>
+	            <otherwise>
+				    A03ACCTYY &gt;= SUBSTR(${frDate},1,4) -- 시작년도
+				AND A03ACCTYY &lt;= SUBSTR(${toDate},1,4) -- 종료년도
+				AND SUBSTR(A03BALYM,1,6) &gt;= SUBSTR(${frDate},1,6) -- 시작년월
+				AND SUBSTR(A03BALYM,1,6) &lt;= SUBSTR(${toDate},1,6) -- 종료년월
+	            </otherwise>
+	         </choose>
+	      </where>
+
+		GROUP BY A03ACTCD1||'-'||A03ACTCD2||'-'||A03ACTCD3, A.M01ACTSUB, B.M01ACTSUB, M06BNM ,A03SAGUB, D10BUDG04
+		ORDER BY A03ACTCD1||'-'||A03ACTCD2||'-'||A03ACTCD3, A03SAGUB
+		                
+	</select>
+		
+	
+</mapper>

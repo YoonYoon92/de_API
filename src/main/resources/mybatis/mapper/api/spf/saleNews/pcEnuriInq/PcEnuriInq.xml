@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.pcEnuriInq.PcEnuriInqMapper">
+
+				<!-- null 단위 조회 -->
+
+	<select id="getPcEnuriInqlist"
+		parameterType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqParamModel"
+		resultType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqModel">
+
+		SELECT
+        trim(MS0510) AS clsNm
+      , JR1405 AS clsNo2
+		/**
+		 * , JR1402 AS regiNo
+		 */
+      , CASE WHEN SUBSTR(JR1402,1,1) = '7' THEN '1' WHEN SUBSTR(JR1402,1,1) = '8' THEN '2' WHEN SUBSTR(JR1402,1,1) = '3' THEN '3' ELSE '9' END orderBy
+      , JR1402||'-'||JR1403 AS rcptNo
+      , (JR1407 * JR1408) AS saleAmt
+      , JR1409 AS enuriAmt
+		/**
+		 * , (JR1409 /(JR1407*JR1408))*100
+		 */
+      ,TRUNCATE(ROUND((CAST(COALESCE(JR1409, 0) AS DECFLOAT) / (JR1407*JR1408))*100, 1), 1) AS enuriRate
+      , (CASE
+         WHEN JR1410 > 0 THEN 'Y'
+         ELSE                 ' '
+         END) primeYn
+      , (CASE
+         WHEN JR1415 != '' THEN MR2502
+		/**
+		 * 20140408/KKH/ 포인트／메세지쿠폰명
+		 */
+         WHEN C51CGBNNM!='' THEN SUBSTRING(C51COUPON,1,2)||trim(C51CGBNNM)
+         WHEN C61CGBNNM!='' THEN 'M'||trim(C61CGBNNM)
+         WHEN JR1415  = '' THEN trim(MR2502)
+         ELSE                   ' '
+         END) cpNm
+      , JR1416 appNo
+      , JR1417 tcdNo
+      , JR1418 pointNo
+      , (CASE
+         WHEN JR1416!='' THEN '04'
+         WHEN JR1415 ='' THEN '99'
+         ELSE JR1415
+         END) enuriCd
+      ,  SUBSTRING(JR1401,1,4)||'/'||
+		SUBSTRING(JR1401,5,2)||'/'||
+		SUBSTRING(JR1401,7,2)       
+ AS maeDate
+      , MS0505 AS clsNo
+  FROM ${dbType}SPORDB.SPOJ14PF
+       LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+       ON   MS0501 = '01' --:DH_JUM
+       AND  MS0505 = JR1404
+       LEFT OUTER JOIN ${dbType}SPORDB.SPOM25PF
+       ON   MR2500 = '01' --:DH_JUM
+       AND  MR2501 = (CASE WHEN JR1416!='' THEN '04'
+                           WHEN JR1415 ='' THEN '99'
+                           ELSE JR1415
+                           END)
+		/**
+		 * 20140408/KKH/ 포인트／메세지쿠폰명
+		 */
+       LEFT OUTER JOIN ${dbType}SCDRDB.SCDC52LF1
+       ON C52MAEJUM = '01' --:DH_JUM
+       AND C52MAEY = SUBSTRING(JR1401,1,4)
+       AND C52MAEM = SUBSTRING(JR1401,5,2)
+       AND C52MAED = SUBSTRING(JR1401,7,2)
+		/**
+		 * AND (C52REGINO = :DREGI OR :DREGI = '')
+		 */
+       AND C52SLPNO = JR1403
+       LEFT OUTER JOIN ${dbType}SCDRDB.SCDC51PF
+       ON C51JUM = '01' -- :DH_JUM
+       AND C51COUPON = C52COUPON
+       AND C51FDATE = C52FDATE
+       LEFT OUTER JOIN ${dbType}SCDRDB.SCDC62LF1
+       ON C62MAEJUM = '01' --:DH_JUM
+       AND C62MAEY = SUBSTRING(JR1401,1,4)
+       AND C62MAEM = SUBSTRING(JR1401,5,2)
+       AND C62MAED = SUBSTRING(JR1401,7,2)
+		/**
+		 * AND (C62REGINO = :DREGI OR :DREGI = '')
+		 */
+       AND C62SLPNO = JR1403
+       LEFT OUTER JOIN ${dbType}SCDRDB.SCDC61PF
+       ON C61COUPON = C62COUPON
+		/**
+		 * 20131111/KKH/ 영업기획　이희정　요청，기간별，레지필터　추가
+		 * 20140102/KKH/ 영업기획　이희정　요청，클래스필터　추가
+		 */
+
+	<where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               JR1401 &gt;= ${frDate} AND  JR1401 &lt;=  ${toDate} AND JR1420 = SUBSTR(${bu},3,2) AND JR1421 = SUBSTR(${tim},5,2)
+            </when>
+            <when test="bu != null and bu != ''">
+               JR1401 &gt;= ${frDate} AND  JR1401 &lt;=  ${toDate} AND JR1420 = SUBSTR(${bu},3,2)
+            </when>
+            <otherwise>
+               JR1401 &gt;= ${frDate} AND  JR1401 &lt;=  ${toDate}
+            </otherwise>
+         </choose>
+      </where>
+      
+
+		/**
+		 * AND    JR1421 = :DH_FLR
+		 * AND   (JR1402 = :DREGI OR :DREGI = '')
+		 * AND   (JR1404 = :DCLASS OR :DCLASS = '')
+		 * AND   (MS0518 = :DZONE  OR :DZONE  = '')
+		 * 20140104/KKH/ 영업기획　하태웅　요청，정렬순서　　추가
+		 */
+		 
+		AND (#{regiNo} = '' or #{regiNo} = JR1402)
+		AND (#{enuriCd} = '' or #{enuriCd} = JR1415)
+
+
+		/**
+		 * 예외에누리 추가
+		 */
+UNION ALL
+SELECT
+        trim(MS0510) clsNm
+        , '' clsNo2
+		/**
+		 * , JR1902 regiNo
+		 */
+      , CASE WHEN SUBSTR(JR1902,1,1) = '7' THEN '1' WHEN SUBSTR(JR1902,1,1) = '8' THEN '2' WHEN SUBSTR(JR1902,1,1) = '3' THEN '3' ELSE '9' END orderBy
+        , JR1902||'-'||RIGHT('0000'||JR1903,4) rcptNo
+        , JR1905 saleAmt
+        , JR1906 enuriAmt
+        ,TRUNCATE(ROUND((CAST(COALESCE(JR1906, 0) AS DECFLOAT) / (JR1905+JR1906))*100, 1), 1) AS enuriRate
+        , '?' primeYn
+        , '예외-'||trim(JR1907) cpNm
+        , '' appNo
+        , JR1217 tcdNo
+        , JR1218 pointNo
+        , JR1904 enuriCd
+        , SUBSTRING(JR1901,1,4)||'/'||
+		SUBSTRING(JR1901,5,2)||'/'||
+		SUBSTRING(JR1901,7,2)       
+         maeDate
+        , JR1206 clsNo
+        FROM ${dbType}SPORDB.SPOJ19PF
+                LEFT OUTER JOIN ${dbType}SPORDB.SPOJ12LF2
+                ON JR1201 = JR1901 AND JR1207 = JR1902 AND JR1208 = JR1903
+                LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+                ON MS0501 = '01' AND MS0505 = JR1206
+	<where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               JR1901 &gt;= ${frDate} AND  JR1901 &lt;= ${toDate} AND JR1203 = SUBSTR(${bu},3,2) AND JR1204 = SUBSTR(${tim},5,2)
+            </when>
+            <when test="bu != null and bu != ''">
+               JR1901 &gt;= ${frDate} AND  JR1901 &lt;= ${toDate} AND JR1203 = SUBSTR(${bu},3,2)
+            </when>
+            <otherwise>
+               JR1901 &gt;= ${frDate} AND  JR1901 &lt;= ${toDate}
+            </otherwise>
+         </choose>
+      </where>
+		/**
+		 * AND JR1902 = regiNo
+		 * AND JR1903 = rcptNo
+		 */
+		 
+		 AND (#{regiNo} = '' or #{regiNo} = JR1902)
+		 AND (#{enuriCd} = '' or #{enuriCd} = JR1904)
+
+
+  ORDER BY maeDate, orderBy, rcptNo, clsNm
+
+
+	</select>
+
+<!-- 포스목록 조회 -->
+		
+	<select id="getPcEnuriInqSearchList"
+		parameterType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqSearchModel"
+		resultType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqSearchModel" fetchSize="1000">
+
+		SELECT  DISTINCT
+				 JR1402 regiNo
+		        ,JR1402||' : '||CASE WHEN trim(PD1806) != '' THEN trim(PD1806) ELSE trim(MS0510) END regiNm
+		        ,1 rcptNo
+		FROM ${dbType}SPORDB.SPOJ14PF
+			LEFT OUTER JOIN ${dbType}SPORDB.SPOM18PF
+			ON PD1801 = '01' AND PD1802 = JR1402
+        	
+        	LEFT OUTER JOIN ${dbType}SPORDB.SPOM11LF2
+        	ON PD1115 = '01' AND PD1104 = JR1402
+        	AND PD1107 = '' AND PD1110 ='O'
+
+        	LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+        	ON MS0501 = '01' AND MS0505 = PD1105
+			
+		WHERE JR1401 &gt;= ${frDate} AND  JR1401 &lt;= ${toDate}
+		ORDER BY JR1402
+
+	</select>
+	
+<!-- 사유목록 조회 -->
+		
+	<select id="getPcEnuriInqSearchList2"
+		parameterType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqSearchModel"
+		resultType="com.saydept.api.spf.saleNews.pcEnuriInq.model.PcEnuriInqSearchModel" fetchSize="1000">
+
+		SELECT  
+				 MR2501 AS enuriCd
+		        ,MR2501||' : '||MR2502 AS enuriNm
+		        ,1 rcptNo
+		
+		FROM ${dbType}SPORDB.SPOM25PF
+		WHERE MR2500 = '01'
+		ORDER BY MR2501
+	</select>
+
+</mapper>
+
+

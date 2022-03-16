@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.buRtnSaleNews.BuRtnSaleNewsMapper">
+
+<!-- null 단위 조회 -->
+	<select id="getNulllist"
+		parameterType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsParamModel"
+		resultType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsModel">
+
+		WITH
+		TA1(jum,jumNm,bu,buNm,tim,timNm,pc,pcNm,cls,clsNm,ddCnt,ddCash,ddCard,ddOther,ddNetsale)as(
+		SELECT
+		IS0303 AS jum
+		
+		, TRIM(MS0102) AS jumNm
+		, IS0304 AS bu
+		, TRIM(MS0507) AS buNm
+		, IS0307 AS tim
+		, TRIM(MS0508) AS timNm
+		, IS0308 AS pc
+		, TRIM(MS0509) AS pcNm
+		, IS0305 AS cls
+		, TRIM(MS0510) AS clsNm
+		, COUNT(*) AS ddCnt
+		, SUM(IS0313) AS ddCash
+		, SUM(IS0314) AS ddCard
+		, SUM(IS0315 + IS0316
+		+ IS0317 + IS0318
+		+ IS0319 + IS0320
+		+ IS0321 + IS0322
+		+ IS0323 + IS0324
+		+
+		IS0325 + IS0326
+		+ IS0327 + IS0328) AS ddOther
+		, SUM(IS0329) AS ddNetsale
+
+		FROM ${dbType}SPFRDB.SPFI03LF4
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM01PF
+		ON MS0101 = IS0303
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+		ON MS0501 = IS0303 AND MS0505 = IS0305
+
+		WHERE IS0303 = '01'
+		
+		
+		AND (IS0301 = '20200701')
+		GROUP BY
+		IS0303
+		, TRIM(MS0102)
+		, IS0304
+		, TRIM(MS0507)
+		, IS0307
+		, TRIM(MS0508)
+		, IS0308
+		, TRIM(MS0509)
+		, IS0305
+		, TRIM(MS0510)
+		),
+
+		TA3 (jum,jumNm,bu,buNm,tim,timNm,pc,pcNm,cls,clsNm,ddCnt,ddCash,ddCard,ddOther,ddNetsale) AS (
+		SELECT *
+		FROM (
+		SELECT jum,jumNm,bu,buNm,tim,timNm,pc,pcNm,cls,clsNm,ddCnt,ddCash,ddCard,ddOther,ddNetsale FROM
+		TA1
+		
+		) TTT
+		)
+
+		SELECT * FROM ta3
+		ORDER BY CASE WHEN JUM != '' THEN jum ELSE '99' END,bu,tim,pc,cls
+
+	</select>
+	
+<!-- 점단위 조회 -->
+	<select id="getJumlist"
+		parameterType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsParamModel"
+		resultType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsModel">
+
+
+		SELECT
+		IS0303 AS jum
+		
+		, TRIM(MS0102) AS jumNm
+		, IS0304 AS bu
+		, TRIM(MS0507) AS buNm
+		, IS0307 AS tim
+		, TRIM(MS0508) AS timNm
+		, IS0308 AS pc
+		, TRIM(MS0509) AS pcNm
+		, IS0305 AS cls
+		, TRIM(MS0510) AS clsNm
+		, COUNT(*) AS ddCnt
+		, SUM(IS0313) AS ddCash
+		, SUM(IS0314) AS ddCard
+		, SUM(IS0315 + IS0316
+		+ IS0317 + IS0318
+		+ IS0319 + IS0320
+		+ IS0321 + IS0322
+		+ IS0323 + IS0324
+		+
+		IS0325 + IS0326
+		+ IS0327 + IS0328) AS ddOther
+		, SUM(IS0329) AS ddNetsale
+
+		FROM ${dbType}SPFRDB.SPFI03LF4
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM01PF
+		ON MS0101 = IS0303
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+		ON MS0501 = IS0303 AND MS0505 = IS0305
+
+		WHERE IS0303 = #{jum}
+		
+		
+		AND (IS0301 &gt;=
+		#{searchDay} AND IS0301 &lt;= #{searchDayTo})
+		GROUP BY
+		IS0303
+		, TRIM(MS0102)
+		, IS0304
+		, TRIM(MS0507)
+		, IS0307
+		, TRIM(MS0508)
+		, IS0308
+		, TRIM(MS0509)
+		, IS0305
+		, TRIM(MS0510)
+		
+		ORDER BY CASE WHEN IS0303 != '' THEN IS0303 ELSE '99' END,bu,tim,pc,cls
+
+	</select>
+	
+<!-- 부단위 조회 -->
+	<select id="getBulist"
+		parameterType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsParamModel"
+		resultType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsModel">
+
+		
+		SELECT
+		IS0303 AS jum
+		
+		, TRIM(MS0102) AS jumNm
+		, IS0304 AS bu
+		, TRIM(MS0507) AS buNm
+		, IS0307 AS tim
+		, TRIM(MS0508) AS timNm
+		, IS0308 AS pc
+		, TRIM(MS0509) AS pcNm
+		, IS0305 AS cls
+		, TRIM(MS0510) AS clsNm
+		, COUNT(*) AS ddCnt
+		, SUM(IS0313) AS ddCash
+		, SUM(IS0314) AS ddCard
+		, SUM(IS0315 + IS0316
+		+ IS0317 + IS0318
+		+ IS0319 + IS0320
+		+ IS0321 + IS0322
+		+ IS0323 + IS0324
+		+
+		IS0325 + IS0326
+		+ IS0327 + IS0328) AS ddOther
+		, SUM(IS0329) AS ddNetsale
+
+		FROM ${dbType}SPFRDB.SPFI03LF4
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM01PF
+		ON MS0101 = IS0303
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+		ON MS0501 = IS0303 AND MS0505 = IS0305
+
+		WHERE IS0303 = #{jum}
+		AND IS0304 = SUBSTR(#{bu},3,2)
+		
+		AND (IS0301 &gt;=
+		#{searchDay} AND IS0301 &lt;= #{searchDayTo})
+		GROUP BY
+		IS0303
+		, TRIM(MS0102)
+		, IS0304
+		, TRIM(MS0507)
+		, IS0307
+		, TRIM(MS0508)
+		, IS0308
+		, TRIM(MS0509)
+		, IS0305
+		, TRIM(MS0510)
+		
+		ORDER BY CASE WHEN IS0303 != '' THEN IS0303 ELSE '99' END,bu,tim,pc,cls
+
+	</select>
+	
+<!-- 팀단위 조회 -->
+	<select id="getTimlist"
+		parameterType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsParamModel"
+		resultType="com.saydept.api.spf.saleNews.buRtnSaleNews.model.BuRtnSaleNewsModel">
+
+		
+		SELECT
+		IS0303 AS jum
+		
+		, TRIM(MS0102) AS jumNm
+		, IS0304 AS bu
+		, TRIM(MS0507) AS buNm
+		, IS0307 AS tim
+		, TRIM(MS0508) AS timNm
+		, IS0308 AS pc
+		, TRIM(MS0509) AS pcNm
+		, IS0305 AS cls
+		, TRIM(MS0510) AS clsNm
+		, COUNT(*) AS ddCnt
+		, SUM(IS0313) AS ddCash
+		, SUM(IS0314) AS ddCard
+		, SUM(IS0315 + IS0316
+		+ IS0317 + IS0318
+		+ IS0319 + IS0320
+		+ IS0321 + IS0322
+		+ IS0323 + IS0324
+		+
+		IS0325 + IS0326
+		+ IS0327 + IS0328) AS ddOther
+		, SUM(IS0329) AS ddNetsale
+
+		FROM ${dbType}SPFRDB.SPFI03LF4
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM01PF
+		ON MS0101 = IS0303
+		LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF
+		ON MS0501 = IS0303 AND MS0505 = IS0305
+
+		WHERE IS0303 = #{jum}
+		AND IS0304 = SUBSTR(#{bu},3,2)
+		AND IS0307 = SUBSTR(#{tim},5,2)
+		AND (IS0301 &gt;=
+		#{searchDay} AND IS0301 &lt;= #{searchDayTo})
+		GROUP BY
+		IS0303
+		, TRIM(MS0102)
+		, IS0304
+		, TRIM(MS0507)
+		, IS0307
+		, TRIM(MS0508)
+		, IS0308
+		, TRIM(MS0509)
+		, IS0305
+		, TRIM(MS0510)
+		
+		ORDER BY CASE WHEN IS0303 != '' THEN IS0303 ELSE '99' END,bu,tim,pc,cls
+
+	</select>
+
+</mapper>

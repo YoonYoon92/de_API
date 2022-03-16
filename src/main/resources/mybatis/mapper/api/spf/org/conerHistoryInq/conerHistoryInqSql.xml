@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.conerHistoryInq.ConerHistoryInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="conerHistoryInqModel" type="com.saydept.api.spf.goods.conerHistoryInq.model.ConerHistoryInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectConerHistoryInq" resultType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel" parameterType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel">
+		/*selectConerHistoryInq*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectConerHistoryInqList" resultType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel" parameterType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqParamModel" fetchSize="1000">
+		/*selectConerHistoryInqList*/
+		SELECT 	tb2.MS0502||'-'||tb2.MS0503||'-'||tb2.MS0504 AS newBuno
+			, trim(tb2.MS0507) AS newBunm
+			, trim(tb2.MS0508) AS newTimNm
+			, trim(tb2.MS0509) AS newPcNm
+			, tb2.MS0505 AS newCorno
+			, trim(tb2.MS0510) AS newCorNm
+			, SUBSTRING(tb2.MS0516,1,4)||'/'||SUBSTRING(tb2.MS0516,5,2)||'/'||SUBSTRING(tb2.MS0516,7,2) AS newFrDate
+			, '|' 		 AS space
+			, tb1.MS3302||'-'||tb1.MS3303||'-'||tb1.MS3304 AS oldBuno
+			, trim(tb1.MS3307) AS oldBunm
+			, trim(tb1.MS3308) AS oldTimNm
+			, trim(tb1.MS3309) AS oldPcNm
+			, tb1.MS3305 AS oldCorno
+			, trim(tb1.MS3310) AS oldCorNm
+			,SUBSTRING(tb1.MS33FRDATE,1,4)||'/'||SUBSTRING(tb1.MS33FRDATE,5,2)||'/'||SUBSTRING(tb1.MS33FRDATE,7,2)	AS oldFrDate
+			,SUBSTRING(tb1.MS33TODATE,1,4)||'/'||SUBSTRING(tb1.MS33TODATE,5,2)||'/'||SUBSTRING(tb1.MS33TODATE,7,2)	AS oldToDate
+			,SUBSTRING(tb1.MS3317,1,4)||'/'||SUBSTRING(tb1.MS3317,5,2)||'/'||SUBSTRING(tb1.MS3317,7,2)				AS oldDelDate
+		FROM 	SPFRDB.SPFM33PF tb1 
+			INNER JOIN SPFRDB.SPFM05PF tb2 
+				ON 	tb1.MS33CORNER = tb2.MS0505 
+		WHERE	tb1.MS33TIME &gt;= SUBSTRING('${startDt}',1,4)||'-'||SUBSTRING('${startDt}',5,2)||'-'||SUBSTRING('${startDt}',7,2)
+			AND tb1.MS33TIME &lt;= SUBSTRING('${endDt}',1,4)||'-'||SUBSTRING('${endDt}',5,2)||'-'||SUBSTRING('${endDt}',7,2)
+			
+			
+		ORDER BY tb1.MS33CORNER 
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateConerHistoryInq" parameterType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel">
+		/*updateConerHistoryInq*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertConerHistoryInq" parameterType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel">
+		/*insertConerHistoryInq*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteConerHistoryInq" parameterType="com.saydept.api.spf.org.conerHistoryInq.model.ConerHistoryInqModel">
+		/*deleteConerHistoryInq*/
+		DELETE ...
+	</delete>
+
+</mapper>

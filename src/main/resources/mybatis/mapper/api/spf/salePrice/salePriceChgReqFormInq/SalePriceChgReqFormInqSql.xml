@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.SalePriceChgReqFormInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="salePriceChgReqFormInqModel" type="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.model.SalePriceChgReqFormInqModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSalePriceChgReqFormInqList" resultType="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.model.SalePriceChgReqFormInqModel" 
+														parameterType="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.model.SalePriceChgReqFormInqModel" >
+		 SELECT PS0103 AS juDt
+		    , PS0101	AS chit
+			,	PS0102	AS chitNum
+			,	PS0108||'-'||PS0109	AS cls
+			,	trim(MS0604) 	AS 	clsNm
+			,	PS0110	AS	newSale
+			,	PS0111	AS	oldSale
+			,	PS0110-PS0111 AS	diffSale
+			,	CASE WHEN PS0114!='' THEN 'Y' ELSE 'N' END AS conf
+		
+			FROM ${dbType}SPFRDB.SPFP01PF
+			
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM06PF 
+			ON MS0601=PS0104 AND MS0602 =PS0108 AND MS0603 =PS0109
+			
+		
+			
+		WHERE PS0103&gt;=#{startDt} AND PS0103&lt;=#{endDt} AND PS0104=#{jum} AND PS0105=SUBSTR(#{bu},3,2)  AND PS0106=SUBSTR(#{tim},5,2) 
+	</select>
+	
+	<select id="selectDetailList" resultType="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.model.SalePriceChgReqFormInqModel" 
+														parameterType="com.saydept.api.spf.salePrice.salePriceChgReqFormInq.model.SalePriceChgReqFormInqModel" >
+		
+			SELECT 	PS0202 AS NUM
+			,	PS0203	AS	item
+			,	trim(MS1307)	AS	itemNm
+			,	PS0206	AS	itemNum
+			,	PS0211	AS	newSale
+			,	PS0209 AS	oldSale
+			,	PS0206*PS0211	AS	sumNewSale
+			,	PS0206*PS0209 AS	sumOldSale
+			
+			FROM ${dbType}SPFRDB.SPFP02PF 
+				LEFT OUTER JOIN ${dbType}SPFRDB.SPFM13LF1 
+					ON MS1308=PS0203
+			WHERE PS0200 =#{chit} AND PS0201=#{chitNum}
+	</select>
+	
+
+</mapper>

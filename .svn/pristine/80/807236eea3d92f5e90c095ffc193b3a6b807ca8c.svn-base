@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.Template.tamplate1.Tamplate1Mapper">
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectTamplate1List" resultType="com.saydept.api.Template.tamplate1.model.Tamplate1Model" parameterType="com.saydept.api.comm.model.SearchModel" fetchSize="1000">
+		/*selectTamplate1List*/
+		SELECT	R1.*
+		FROM 	(
+					SELECT	PG.*
+					,		ROWNUMBER() OVER() AS startRn
+					FROM 	(
+								SELECT	TB1.P01HWCC			/*TR ID*/
+								,			P01HSYY         /*영업년*/
+								,			P01HSMM         /*　　월*/
+								,			TB1.P01HSYY||P01HSMM||TB1.P01HSDD AS P01HSYMD	/*년월*/
+								,			TB1.P01HSDD 	/*　　일*/
+								,			TB1.P01HTHH     /*　　시*/
+								,			TB1.P01HTMM     /*　　분*/
+								,			TB1.P01HTSS     /*　　초*/
+								,			TB1.P01HSCD     /*점번호*/
+								,			TB1.P01HRNO     /*레지번호*/
+								,			TB1.P01HTNO     /*영수증번호*/
+								,			TB1.P01HSEQ     /*일련번호*/
+								,			TB1.P01HOPN     /*답당자번호*/
+								,			TB1.P01HICN     /*ITEM등록수*/
+								,			TB1.P01HJCN     /*전표등록수*/
+								,			TB1.P01HSGU     /*판매구분*/
+								,			TB1.P01HSG1     /*시재구분１*/
+								,			TB1.P01HSM1     /*시재금액１*/
+								,			TB1.P01HSG2     /*시재구분２*/
+								,			TB1.P01HSM2     /*시재금액２*/
+								,			TB1.P01HSG3     /*시재구분３*/
+								,			TB1.P01HSM3     /*시재금액３*/
+								,			TB1.P01HSG4     /*시재구분４*/
+								,			TB1.P01HSM4     /*시재금액４*/
+								,			TB1.P01HSG5     /*시재구분５*/
+								,			TB1.P01HSM5     /*시재금액５*/
+								,			TB1.P01HEGM     /*에누리*/
+								,			TB1.P01CODG     /*COD구분*/
+								,			TB1.P01CODN     /*COD전표번호*/
+								,			TB1.P01DATA1    /*매출데이타１*/
+								,			TB1.P01DATA2    /*매출데이타２*/
+								,			TB1.P01DATA3    /*매출데이타３*/
+								,			TB1.P01DATA4    /*매출데이타４*/
+								,			TB1.P01DATA5    /*매출데이타５*/
+								,			TB1.P01DATA6    /*매출데이타６*/
+								,			TB1.P01DATA7    /*매출데이타７*/
+								,			TB1.P01DATA8    /*매출데이타８*/
+								,			TB1.P01DATA9    /*매출데이타９*/
+								,			TB1.P01RDATE    /*수신일자*/
+								,			TB1.P01RTIME    /*수신시각*/
+								,			ROWNUMBER() OVER() AS limitRn
+								,   		COUNT(*) OVER()    AS totCnt 
+								FROM 	SPOTNRDB.SPOPF01 TB1
+								WHERE 	TB1.P01HSYY = '2018'
+								AND 	TB1.P01HSMM = '01'
+								<!-- AND 	TB1.P01HSDD = '01' -->
+								ORDER BY TB1.P01HTHH
+								,			TB1.P01HTMM
+								,			TB1.P01HTSS
+							)PG
+					WHERE 	PG.limitRn <![CDATA[<=]]> ${page} * ${limit}
+				)R1
+		WHERE R1.startRn > ${start}
+	</select>
+	
+	<select id="selectTamplate1List2" resultType="com.saydept.api.Template.tamplate1.model.Tamplate1Model" parameterType="com.saydept.api.comm.model.SearchModel" fetchSize="1000">
+		/*selectTamplate1List2*/
+		SELECT	R1.*
+		FROM 	(
+					SELECT	TB1.P01HWCC			/*TR ID*/
+					,			P01HSYY         /*영업년*/
+					,			P01HSMM         /*　　월*/
+					,			TB1.P01HSYY||P01HSMM||TB1.P01HSDD AS P01HSYMD	/*년월*/
+					,			TB1.P01HSDD 	/*　　일*/
+					,			TB1.P01HTHH     /*　　시*/
+					,			TB1.P01HTMM     /*　　분*/
+					,			TB1.P01HTSS     /*　　초*/
+					,			TB1.P01HSCD     /*점번호*/
+					,			TB1.P01HRNO     /*레지번호*/
+					,			TB1.P01HTNO     /*영수증번호*/
+					,			TB1.P01HSEQ     /*일련번호*/
+					,			TB1.P01HOPN     /*답당자번호*/
+					,			TB1.P01HICN     /*ITEM등록수*/
+					,			TB1.P01HJCN     /*전표등록수*/
+					,			TB1.P01HSGU     /*판매구분*/
+					,			TB1.P01HSG1     /*시재구분１*/
+					,			TB1.P01HSM1     /*시재금액１*/
+					,			TB1.P01HSG2     /*시재구분２*/
+					,			TB1.P01HSM2     /*시재금액２*/
+					,			TB1.P01HSG3     /*시재구분３*/
+					,			TB1.P01HSM3     /*시재금액３*/
+					,			TB1.P01HSG4     /*시재구분４*/
+					,			TB1.P01HSM4     /*시재금액４*/
+					,			TB1.P01HSG5     /*시재구분５*/
+					,			TB1.P01HSM5     /*시재금액５*/
+					,			TB1.P01HEGM     /*에누리*/
+					,			TB1.P01CODG     /*COD구분*/
+					,			TB1.P01CODN     /*COD전표번호*/
+					,			TB1.P01DATA1    /*매출데이타１*/
+					,			TB1.P01DATA2    /*매출데이타２*/
+					,			TB1.P01DATA3    /*매출데이타３*/
+					,			TB1.P01DATA4    /*매출데이타４*/
+					,			TB1.P01DATA5    /*매출데이타５*/
+					,			TB1.P01DATA6    /*매출데이타６*/
+					,			TB1.P01DATA7    /*매출데이타７*/
+					,			TB1.P01DATA8    /*매출데이타８*/
+					,			TB1.P01DATA9    /*매출데이타９*/
+					,			TB1.P01RDATE    /*수신일자*/
+					,			TB1.P01RTIME    /*수신시각*/
+					FROM 	SPOTNRDB.SPOPF01 TB1
+					<if test="posNo != '' and posNo != null">
+					WHERE 	TB1.P01HRNO = #{posNo}
+					</if>
+				)R1
+		WHERE 	R1.P01HSYMD BETWEEN #{startDt} AND #{endDt}
+		ORDER BY R1.P01HSYMD
+		,			R1.P01HTHH
+		,			R1.P01HTMM
+		,			R1.P01HTSS
+	</select>
+
+</mapper>

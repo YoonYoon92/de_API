@@ -1,0 +1,28 @@
+package com.saydept.api.dashboard;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.saydept.api.dashboard.model.DashboardModel;
+
+@Mapper
+public interface DashboardMapper {
+
+	DashboardModel selectDashboard(DashboardModel request);
+
+	List<DashboardModel> selectDashboardList(DashboardModel request);
+
+	int updateDashboard(DashboardModel request);
+	
+	int insertDashboard(DashboardModel request);
+/**
+ * 
+ * int형인 이유 insert가 되면 1이 출력되 변화가있는거고 0이면 없다고 출력
+ * 
+ */
+	int saveDashboard(DashboardModel request);
+	
+	int deleteDashboard(DashboardModel request);
+
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.marginExchangeInq.MarginExchangeInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="marginExchangeInqModel" type="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectMarginExchangeInq" resultType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel" parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel">
+		/*selectMarginExchangeInq*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectMarginExchangeInqList" resultType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel" parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel" fetchSize="1000">
+		SELECT 
+				MS1601	AS 	updateDt
+				,MS1603	AS	cls1
+				,MS1604	AS	cls2
+				,trim(MS1608)	AS	clsNm
+				,MS1609	AS	marginBef
+				,MS1610	AS	marginAf
+
+		 FROM ${dbType}SPFRDB.SPFM16LF2
+		WHERE MS1602=#{jum} AND MS1603=#{coner}
+		ORDER BY MS1604,MS1601 desc
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateMarginExchangeInq" parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel">
+		/*updateMarginExchangeInq*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertMarginExchangeInq" parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel">
+		/*insertMarginExchangeInq*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteMarginExchangeInq" parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel">
+		/*deleteMarginExchangeInq*/
+		DELETE ...
+	</delete>
+	<select id="selectConerList" resultType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel" 
+										parameterType="com.saydept.api.spf.goods.marginExchangeInq.model.MarginExchangeInqModel" fetchSize="1000">
+					SELECT	MS0505			as	coner
+						,	MS0505||'('||trim(MS0510)||')'	as	conerNm
+						
+			 		FROM ${dbType}SPFRDB.SPFM05PF 
+					WHERE MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+							AND MS0515=''
+					ORDER BY MS0505
+				
+	</select>
+</mapper>

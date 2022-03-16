@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.scd.custmer.pointSalesInq.PointSalesInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="pointSalesInqModel" type="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectPointSalesInq" resultType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel" parameterType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel">
+		/*selectPointSalesInq*/
+		SELECT ...
+	</select>
+	
+	<select id="pointInform" resultType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel" parameterType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel">
+		SELECT 	'A'			AS stsDiv
+				,trim(P05HNAME)	AS pointNm
+				,CASE WHEN P05TPOINT IS NOT NULL THEN P05TPOINT*100  ELSE 0 END  AS pointScore
+				,CASE WHEN P14E_PNT IS NOT NULL THEN P14E_PNT ELSE 0 END  AS lostPoint
+		FROM SCDRDB.SCDP05PF
+		 LEFT OUTER JOIN SCDRDB.SCDP14PF
+		 ON P14JUM='01' AND P14YY=#{yearP1} AND P14MM =#{monthP1} AND P14WHEGU=P05WHEGU AND P14SEQNO=P05SEQNO AND P14CHECK=P05CHECK 
+	
+		 WHERE p05jum='01' AND P05WHEGU=#{searchPoint1}  AND P05SEQNO =#{searchPoint2} AND P05CHECK =#{searchPoint3}
+
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectPointSalesInqList" resultType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel" parameterType="com.saydept.api.scd.custmer.pointSalesInq.model.PointSalesInqModel" fetchSize="1000">
+		SELECT  P02MAEY1||P02MAEY2||P02MAEM||P02MAED||'/'||SUBSTR(P02TIME,1,2)||':'||SUBSTR(P02TIME,3,2)||':'||SUBSTR(P02TIME,5,2) AS saleDt
+				,CASE WHEN P02MAEGU='0' THEN '이월내역' 
+					WHEN P02MAEGU='1' THEN '카드매출'
+					WHEN P02MAEGU='2' THEN '현금매출'
+					WHEN P02MAEGU='3' THEN '상품권지급'
+					WHEN P02MAEGU='5' THEN '신판조정'
+					WHEN P02MAEGU='6' THEN '보너스지급'
+					WHEN P02MAEGU='9' THEN '연체감점'
+					WHEN P02MAEGU='P' THEN '포인트사용'
+					WHEN P02MAEGU='D' THEN '포인트소멸' ELSE '' END AS saleDiv
+					
+				,P02REGINO AS posNum
+				,P02SLPNO  AS receipt
+				,TRIM(P02CLSNAME) AS clsNm
+				,CASE WHEN  P02SLPGU='61' THEN '일반'
+					  WHEN  P02SLPGU='62' THEN '할부'
+					  WHEN  P02SLPGU='63' THEN '현금'
+					  WHEN  P02SLPGU='64' AND P02MAEGU='5' THEN '조정'
+					  WHEN  P02SLPGU='64' AND P02MAEGU='6' THEN 'BONUS'
+					  WHEN  P02SLPGU='64' THEN 'PLUS'
+					  WHEN  P02SLPGU='65' THEN '지급'
+					  ELSE '기타'  END AS pointDiv
+				,P02CARD	AS cardSale
+				,P02CARDP*100	AS cardPoint
+				,P02CASH	AS cashSale
+				,P02CASHP*100	AS cashPoint
+				,P02MPOINT*100	AS salePoint
+				,P02TPOINT*100	AS totPoint
+				,P02SUNMAE 		AS netSale
+				,CASE WHEN P02UPTCOD='1' THEN 'Y' ELSE '' END AS saleReturn
+				,CASE WHEN P02UPTCD='*' THEN 'Y' ELSE '' END AS saleUpate
+		
+		
+		FROM SCDRDB.SCDP02LF1 
+		WHERE 	P02JUM='01' AND	P02WHEGU=#{searchPoint1} AND P02SEQNO=#{searchPoint2} AND P02CHECK=#{searchPoint3} AND
+			 P02MAEY1=substr(#{searchDt},1,2) AND P02MAEY2 =substr(#{searchDt},3,2) AND P02MAEM=substr(#{searchDt},5,2)
+
+	</select>
+
+
+</mapper>

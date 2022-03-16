@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.comm.CommMapper">
+
+
+	<!-- 공통코드 조회 -->
+	<select id="selectCommCodeList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommCodeList*/
+		SELECT	TB1.GS0201 			AS groupCd
+		,			TB1.GS0202 		AS codeId
+		,			TB1.GS0203 		AS groupNm
+		,			TB1.GS0204 		AS codeNm
+		FROM 	SPORDB.SPOG02PF TB1
+		WHERE 		TB1.GS0201 	= 	#{groupCd}
+		ORDER BY TB1.GS0202 
+	</select>
+	
+	<!-- 유저 로그인  -->
+	<select id="selectUserLogin" resultType="com.saydept.api.comm.model.AccountModel" parameterType="com.saydept.api.comm.model.AccountInput">
+		
+		SELECT    WBY02SABUN       as userId
+	            ,WBY02PW       as userPw
+	            ,TRIM(SUBSTR(WBY02NAME,1,11))||X'0F' as userName
+	            ,WBY02GUBUN     as userAuth
+	    FROM    WEBRDB.WEBY02PF wp 
+		WHERE   WBY02SABUN = #{userId} AND WBY02PW = #{userPw}
+	</select>		
+	
+	<!-- 로그인 유저 조직정보  -->
+	<select id="selectUserOrgInfo" resultType="com.saydept.api.comm.model.AccountModel" parameterType="com.saydept.api.comm.model.AccountInput">
+		
+		SELECT   I01NGU||I01NYY||I01NSQ       as userId
+	            ,I01NAM                       as userName
+	            ,I01BU1                       as jum
+	            ,I01BU2                       as bu
+	            ,I01BU3                       as team
+	            ,M06BNM                       as teamName
+	    FROM    SPSRDB.SPSI01PF wp 
+	    		LEFT OUTER JOIN ${dbType}SPSRDB.SPSM06PF
+	    		ON M06BU1 = I01BU1 AND M06BU2 = I01BU2 AND M06BU3 = I01BU3
+		WHERE   I01NGU||I01NYY||I01NSQ = #{userId}
+	</select>		
+	
+	<!-- 사용자 리스트 가져오기 (로그인 테이블)  -->
+	<select id="selectUserList" resultType="com.saydept.api.comm.model.AccountModel" fetchSize="1000">
+		/*selectUserList*/
+		SELECT 	WBY02SABUN 				AS userId
+		,TRIM(SUBSTR(WBY02NAME,1,11))||X'0F'			AS userName
+		,		WBY02PW					AS userPW
+		,		WBY02GUBUN  			AS userAuth
+		FROM 	WEBRDB.WEBY02PF	
+	</select>
+	
+	
+	<!-- 유저정보저장 -->
+	<select id="userInfo" resultType="com.saydept.api.comm.model.AccountModel" parameterType="com.saydept.api.comm.model.AccountInput">
+		
+		SELECT 	WBY01SABUN
+			,		SUBSTRING(WBY01LDATE,1,4)||'년'||SUBSTRING(WBY01LDATE,5,2)||'월'||SUBSTRING(WBY01LDATE,7,2)||'일'||SUBSTRING(WBY01LDATE,9,2)||'시'||SUBSTRING(WBY01LDATE,11,2)||'분'         AS lateDate
+			,		ZD0103  			AS latePgm
+			
+			FROM WEBRDB.WEBY01PF
+						LEFT OUTER JOIN ${dbType}WEBRDB.WEBZ02PF 
+						ON WBY01PGMID = ZD0203
+						LEFT OUTER JOIN ${dbType}WEBRDB.WEBZ01PF 
+						ON ZD0201=ZD0101 AND ZD0202=ZD0102
+			WHERE  WBY01SABUN=#{userId}
+			
+			ORDER BY CASE WHEN WBY01LDATE IS NULL THEN '000000000000000' WHEN WBY01LDATE ='' THEN '000000000000000'  ELSE WBY01LDATE END DESC
+			FETCH FIRST 1 ROWS ONLY
+
+	</select>	
+	<insert id="insertlog"  parameterType="com.saydept.api.comm.model.AccountInput">	 	  
+		 	 	 INSERT INTO ${dbType}WEBRDB.WEBY03PF VALUES(#{userId}||'DAY'||TRIM(CHAR(YEAR(CURRENT DATE)))||'-'||
+																TRIM(CHAR(MONTH(CURRENT DATE)))||'-'||
+																TRIM(CHAR(DAY(CURRENT DATE)))||'-'||
+																TRIM(CHAR(HOUR(CURRENT TIMESTAMP)))||':'||
+																TRIM(CHAR(MINUTE(CURRENT TIMESTAMP)))||':'||
+																TRIM(CHAR(SECOND(CURRENT TIMESTAMP)))||'IP'||#{userIp})
+																										
+										        
+	</insert>
+	<!-- 매장목록 조회 -->
+	<select id="selectCommStoreList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommStoreList*/
+		SELECT	TB1.MS0101 			AS storeCd
+		,			TB1.MS0102 		AS storeNm
+		FROM 	SPFRDB.SPFM01PF TB1
+		<!-- WHERE 		TB1.MS0101	 = #{storeCd}
+		AND 	TB1.MS0116 IS NULL  -->
+	</select>
+	
+	<!-- POS목록 조회 -->
+	<select id="selectCommPosList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommPosList*/
+		SELECT	TB1.P01HRNO			AS posNo
+		FROM 	SPOTNRDB.SPOPF01 TB1
+		WHERE 		TB1.P01HSCD = #{posNo}
+		AND 	TB1.p01HSyy 	= '2018'
+		AND 	TB1.p01HSmm 	= '01'
+		AND 	TB1.p01HSDD		= '01'
+		GROUP BY TB1.P01HRNO
+	</select>
+	
+	
+	<!-- 조직조회(정) -->
+	<select id="selectStoreLv1List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv1List*/
+		SELECT	TRIM(TB1.MS0101) 		AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0102 ) 		AS name			/* 조직명 */
+		,		TRIM(TB1.MS0102)		AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 			AS iconCls		/* 아이콘 */
+		,		'false'					AS leaf   
+		FROM 	SPFRDB.SPFM01PF TB1
+		<if test="id != null and id != ''">
+		WHERE 	TRIM(TB1.MS0101) = #{id}
+		</if>
+	</select>
+	
+	<!-- 조직조회(부) -->
+	<select id="selectStoreLv2List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv2List*/
+		SELECT	TRIM(TB1.MS0201)||TRIM(TB1.MS0202) 	AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0204 ) 					AS name			/* 조직명 */
+		,		TRIM(TB1.MS0204)					AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 						AS iconCls		/* 아이콘 */
+		,		'false'								AS leaf   
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE  	TRIM(TB1.MS0201)  = #{id}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+	</select>
+	
+	<!-- 조직조회(팀) -->
+	<select id="selectStoreLv3List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv3List*/
+		SELECT	TRIM(TB1.MS0301)||
+				TRIM(TB1.MS0302)||
+				TRIM(TB1.MS0303)					AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0306 ) 					AS name			/* 조직명 */
+		,		TRIM(TB1.MS0306)					AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 						AS iconCls		/* 아이콘 */
+		,		'false'								AS leaf   
+		FROM 	SPFRDB.SPFM03PF TB1
+		WHERE  	TRIM(TB1.MS0301)||TRIM(TB1.MS0302)  = #{id}
+	</select>
+	
+	<!-- 조직조회(세분류) -->
+	<select id="selectStoreLv4List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv4List*/
+		SELECT	TRIM(TB1.MS0401)||
+		TRIM(TB1.MS0402)||
+		TRIM(TB1.MS0403)||
+		TRIM(TB1.MS0404)							AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0408) 					AS name			/* 조직명 */
+		,		TRIM(TB1.MS0408)					AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 						AS iconCls		/* 아이콘 */
+		,		'true'								AS leaf   
+		FROM 	${dbType}SPFRDB.SPFM04PF TB1
+		WHERE  	TRIM(TB1.MS0401)||
+				TRIM(TB1.MS0402)||
+				TRIM(TB1.MS0403)	 = #{id}
+	</select>
+	
+	<!-- 조직조회(코너) -->
+	<select id="selectStoreLv5List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv5List*/
+		SELECT	TRIM(TB1.MS0501)||
+		TRIM(TB1.MS0505)							AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0510)					AS name			/* 조직명 */
+		,		TRIM(TB1.MS0510)					AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 						AS iconCls		/* 아이콘 */
+		,		'false'								AS leaf  
+		FROM 	${dbType}SPFRDB.SPFM05PF TB1
+		WHERE  	TRIM(TB1.MS0501)||
+				TRIM(TB1.MS0502)||
+				TRIM(TB1.MS0503)||
+				TRIM(TB1.MS0504)	= #{id}
+	</select>
+	
+	<!-- 조직조회(클래스) -->
+	<select id="selectStoreLv6List" resultType="storeModel" parameterType="storeModel" fetchSize="100">
+		/*selectStoreLv6List*/
+		SELECT	TRIM(TB1.MS0601)||
+		TRIM(TB1.MS0602)||
+		TRIM(TB1.MS0603)							AS id			/* 조직코드 */
+		,		TRIM(TB1.MS0604) 					AS name			/* 조직명 */
+		,		TRIM(TB1.MS0604)					AS text			/* 조직명(KR) */
+		,		'fa fa-folder' 						AS iconCls		/* 아이콘 */
+		,		'false'								AS leaf  
+		FROM 	${dbType}SPFRDB.SPFM06PF TB1
+		WHERE  	TRIM(TB1.MS0601)||
+				TRIM(TB1.MS0602)	= #{id}
+	</select>
+	
+	<!-- 조직조회(점) 콤보박스 -->
+	<select id="selectStoreComboLv1List" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectStoreComboLv1List*/
+		SELECT	TRIM(TB1.MS0101) 		AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0102 ) 		AS storeLvNm			/* 조직명 */
+		FROM 	${dbType}SPFRDB.SPFM01PF TB1
+		WHERE 	MS0116 =''
+	</select>
+	
+	<!-- 조직조회(부) -->
+	<select id="selectStoreComboLv2List" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectStoreComboLv2List*/
+		SELECT	TRIM(TB1.MS0201)||TRIM(TB1.MS0202) 	AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0204 ) 					AS storeLvNm			/* 조직명 */
+		FROM 	${dbType}SPFRDB.SPFM02PF TB1
+		 		LEFT OUTER JOIN SPFRDB.SPFM02PF2
+		 		ON      MS02201=MS0201 AND MS02202=MS0202
+		 		
+		WHERE  	TRIM(TB1.MS0201)  = #{paramLvCd}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+				ORDER BY MS02200
+	</select>
+	<!-- 조직조회(부) 인사마스터 기준 -->
+	<select id="selectStoreComboLv2ListInsa" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectStoreComboLv2ListInsa*/
+		SELECT	TRIM(TB1.M06BU1)||TRIM(TB1.M06BU2) 	AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.M06BNM) 					AS storeLvNm			/* 조직명 */
+		FROM 	${dbType}SPSRDB.SPSM06PF TB1
+		WHERE  	TRIM(TB1.M06BU1)  = #{paramLvCd} 
+				AND TB1.M06BU2 != '00' 
+				AND TB1.M06BU3  = '00'
+	</select>
+	
+	<!-- 조직조회(팀) -->
+	<select id="selectStoreComboLv3List" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectStoreComboLv3List*/
+		SELECT	TRIM(TB1.MS0301)||
+				TRIM(TB1.MS0302)||
+				TRIM(TB1.MS0303)					AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0306 ) 					AS storeLvNm			/* 조직명 */
+		FROM 	${dbType}SPFRDB.SPFM03PF TB1
+		WHERE  	TRIM(TB1.MS0301)||TRIM(TB1.MS0302)  = #{paramLvCd}				
+	</select>
+	<!-- 조직조회(팀) 인사마스터 기준 -->
+	<select id="selectStoreComboLv3ListInsa" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectStoreComboLv3ListInsa*/
+		SELECT	TRIM(TB1.M06BU1)||
+				TRIM(TB1.M06BU2)||
+				TRIM(TB1.M06BU3) 					AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.M06BNM) 					AS storeLvNm			/* 조직명 */
+		FROM 	SPSRDB.SPSM06PF TB1
+		WHERE  	TRIM(TB1.M06BU1)||TRIM(TB1.M06BU2)  = #{paramLvCd}
+				AND TB1.M06BU3  != '00'
+	</select>
+	
+	
+	
+	<!-- 조직조회(세분류) -->
+	<select id="selectStoreComboLv4List" resultType="commModel" parameterType="commModel" fetchSize="500">
+		/*selectStoreComboLv4List*/
+		SELECT	TRIM(TB1.MS0401)||
+		TRIM(TB1.MS0402)||
+		TRIM(TB1.MS0403)||
+		TRIM(TB1.MS0404)							AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0408) 					AS storeLvNm			/* 조직명 */
+		FROM 	SPFRDB.SPFM04PF TB1
+		WHERE  	TRIM(TB1.MS0401)||
+				TRIM(TB1.MS0402)||
+				TRIM(TB1.MS0403)	 = #{paramLvCd}
+	</select>
+	
+	<!-- 조직조회(코너) -->
+	<select id="selectStoreComboLv5List" resultType="commModel" parameterType="commModel" fetchSize="1000">
+		/*selectStoreComboLv5List*/
+		SELECT	TRIM(TB1.MS0505)							AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0510)||'('||(TB1.MS0505)||')'  					AS storeLvNm			/* 조직명 */
+		FROM 	SPFRDB.SPFM05PF TB1
+		WHERE  	TRIM(TB1.MS0501)||
+				TRIM(TB1.MS0502)||
+				TRIM(TB1.MS0503)||
+				TRIM(TB1.MS0504)	= #{paramLvCd}
+	</select>
+	
+	<!-- 조직조회(클래스) -->
+	<select id="selectStoreComboLv6List" resultType="commModel" parameterType="commModel" fetchSize="500">
+		/*selectStoreComboLv6List*/
+		SELECT	
+		TRIM(TB1.MS0603)							AS storeLvCd			/* 조직코드 */
+		,		TRIM(TB1.MS0604)||'('||TRIM(TB1.MS0603)||')' 					AS storeLvNm			/* 조직명 */
+		FROM 	SPFRDB.SPFM06PF TB1
+		WHERE  	TRIM(TB1.MS0601)||TRIM(TB1.MS0602)	= #{paramLvCd}
+	</select>
+</mapper>

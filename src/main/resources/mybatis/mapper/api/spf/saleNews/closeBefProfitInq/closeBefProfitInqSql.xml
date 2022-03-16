@@ -1,0 +1,1206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.closeBefProfitInq.CloseBefProfitInqMapper">
+
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="closeBefProfitInqModel" type="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel"/>
+	-->
+
+
+<!-- 작업 테이블 데이터 지우기 -->
+<delete id="deleteCloseBefProfitInqI01" >	
+	DELETE	 FROM	SESSION.TEMP_I01
+</delete>
+<delete id="deleteCloseBefProfitInqI01L" >	
+	DELETE	 FROM	SESSION.TEMP_I01L
+</delete>
+<delete id="deleteCloseBefProfitInqI02" >	
+	DELETE	 FROM	SESSION.TEMP_I02
+</delete>
+<delete id="deleteCloseBefProfitInqI02L" >	
+	DELETE	 FROM	SESSION.TEMP_I02L
+</delete>
+<delete id="deleteCloseBefProfitInqTB1" >	
+	DELETE	 FROM	SESSION.TEMP_TB1
+</delete>
+<delete id="deleteCloseBefProfitInqTB2" >	
+	DELETE	 FROM	SESSION.TEMP_TB2
+</delete>
+<delete id="deleteCloseBefProfitInqTB3" >	
+	DELETE	 FROM	SESSION.TEMP_TB3
+</delete>
+
+
+
+<!-- 당년 일 매출 테이블 생성 I01 -->
+<select id="createCloseBefProfitInqI01" >
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_I01(
+	saleDate        	char(8),    /* 매출일  */
+	jum 				char(2),	/* 점   */
+	bu					char(2), 	/* 부   */		
+	tim					char(2),	/* 팀   */
+	pc					char(2),	/* PC */
+	class1				char(5),	/* 클래스번호1   */
+	class2				char(2),	/* 클래스번호2   */
+	saleForm			char(2),	/* 판매형태구분     */
+
+	dayNetsale 			DECIMAL(12, 0),	/* 당일순매출   */
+	dayDiscount			DECIMAL(10, 0), /* 당일할인액  */
+	dayTotalsale       	DECIMAL(12, 0), /* 당일총매출  */  
+	dayRProfit			DECIMAL(5, 2),	/* 이익율  */	
+	dayProfit           DECIMAL(11, 0)  /* 당일이익액  */  
+)	NOT LOGGED                   
+    WITH REPLACE
+</select>
+<!-- 전년 일 매출 테이블 생성 I01L -->
+<select id="createCloseBefProfitInqI01L" >
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_I01L(
+	saleDate        	char(8),    /* 매출일  */
+	jum 				char(2),	/* 점   */
+	bu					char(2), 	/* 부   */		
+	tim					char(2),	/* 팀   */
+	pc					char(2),	/* PC */
+	class1				char(5),	/* 클래스번호1   */
+	class2				char(2),	/* 클래스번호2   */
+	saleForm			char(2),	/* 판매형태구분     */
+
+	dayNetsale 			DECIMAL(12, 0),	/* 당일순매출   */
+	dayDiscount			DECIMAL(10, 0), /* 당일할인액  */
+	dayTotalsale      	DECIMAL(12, 0), /* 당일총매출  */  
+	dayRProfit			DECIMAL(5, 2),	/* 이익율  */	
+	dayProfit          	DECIMAL(11, 0)  /* 당일이익액  */  
+)	NOT LOGGED                   
+    WITH REPLACE
+</select>
+<!-- 당년 월 매출 테이블 생성 I02 -->
+<select id="createCloseBefProfitInqI02" >
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_I02(
+	saleDate        	char(8),    /* 매출일  */
+	jum 				char(2),	/* 점   */
+	bu					char(2), 	/* 부   */		
+	tim					char(2),	/* 팀   */
+	pc					char(2),	/* PC */
+	class1				char(5),	/* 클래스번호1   */
+	class2				char(2),	/* 클래스번호2   */
+	saleForm			char(2),	/* 판매형태구분     */
+
+	dayNetsale 			DECIMAL(12, 0),	/* 당일순매출   */
+	dayDiscount			DECIMAL(10, 0), /* 당일할인액  */
+	dayTotalsale       	DECIMAL(12, 0), /* 당일총매출  */  
+	dayRProfit			DECIMAL(5, 2),	/* 이익율  */	
+	dayProfit           DECIMAL(11, 0)  /* 당일이익액  */  
+)	NOT LOGGED                   
+    WITH REPLACE
+</select>
+<!-- 전년 월 매출 테이블 생성 I02L -->
+<select id="createCloseBefProfitInqI02L" >
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_I02L(
+	saleDate        	char(8),    /* 매출일  */
+	jum 				char(2),	/* 점   */
+	bu					char(2), 	/* 부   */		
+	tim					char(2),	/* 팀   */
+	pc					char(2),	/* PC */
+	class1				char(5),	/* 클래스번호1   */
+	class2				char(2),	/* 클래스번호2   */
+	saleForm			char(2),	/* 판매형태구분     */
+
+	dayNetsale 			DECIMAL(12, 0),	/* 당일순매출   */
+	dayDiscount			DECIMAL(10, 0), /* 당일할인액  */
+	dayTotalsale      	DECIMAL(12, 0), /* 당일총매출  */  
+	dayRProfit			DECIMAL(5, 2),	/* 이익율  */	
+	dayProfit          	DECIMAL(11, 0)  /* 당일이익액  */  
+)	NOT LOGGED                   
+    WITH REPLACE
+</select>
+
+<!-- 종합데이터 테이블 생성 -->
+<select id="createCloseBefProfitInqTB1" >
+<![CDATA[		
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB1(
+	fromSaleDate        char(8),  
+	toSaleDate        	char(8),  
+	jum 				char(2),	
+	bu					char(2), 
+	tim					char(2),	
+	pc					char(2),	
+	class1				char(5),		
+	class2				char(2),
+	saleForm			char(2),	
+	yearNetsale 		DECIMAL(12, 0),	
+	yearDiscount		DECIMAL(10, 0), 
+	yearTotalsale       DECIMAL(12, 0),   
+	yearProfit			DECIMAL(11, 0),
+	yearNetsaleL 		DECIMAL(12, 0),	
+	yearDiscountL		DECIMAL(10, 0), 
+	yearTotalsaleL      DECIMAL(12, 0),     
+	yearProfitL			DECIMAL(11, 0)
+)	NOT LOGGED                   
+   	WITH REPLACE
+]]>
+</select>
+<!-- 목표 테이블 생성 TB2 -->
+<select id="createCloseBefProfitInqTB2" >	
+<![CDATA[
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB2(
+	fromSaleDate        char(8),   
+	toSaleDate        	char(8),   
+	jum 				char(2),	
+	bu					char(2), 	
+	tim					char(2),	
+	pc					char(2),	
+	corno				char(5),	
+	yearTry 			DECIMAL(12, 0), 
+	yearProfitTry       DECIMAL(11, 0),	
+	yearTryL 			DECIMAL(12, 0), 
+	yearProfitTryL   	DECIMAL(11, 0)	
+)	NOT LOGGED                   
+    WITH REPLACE
+]]>
+</select>
+<!-- 목표 테이블 생성 TB3  온라인만저장 -->
+<select id="createCloseBefProfitInqTB3" >	
+<![CDATA[
+DECLARE GLOBAL TEMPORARY TABLE  SESSION.TEMP_TB3(
+	fromSaleDate        char(8),   
+	toSaleDate        	char(8),   
+	jum 				char(2),	
+	bu					char(2), 	
+	tim					char(2),	
+	pc					char(2),	
+	corno				char(5),	
+	yearTry 			DECIMAL(12, 0), 
+	yearProfitTry       DECIMAL(11, 0),	
+	yearTryL 			DECIMAL(12, 0), 
+	yearProfitTryL   	DECIMAL(11, 0)	
+)	NOT LOGGED                   
+    WITH REPLACE
+]]>
+</select>
+
+
+<!-- 월 마감 데이터 존재 체크  -->
+<select id="selectCloseBefProfitInqMchk" resultType="Integer" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	SELECT 	COUNT(DISTINCT IS0201||IS0202) 
+	FROM 	${dbType}SPFRDB.SPFI02PF
+	WHERE	IS0201||IS0202 >= SUBSTR(#{fromDate},1,6) AND IS0201||IS0202 <= SUBSTR(#{toDate},1,6)	
+]]>
+</select>
+
+
+
+<!-- 당년 일 매출실적 Insert I01-->
+<select id="insertCloseBefProfitInqI01" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO 	SESSION.TEMP_I01
+	SELECT 	CAST(IS0102 AS CHAR(8))
+			,CAST(IS0103 AS CHAR(2))
+			,CAST(IS0106 AS CHAR(2))
+			,CAST(IS0107 AS CHAR(2))
+			,CAST(IS0108 AS CHAR(2))
+			,CASE 
+				WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0104  AS CHAR(5))  
+		 		END								
+			,CAST(IS0105 AS CHAR(2))
+			,CAST(IS0111 AS CHAR(2))
+			,IS0129, IS0130, IS0131
+			,CASE 						
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1') OR (IS0110 = '2')) AND (MS1601 > IS0102)		
+				--(변경일자(MS1601) > 매출일자(IS0102))일경우			
+	  				THEN (CASE WHEN MS1609 > 0 THEN MS1609 ELSE MS0609 END)	  			  						
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1')	OR (IS0110 = '2')) AND (MS1601 <= IS0102 AND MS1611 <= IS0102) 
+				--(변경일자(MS1601) >= 매출일자(IS0102) AND 매출일자(IS0102) <= 행사종료일자(MS1611)   )일경우
+					THEN CASE WHEN MS1610 > 0 THEN MS1610	ELSE MS0609 END					
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1')	OR (IS0110 = '2')) AND (MS1601 <= IS0102 AND MS1615 <= IS0102) 
+				--(변경일자(MS1601) < 매출일자(IS0102) AND 매출일자(IS0102) >= 변경전수정일자(MS1615) )일경우
+				 	THEN CASE WHEN MS1610 > 0 THEN MS1610	ELSE MS0609 END							 		 	
+				ELSE CASE WHEN IS0135 > 0 THEN IS0135	ELSE MS0609 END		
+				--클래스가 직매입이아니고 당일이 아닐경우					
+				END	AS dayRProfit
+			,0		 
+	FROM 	${dbType}SPFRDB.SPFI01PF
+		LEFT OUTER JOIN 	(SELECT MAX(MS1601) TTDAY, MS1602 TTJUM, MS1603 TTCLS1, MS1604 TTCLS2
+							 FROM 	${dbType}SPFRDB.SPFM16LF2							 
+							 GROUP BY MS1602, MS1603, MS1604
+							 ) TT1
+			ON 	TTDAY=IS0102 AND TTJUM = IS0103 AND TTCLS1=IS0104 AND TTCLS2=IS0105
+		LEFT OUTER JOIN 	${dbType}SPFRDB.SPFM16PF 
+			ON	MS1601=TTDAY AND MS1602=TTJUM AND MS1603=TTCLS1 AND MS1604=TTCLS2	
+		INNER JOIN 			${dbType}SPFRDB.SPFM06PF
+			ON	MS0601=IS0103 AND MS0602=IS0104 AND MS0603=IS0105
+		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+			ON	MS05101=IS0103 AND MS05103=IS0104
+	WHERE 	IS0102 >= #{fromYYMMDD} AND IS0102 <= #{toDate}			
+]]>	
+</select>
+
+<!-- 전년 일 매출실적 Insert I01L-->
+<select id="insertCloseBefProfitInqI01L" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO 	SESSION.TEMP_I01L
+	SELECT 	CAST(IS0102 AS CHAR(8))
+			,CAST(IS0103 AS CHAR(2))
+			,CAST(IS0106 AS CHAR(2))
+			,CAST(IS0107 AS CHAR(2))
+			,CAST(IS0108 AS CHAR(2))
+			,CASE 
+				WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0104  AS CHAR(5))  
+		 		END			
+			,CAST(IS0105 AS CHAR(2))
+			,CAST(IS0111 AS CHAR(2))
+			,IS0129, IS0130, IS0131
+			,CASE 						
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1') OR (IS0110 = '2')) AND (MS1601 > IS0102)		
+				--(변경일자(MS1601) > 매출일자(IS0102))일경우			
+	  				THEN (CASE WHEN MS1609 > 0 THEN MS1609 ELSE MS0609 END)	  			  						
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1')	OR (IS0110 = '2')) AND (MS1601 <= IS0102 AND MS1611 <= IS0102) 
+				--(변경일자(MS1601) >= 매출일자(IS0102) AND 매출일자(IS0102) <= 행사종료일자(MS1611)   )일경우
+					THEN CASE WHEN MS1610 > 0 THEN MS1610	ELSE MS0609 END					
+				WHEN ((#{today} = IS0102) OR (IS0110 = '1')	OR (IS0110 = '2')) AND (MS1601 <= IS0102 AND MS1615 <= IS0102) 
+				--(변경일자(MS1601) < 매출일자(IS0102) AND 매출일자(IS0102) >= 변경전수정일자(MS1615) )일경우
+				 	THEN CASE WHEN MS1610 > 0 THEN MS1610	ELSE MS0609 END							 		 	
+				ELSE CASE WHEN IS0135 > 0 THEN IS0135	ELSE MS0609 END		
+				--클래스가 직매입이아니고 당일이 아닐경우					
+				END	AS dayRProfit
+			,0		 
+	FROM 	${dbType}SPFRDB.SPFI01PF
+		LEFT OUTER JOIN 	(SELECT MAX(MS1601) TTDAY, MS1602 TTJUM, MS1603 TTCLS1, MS1604 TTCLS2
+							 FROM 	${dbType}SPFRDB.SPFM16LF2							 
+							 GROUP BY MS1602, MS1603, MS1604
+							 ) TT1
+			ON 	TTDAY=IS0102 AND TTJUM = IS0103 AND TTCLS1=IS0104 AND TTCLS2=IS0105
+		LEFT OUTER JOIN 	${dbType}SPFRDB.SPFM16PF 
+			ON	MS1601=TTDAY AND MS1602=TTJUM AND MS1603=TTCLS1 AND MS1604=TTCLS2	
+		INNER JOIN 			${dbType}SPFRDB.SPFM06PF
+			ON	MS0601=IS0103 AND MS0602=IS0104 AND MS0603=IS0105
+		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+			ON	MS05101=IS0103 AND MS05103=IS0104
+	WHERE 	IS0102 >= #{fromYYMMDDL} AND IS0102 <= #{toDateL}			
+]]>						
+</select>
+
+
+<!-- 일 매출 이익액 Update 당년 -->
+<select id="updateCloseBefProfitInq21" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	UPDATE	SESSION.TEMP_I01
+	SET		dayProfit = (dayTotalSale * dayRProfit / 100) - dayDiscount	
+]]>
+</select>
+<!-- 일 매출 이익액 Update 전년 -->
+<select id="updateCloseBefProfitInq22" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	UPDATE	SESSION.TEMP_I01L
+	SET		dayProfit = (dayTotalSale * dayRProfit / 100) - dayDiscount	
+]]>
+</select>
+
+
+<!-- 당년 월 매출실적 Insert I02-->
+<select id="insertCloseBefProfitInqI02" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO 	SESSION.TEMP_I02
+	SELECT 	CAST(IS0201||IS0202 AS CHAR(8))
+			,CAST(IS0203 AS CHAR(2))
+			,CAST(IS0206 AS CHAR(2))
+			,CAST(IS0207 AS CHAR(2))
+			,CAST(IS0208 AS CHAR(2))
+			,CASE 
+				WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0204  AS CHAR(5))  
+		 		END								
+			,CAST(IS0205 AS CHAR(2))
+			,CAST(IS0211 AS CHAR(2))
+			,IS0229, IS0230, IS0231
+			,777
+			,IS0232		 
+	FROM 	${dbType}SPFRDB.SPFI02PF	
+		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+			ON	MS05101=IS0203 AND MS05103=IS0204
+	WHERE 	IS0201||IS0202 >= #{fromYYMM} AND IS0201||IS0202 <= #{toYYMM}	
+]]>	
+</select>
+
+<!-- 전년 월 매출실적 Insert I02L-->
+<select id="insertCloseBefProfitInqI02L" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO 	SESSION.TEMP_I02L
+	SELECT 	CAST(IS0201||IS0202 AS CHAR(8))
+			,CAST(IS0203 AS CHAR(2))
+			,CAST(IS0206 AS CHAR(2))
+			,CAST(IS0207 AS CHAR(2))
+			,CAST(IS0208 AS CHAR(2))
+			,CASE 
+				WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+									ELSE CAST(IS0204  AS CHAR(5))  
+		 		END								
+			,CAST(IS0205 AS CHAR(2))
+			,CAST(IS0211 AS CHAR(2))
+			,IS0229, IS0230, IS0231
+			,777
+			,IS0232		 
+	FROM 	${dbType}SPFRDB.SPFI02PF	
+		LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+			ON	MS05101=IS0203 AND MS05103=IS0204
+	WHERE 	IS0201||IS0202 >= #{fromYYMML} AND IS0201||IS0202 <= #{toYYMML} 			
+]]>	
+</select>
+
+
+
+
+<!-- 매출 최종테이블 종합 DataInsert  TB1 (목표는 별도테이블 TB3) -->
+<select id="insertCloseBefProfitInq41" resultType="Integer" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO  SESSION.TEMP_TB1
+	WITH
+--당년 매출 계 코너별 I01
+	TA1(jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit)	AS(
+		SELECT 	CAST(jum 	    AS CHAR(2))				--점
+				,CAST(bu		AS CHAR(2))				--부
+				,CAST(tim		AS CHAR(2))				--팀
+				,CAST(pc		AS CHAR(2))				--PC
+				,CAST(class1	AS CHAR(5))				--클래스1
+				,CAST(class2  	AS CHAR(2))				--클래스2
+				,CAST(saleForm 	AS CHAR(2))				--판매형태
+				,sum(dayNetsale)						--순매출
+				,sum(dayDiscount)						--할인
+				,sum(dayTotalsale)						--총매출			
+				,floor(sum(((dayTotalsale*dayRProfit)/100)-dayDiscount))		--이익액					
+		FROM 	SESSION.TEMP_I01	
+			GROUP BY jum,bu,tim,pc,class1,class2,saleForm		
+	),
+--당년 매출 계 코너별 I02
+	TA2(jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit)	AS(
+		SELECT 	CAST(jum 	    AS CHAR(2))				--점
+				,CAST(bu		AS CHAR(2))				--부
+				,CAST(tim		AS CHAR(2))				--팀
+				,CAST(pc		AS CHAR(2))				--PC
+				,CAST(class1	AS CHAR(5))				--클래스1
+				,CAST(class2  	AS CHAR(2))				--클래스2
+				,CAST(saleForm 	AS CHAR(2))				--판매형태
+				,sum(dayNetsale)						--순매출
+				,sum(dayDiscount)						--할인
+				,sum(dayTotalsale)						--총매출				
+				,sum(dayProfit)							--이익액					
+		FROM 	SESSION.TEMP_I02	
+			GROUP BY jum,bu,tim,pc,class1,class2,saleForm		
+	),
+--전년 매출 계 코너별 I01L
+	TA3(jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit)	AS(
+		SELECT 	CAST(jum 	    AS CHAR(2))				--점
+				,CAST(bu		AS CHAR(2))				--부
+				,CAST(tim		AS CHAR(2))				--팀
+				,CAST(pc		AS CHAR(2))				--PC
+				,CAST(class1	AS CHAR(5))				--클래스1
+				,CAST(class2  	AS CHAR(2))				--클래스2
+				,CAST(saleForm 	AS CHAR(2))				--판매형태
+				,sum(dayNetsale)						--순매출
+				,sum(dayDiscount)						--할인
+				,sum(dayTotalsale)						--총매출		
+				,floor(sum(((dayTotalsale*dayRProfit)/100)-dayDiscount))		--이익액					
+		FROM 	SESSION.TEMP_I01L	
+			GROUP BY jum,bu,tim,pc,class1,class2,saleForm		
+	),
+--전년 매출 계 코너별 I02L
+	TA4(jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit)	AS(
+		SELECT 	CAST(jum 	    AS CHAR(2))				--점
+				,CAST(bu		AS CHAR(2))				--부
+				,CAST(tim		AS CHAR(2))				--팀
+				,CAST(pc		AS CHAR(2))				--PC
+				,CAST(class1	AS CHAR(5))				--클래스1
+				,CAST(class2  	AS CHAR(2))				--클래스2
+				,CAST(saleForm 	AS CHAR(2))				--판매형태
+				,sum(dayNetsale)						--순매출
+				,sum(dayDiscount)						--할인
+				,sum(dayTotalsale)						--총매출					
+				,sum(dayProfit)							--이익액					
+		FROM 	SESSION.TEMP_I02L	
+			GROUP BY jum,bu,tim,pc,class1,class2,saleForm		
+	),
+-- 4개 테이블 UNION ALL  
+	TA5(fromDate,toDate,jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit,netSaleL,discountL,totalSaleL,profitL)	AS(
+		SELECT CAST(#{fromDate} AS CHAR(8))	,CAST(#{toDate} AS CHAR(8))	,jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit,0,0,0,0 FROM TA1
+		UNION
+		SELECT CAST(#{fromDate} AS CHAR(8))	,CAST(#{toDate} AS CHAR(8))	,jum,bu,tim,pc,class1,class2,saleForm,netSale,discount,totalSale,profit,0,0,0,0 FROM TA2
+		UNION
+		SELECT CAST(#{fromDate} AS CHAR(8))	,CAST(#{toDate} AS CHAR(8))	,jum,bu,tim,pc,class1,class2,saleForm,0,0,0,0,netSale,discount,totalSale,profit FROM TA3
+		UNION
+		SELECT CAST(#{fromDate} AS CHAR(8))	,CAST(#{toDate} AS CHAR(8))	,jum,bu,tim,pc,class1,class2,saleForm,0,0,0,0,netSale,discount,totalSale,profit FROM TA4	
+	)  
+	
+	SELECT 	fromDate,toDate,jum,bu,tim,pc,class1,class2,saleForm
+			,SUM(netSale)	,SUM(discount)	,SUM(totalSale)		,SUM(profit)	
+			,SUM(netSaleL)	,SUM(discountL)	,SUM(totalSaleL)	,SUM(profitL)
+	FROM	TA5
+	GROUP BY 	fromDate,toDate,jum,bu,tim,pc,class1,class2,saleForm
+]]>
+</select>
+
+
+
+
+
+<!-- 매출목표 Insert1 TB2 조직 -->
+<select id="insertCloseBefProfitInq31" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO SESSION.TEMP_TB2
+	WITH 
+		TB3T1(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+		 	SELECT 	CAST(#{fromDate} AS CHAR(8))			--시작일
+					,CAST(#{toDate} AS CHAR(8))		--종료일
+					,CAST(is05102 AS CHAR(2))			--점
+					,CAST(is05103 AS CHAR(2))			--부
+					,CAST(is05104 AS CHAR(2))			--팀
+					,CAST(is05105 AS CHAR(2))			--PC
+					,''      							--클래스1(코너번호) 
+					,sum(is05106*1000) yearTry,sum(is05107*1000)   --당년 매출목표,이익목표
+					,0,0								--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI05PF1					
+			WHERE	is05101 >=#{fromDate} AND is05101 <=#{toDate}
+			GROUP BY is05102,is05103,is05104,is05105 
+			ORDER BY is05102,is05103,is05104,is05105 	
+		),
+		TB3T2(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+		 	SELECT 	CAST(#{fromDate} AS CHAR(8))			--시작일
+					,CAST(#{toDate} AS CHAR(8))		--종료일
+					,CAST(is05102 AS CHAR(2))			--점
+					,CAST(is05103 AS CHAR(2))			--부
+					,CAST(is05104 AS CHAR(2))			--팀
+					,CAST(is05105 AS CHAR(2))			--PC
+					,''      							--클래스1(코너번호) 
+					,0,0          						--당년 매출목표,이익목표
+					,sum(is05106*1000) yearTry,sum(is05107*1000)	--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI05PF1					
+			WHERE	is05101 >=#{fromDateL} AND is05101 <=#{toDateL}
+			GROUP BY is05102,is05103,is05104,is05105 
+			ORDER BY is05102,is05103,is05104,is05105 	
+		)
+							 
+		SELECT fdate,tdate,jum,bu,tim,pc,class1,SUM(yearTry),SUM(yearProfitTry),SUM(yearTryL),SUM(yearProfitTryL) FROM
+		(
+		SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB3T2
+		UNION ALL
+		SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB3T1
+		) TB3T3
+		GROUP BY fdate,tdate,jum,bu,tim,pc,class1
+]]>	
+</select>
+
+<!-- 매출목표 Insert2  TB2 코너 -->
+<select id="insertCloseBefProfitInq32" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO SESSION.TEMP_TB2
+	WITH
+		TB2T1(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+			SELECT 	CAST(#{fromDate} AS CHAR(8))		--시작일
+					,CAST(#{toDate} AS CHAR(8))			--종료일
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0501 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0703  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0502 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0704  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0503 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0705  AS CHAR(2))  
+				 		END		
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0504 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0706  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0707  AS CHAR(5))  
+				 		END			
+					,sum(IS0709)*1000,sum(IS0710)*1000      --당년 매출목표,이익목표
+					,0,0									--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI07PF
+				LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+					ON	MS05101=IS0703 AND MS05103=IS0707
+			WHERE	IS0702 >= #{fromDate} AND IS0702 <= #{toDate}
+			GROUP BY IS0703 ,IS0704 ,IS0705 ,IS0706 ,IS0707 ,MS05102
+		),
+		TB2T2(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+			SELECT 	CAST(#{fromDate} AS CHAR(8))		--시작일
+					,CAST(#{toDate} AS CHAR(8))			--종료일
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0501 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0703  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0502 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0704  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0503 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0705  AS CHAR(2))  
+				 		END		
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0504 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0706  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0707  AS CHAR(5))  				 		END			
+
+					,0,0							      	--당년 매출목표,이익목표
+					,sum(IS0709)*1000,sum(IS0710)*1000 		--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI07PF
+				LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+					ON	MS05101=IS0703 AND MS05103=IS0707
+			WHERE	IS0702 >= #{fromDateL} AND IS0702 <= #{toDateL}
+			GROUP BY IS0703 ,IS0704 ,IS0705 ,IS0706 ,IS0707 ,MS05102
+		)
+			
+		SELECT fdate,tdate,jum,bu,tim,pc,class1,SUM(yearTry),SUM(yearProfitTry),SUM(yearTryL),SUM(yearProfitTryL) FROM
+		(
+		SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB2T1
+		UNION ALL
+		SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB2T2
+		) TB3T3
+		GROUP BY fdate,tdate,jum,bu,tim,pc,class1	
+]]>
+</select>
+
+<!-- 매출목표 Insert3  온라인 코너별 (코너번호 입력시 원래코너와 맞추기위해 변환해서 넣는다)-->
+<select id="insertCloseBefProfitInq33" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	INSERT INTO SESSION.TEMP_TB3
+	WITH
+		TB3T1(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+			SELECT 	CAST(#{fromDate} AS CHAR(8))		--시작일
+					,CAST(#{toDate} AS CHAR(8))			--종료일
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0501 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0703  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0502 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0704  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0503 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0705  AS CHAR(2))  
+				 		END		
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0504 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0706  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0707  AS CHAR(5))  
+				 		END			
+					,sum(IS0709)*1000,sum(IS0710)*1000      --당년 매출목표,이익목표
+					,0,0									--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI07PF
+				LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+					ON	MS05101=IS0703 AND MS05103=IS0707
+			WHERE	IS0702 >= #{fromDate} AND IS0702 <= #{toDate} 
+					AND SUBSTR(IS0707,1,1) < '0'
+			GROUP BY IS0703 ,IS0704 ,IS0705 ,IS0706 ,IS0707 ,MS05102
+		),
+		TB3T2(fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL) AS(
+			SELECT 	CAST(#{fromDate} AS CHAR(8))		--시작일
+					,CAST(#{toDate} AS CHAR(8))			--종료일
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0501 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0703  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0502 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0704  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0503 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0705  AS CHAR(2))  
+				 		END		
+					,CASE 
+						WHEN MS05102 <> '' 	THEN (SELECT MS0504 FROM ${dbType}SPFRDB.SPFM05PF WHERE MS0501=IS0703 AND MS0505=MS05102) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0706  AS CHAR(2))  
+				 		END					
+					,CASE 
+						WHEN MS05102 <> '' 	THEN CAST(MS05102 AS CHAR(5)) -- 종속코너 있으면 주코너번호로
+											ELSE CAST(IS0707  AS CHAR(5))  				 		END			
+
+					,0,0							      	--당년 매출목표,이익목표
+					,sum(IS0709)*1000,sum(IS0710)*1000 		--전년 매출목표,이익목표
+			FROM 	${dbType}spfrdb.SPFI07PF
+				LEFT OUTER JOIN		${dbType}SPFRDB.SPFM051PF
+					ON	MS05101=IS0703 AND MS05103=IS0707
+			WHERE	IS0702 >= #{fromDateL} AND IS0702 <= #{toDateL}
+					AND SUBSTR(IS0707,1,1) < '0'
+			GROUP BY IS0703 ,IS0704 ,IS0705 ,IS0706 ,IS0707 ,MS05102
+		)
+			
+		SELECT fdate,tdate,jum,bu,tim,pc
+				,(SELECT MS05802 FROM ${dbType}SPFRDB.SPFM05PF8 WHERE MS05801=jum AND MS05803=class1)
+				,SUM(yearTry),SUM(yearProfitTry),SUM(yearTryL),SUM(yearProfitTryL) 
+		FROM
+			(
+			SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB3T1
+			UNION ALL
+			SELECT 	fdate,tdate,jum,bu,tim,pc,class1,yearTry,yearProfitTry,yearTryL,yearProfitTryL FROM TB3T2
+			) TB3T3
+		GROUP BY fdate,tdate,jum,bu,tim,pc,class1	
+]]>
+</select>
+
+
+
+<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	
+<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	
+<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	<!-- 데이터 생성 끝  // SELECT 시작   -->	
+
+
+<!-- 1) SELECT  LV_JUM : 부 단계까지 썸해서 출력-->   
+<select id="selectCloseBefProfitInqListLvJum" resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+	WITH
+	TB9(fromSaleDate,toSaleDate,jum,bu,jumNm,buNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate 
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate)
+	AS(
+		SELECT	CAST(#{fromDate} AS CHAR(8))		--시작일
+				,CAST(#{toDate} AS CHAR(8))			--종료일 	
+				,jum					AS jum						--점
+				,bu						AS bu						--부
+				,trim(MS0203)		  	AS jumNm					--점명
+				,trim(MS0204)			AS buNm 					--부명
+				
+				,sum(yearNetsale)		AS yearNetsale				--당년 순매출
+				,sum(yearDiscount)		AS yearDiscount				--당년 할인액
+				,sum(yearTotalsale)		AS yearTotalsale			--당년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)	AS yearTry			--당년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)	AS yearProfitTry	--당년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu  
+											Group by jum,bu)	AS yearTry			--당년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu 
+											Group by jum,bu)	AS yearProfitTry	--당년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)
+				 - (SELECT sum(yearTry) 	FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu  
+											Group by jum,bu))	AS yearTry			--당년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)
+				 - (SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu 
+											Group by jum,bu))	AS yearProfitTry	--당년 이익목표 (오프라인)	
+				</if>			
+				,sum(yearProfit)		AS yearProfit				--당년 이익액				
+				,CASE WHEN sum(yearNetsale) > -1 THEN (float(sum(yearProfit))/float(sum(yearNetsale)))*100
+												 ELSE (float(sum(yearProfit))/float(sum(yearNetsale)))*100*-1
+					END					AS yearProfitRate			--당년 이익률
+				
+				,sum(yearNetsaleL)		AS lastYearNetsale				--전년 순매출
+				,sum(yearDiscountL)		AS lastYearDiscount				--전년 할인액
+				,sum(yearTotalsaleL)	AS lastYearTotalsale			--전년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)	AS lastYearTry			--전년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)	AS lastYearProfitTry	--전년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu  
+											Group by jum,bu)	AS lastYearTry			--전년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu 
+											Group by jum,bu)	AS lastYearProfitTry	--전년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTryL) 	FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)
+				 - (SELECT sum(yearTryL) 	FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu  
+											Group by jum,bu))	AS lastYearTry			--전년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND corno='' 
+											Group by jum,bu)
+				 - (SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu 
+											Group by jum,bu))	AS lastYearProfitTry	--전년 이익목표 (오프라인)	
+				</if>				
+				,sum(yearProfitL)		AS lastYearProfit			--전년 이익액			
+				,CASE WHEN sum(yearNetsaleL) > -1 THEN (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100
+										 		  ELSE (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100*-1
+					END			 		AS	lastYearProfitRate		--전년 이익률	
+	
+		
+		FROM 	SESSION.TEMP_TB1	A
+			INNER JOIN	${dbType}SPFRDB.SPFM02PF
+				ON MS0201=jum AND MS0202=bu
+	<![CDATA[
+		WHERE	exists(SELECT * FROM ${dbType}SPFRDB.SPFM04PF2  				
+						WHERE MS04201=jum AND MS04202=bu AND MS04203=tim AND MS04204=pc AND MS04221='Y')
+				AND jum = SUBSTR(#{jum},1,2) 	   
+	]]>	 
+			<if test="saleForm != null and saleForm !='' and saleForm !='ALL'">
+				AND saleForm = #{saleForm}
+			</if>		
+			<if test="onlineForm == 'ON'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) < '0'
+				]]>
+			</if>
+			<if test="onlineForm == 'OFF'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) >= '0'
+				]]>
+			</if>
+	  
+		GROUP BY jum,bu,MS0203,MS0204		
+	)
+	SELECT 	fromSaleDate,toSaleDate,jum,bu,jumNm,buNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate ,(float(yearProfit)/float(yearProfitTry))*100 AS yearProfitTryRate, '｜' AS sep01
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate ,(float(lastYearProfit)/float(lastYearProfitTry))*100 AS lastYearProfitTryRate
+	FROM	TB9           
+	ORDER BY jum,bu
+</select>
+
+
+<!-- 2) SELECT  LV_BU : 팀 단계까지 썸해서 출력 -->
+<select id="selectCloseBefProfitInqListLvBu" resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+	WITH
+	TB9(fromSaleDate,toSaleDate,jum,bu,tim,jumNm,buNm,timNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate 
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate)
+	AS(
+		SELECT 	CAST(#{fromDate} AS CHAR(8))						--시작일
+				,CAST(#{toDate} AS CHAR(8))							--종료일 	
+				,jum					AS jum						--점
+				,bu						AS bu						--부
+				,tim					AS tim						--팀
+				,trim(MS0304)		  	AS jumNm					--점명
+				,trim(MS0305)			AS buNm 					--부명
+				,trim(MS0306)			AS timNm 					--팀명
+							
+				,sum(yearNetsale)		AS yearNetsale				--당년 순매출
+				,sum(yearDiscount)		AS yearDiscount				--당년 할인액
+				,sum(yearTotalsale)		AS yearTotalsale			--당년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)	AS yearTry			--당년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)	AS yearProfitTry	--당년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim  
+											Group by jum,bu,tim)	AS yearTry			--당년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim 
+											Group by jum,bu,tim)	AS yearProfitTry	--당년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)
+				 - (SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim  
+											Group by jum,bu,tim))	AS yearTry			--당년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)
+				 - (SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim 
+											Group by jum,bu,tim))	AS yearProfitTry	--당년 이익목표 (오프라인)	
+				</if>			
+				,sum(yearProfit)		AS yearProfit				--당년 이익액	
+				,CASE WHEN sum(yearNetsale) > -1 THEN (float(sum(yearProfit))/float(sum(yearNetsale)))*100
+												 ELSE (float(sum(yearProfit))/float(sum(yearNetsale)))*100*-1
+					END					AS	yearProfitRate			--당년 이익률
+				
+				,sum(yearNetsaleL)		AS lastYearNetsale				--전년 순매출
+				,sum(yearDiscountL)		AS lastYearDiscount				--전년 할인액
+				,sum(yearTotalsaleL)	AS lastYearTotalsale			--전년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)	AS lastYearTry			--전년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)	AS lastYearProfitTry	--전년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim  
+											Group by jum,bu,tim)	AS lastYearTry			--전년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim
+											Group by jum,bu,tim)	AS lastYearProfitTry	--전년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)
+				 - (SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim  
+											Group by jum,bu,tim))	AS lastYearTry			--전년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND corno='' 
+											Group by jum,bu,tim)
+				 - (SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim 
+											Group by jum,bu,tim))	AS lastYearProfitTry	--전년 이익목표 (오프라인)	
+				</if>			
+				,sum(yearProfitL)		AS lastYastYearProfit			--전년 이익액		
+				,CASE WHEN sum(yearNetsaleL) > -1 THEN (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100
+										 		  ELSE (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100*-1
+					END			 		AS	lastYearProfitRate		--전년 이익률							
+		
+		FROM 	SESSION.TEMP_TB1	A
+			INNER JOIN	${dbType}SPFRDB.SPFM03PF
+				ON MS0301=jum AND MS0302=bu AND MS0303=tim
+	<![CDATA[
+		WHERE	exists(SELECT * FROM ${dbType}SPFRDB.SPFM04PF2  				
+						WHERE MS04201=jum AND MS04202=bu AND MS04203=tim AND MS04204=pc AND MS04221='Y')
+				AND jum = SUBSTR(#{bu},1,2)
+				AND bu  = SUBSTR(#{bu},3,2)
+	]]>	
+			<if test="saleForm != null and saleForm !='' and saleForm !='ALL'">
+				AND saleForm = #{saleForm}
+			</if>		
+			<if test="onlineForm == 'ON'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) < '0'
+				]]>
+			</if>
+			<if test="onlineForm == 'OFF'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) >= '0'
+				]]>
+			</if>			   
+		GROUP BY jum,bu,tim,MS0304,MS0305,MS0306		
+	)
+	SELECT 	fromSaleDate,toSaleDate,jum,bu,tim,jumNm,buNm,timNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate ,(float(yearProfit)/float(yearProfitTry))*100 AS yearProfitTryRate, '｜' AS sep01
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate ,(float(lastYearProfit)/float(lastYearProfitTry))*100 AS lastYearProfitTryRate
+	FROM	TB9      
+	ORDER BY jum,bu,tim       
+</select>
+
+<!-- 3) SELECT  LV_TIM : PC 단계까지 썸해서 출력 -->
+<select id="selectCloseBefProfitInqListLvTim" resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+	WITH
+	TB9(fromSaleDate,toSaleDate,jum,bu,tim,pc,jumNm,buNm,timNm,pcNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate 
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate)
+	AS(
+		SELECT 	CAST(#{fromDate} AS CHAR(8))						--시작일
+				,CAST(#{toDate} AS CHAR(8))							--종료일 	
+				,jum					AS jum						--점
+				,bu						AS bu						--부
+				,tim					AS tim						--팀
+				,pc						AS pc						--PC
+				,trim(MS0405)		  	AS jumNm					--점명
+				,trim(MS0406)			AS buNm 					--부명
+				,trim(MS0407)			AS timNm 					--팀명
+				,trim(MS0408)			AS pcNm 					--pc명
+				
+				,sum(yearNetsale)		AS yearNetsale				--당년 순매출
+				,sum(yearDiscount)		AS yearDiscount				--당년 할인액
+				,sum(yearTotalsale)		AS yearTotalsale			--당년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)	AS yearTry			--당년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)	AS yearProfitTry	--당년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc  
+											Group by jum,bu,tim,pc)	AS yearTry			--당년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc 
+											Group by jum,bu,tim,pc)	AS yearProfitTry	--당년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)
+				 - (SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc  
+											Group by jum,bu,tim,pc))	AS yearTry			--당년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)
+				 - (SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc 
+											Group by jum,bu,tim,pc))	AS yearProfitTry	--당년 이익목표 (오프라인)	
+				</if>				
+				,sum(yearProfit)		AS yearProfit				--당년 이익액	
+				,CASE WHEN sum(yearNetsale) > -1 THEN (float(sum(yearProfit))/float(sum(yearNetsale)))*100
+												 ELSE (float(sum(yearProfit))/float(sum(yearNetsale)))*100*-1
+					END					AS	yearProfitRate			--당년 이익률
+				
+				,sum(yearNetsaleL)		AS lastYearNetsale				--전년 순매출
+				,sum(yearDiscountL)		AS lastYearDiscount				--전년 할인액
+				,sum(yearTotalsaleL)	AS lastYearTotalsale			--전년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)	AS lastYearTry			--전년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)	AS lastYearProfitTry	--전년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc  
+											Group by jum,bu,tim,pc)	AS lastYearTry			--전년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc
+											Group by jum,bu,tim,pc)	AS lastYearProfitTry	--전년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)
+				 - (SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc  
+											Group by jum,bu,tim,pc))	AS lastYearTry			--전년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno='' 
+											Group by jum,bu,tim,pc)
+				 - (SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc 
+											Group by jum,bu,tim,pc))	AS lastYearProfitTry	--전년 이익목표 (오프라인)	
+				</if>		
+				,sum(yearProfitL)		AS lastYearProfit			--전년 이익액		
+				,CASE WHEN sum(yearNetsaleL) > -1 THEN (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100
+										 		  ELSE (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100*-1
+					END			 		AS	lastYearProfitRate		--전년 이익률						
+		
+		FROM 	SESSION.TEMP_TB1	A
+			INNER JOIN	${dbType}SPFRDB.SPFM04PF
+				ON MS0401=jum AND MS0402=bu AND MS0403=tim AND MS0404=pc	
+	<![CDATA[
+		WHERE	exists(SELECT * FROM ${dbType}SPFRDB.SPFM04PF2  				
+						WHERE MS04201=jum AND MS04202=bu AND MS04203=tim AND MS04204=pc AND MS04221='Y')
+				AND jum = SUBSTR(#{tim},1,2)
+				AND bu  = SUBSTR(#{tim},3,2)
+				AND tim = SUBSTR(#{tim},5,2)
+	]]>	
+			<if test="saleForm != null and saleForm !='' and saleForm !='ALL'">
+				AND saleForm = #{saleForm}
+			</if>	
+			<if test="onlineForm == 'ON'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) < '0'
+				]]>
+			</if>
+			<if test="onlineForm == 'OFF'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) >= '0'
+				]]>
+			</if>
+		GROUP BY jum,bu,tim,pc,MS0405,MS0406,MS0407,MS0408		
+	)
+	SELECT 	fromSaleDate,toSaleDate,jum,bu,tim,pc,jumNm,buNm,timNm,pcNm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate ,(float(yearProfit)/float(yearProfitTry))*100 AS yearProfitTryRate, '｜' AS sep01
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate ,(float(lastYearProfit)/float(lastYearProfitTry))*100 AS lastYearProfitTryRate
+	FROM	TB9         
+	ORDER BY jum,bu,tim,pc 
+</select>
+
+
+<!-- 4) SELECT  LV_PC  -->
+<select id="selectCloseBefProfitInqListLvPc"  resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+	WITH
+	TB9(fromSaleDate,toSaleDate,jum,bu,tim,pc,class1,jumNm,buNm,timNm,pcNm,class1Nm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate 
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate)
+	AS(
+		SELECT 	CAST(#{fromDate} AS CHAR(8))						--시작일
+				,CAST(#{toDate} AS CHAR(8))							--종료일 	
+				,jum					AS jum						--점
+				,bu						AS bu						--부
+				,tim					AS tim						--팀
+				,pc						AS pc						--PC	
+				,class1					AS class1					--클래스1	
+				,trim(MS0506)		  	AS jumNm					--점명
+				,trim(MS0507)			AS buNm 					--부명
+				,trim(MS0508)			AS timNm 					--팀명
+				,trim(MS0509)			AS pcNm 					--pc명
+				,trim(MS0510)			AS class1Nm					--코너명
+				,sum(yearNetsale)		AS yearNetsale				--당년 순매출	
+				,sum(yearDiscount)		AS yearDiscount				--당년 할인액
+				,sum(yearTotalsale)		AS yearTotalsale			--당년 총매출	
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)	AS yearTry			--당년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)	AS yearProfitTry	--당년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1  
+											Group by jum,bu,tim,pc,corno)	AS yearTry			--당년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)	AS yearProfitTry	--당년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)
+				 - (SELECT sum(yearTry) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1  
+											Group by jum,bu,tim,pc,corno))	AS yearTry			--당년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B		WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)
+				 - (SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno))	AS yearProfitTry	--당년 이익목표 (오프라인)	
+				</if>			
+				,sum(yearProfit)		AS yearProfit				--당년 이익액	
+				,CASE WHEN sum(yearNetsale) > -1 THEN (float(sum(yearProfit))/float(sum(yearNetsale)))*100
+												 ELSE (float(sum(yearProfit))/float(sum(yearNetsale)))*100*-1
+					END					AS	yearProfitRate			--당년 이익률
+				
+				,sum(yearNetsaleL)		AS lastYearNetsale				--전년 순매출
+				,sum(yearDiscountL)		AS lastYearDiscount				--전년 할인액
+				,sum(yearTotalsaleL)	AS lastYearTotalsale			--전년 총매출			
+				<if test="onlineForm == null or onlineForm =='' or onlineForm =='ALL'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)	AS lastYearTry			--전년 매출목표 (온라인+오프라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)	AS lastYearProfitTry	--전년 이익목표	(온라인+오프라인)	
+				</if>
+				<if test="onlineForm == 'ON'">
+				,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1  
+											Group by jum,bu,tim,pc,corno)	AS lastYearTry			--전년 매출목표 (온라인)
+				,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1
+											Group by jum,bu,tim,pc,corno)	AS lastYearProfitTry	--전년 이익목표	(온라인)	
+				</if>
+				<if test="onlineForm == 'OFF'">
+				,((SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)
+				 - (SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1  
+											Group by jum,bu,tim,pc,corno))	AS lastYearTry			--전년 매출목표 (오프라인)
+				,((SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno)
+				 - (SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB3 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+											Group by jum,bu,tim,pc,corno))	AS lastYearProfitTry	--전년 이익목표 (오프라인)	
+				</if>			
+				,sum(yearProfitL)		AS lastYearProfit			--전년 이익액						
+				,CASE WHEN sum(yearNetsaleL) > -1 THEN (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100
+										 		  ELSE (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100*-1
+					END			 		AS	lastYearProfitRate		--전년 이익률						
+		
+		FROM 	SESSION.TEMP_TB1 A
+			LEFT OUTER JOIN ${dbType}spfrdb.spfm05pf
+				ON MS0501=jum AND MS0505=class1			
+		WHERE	exists(SELECT * FROM ${dbType}SPFRDB.SPFM04PF2  				
+						WHERE MS04201=jum AND MS04202=bu AND MS04203=tim AND MS04204=pc AND MS04221='Y')
+				AND jum = SUBSTR(#{tim},1,2)
+				AND bu  = SUBSTR(#{tim},3,2)
+				AND tim = SUBSTR(#{tim},5,2)
+				AND pc 	= SUBSTR(#{pc},7,2)
+			<if test="saleForm != null and saleForm !='' and saleForm !='ALL'">
+				AND saleForm = #{saleForm}
+			</if>	
+			<if test="onlineForm == 'ON'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) < '0'
+				]]>
+			</if>
+			<if test="onlineForm == 'OFF'">
+				<![CDATA[
+				AND SUBSTR(class1,1,1) >= '0'
+				]]>
+			</if>
+		GROUP BY jum,bu,tim,pc,class1,MS0506,MS0507,MS0508,MS0509,MS0510
+		HAVING 	sum(yearNetsale) != 0		
+	)
+	
+	SELECT 	fromSaleDate,toSaleDate,jum,bu,tim,pc,class1,jumNm,buNm,timNm,pcNm,class1Nm
+			,yearNetsale ,yearDiscount ,yearTotalsale ,yearTry ,yearProfitTry ,yearProfit ,yearProfitRate ,(float(yearProfit)/float(yearProfitTry))*100 AS yearProfitTryRate, '｜' AS sep01
+			,lastYearNetsale ,lastYearDiscount ,lastYearTotalsale ,lastYearTry ,lastYearProfitTry ,lastYearProfit ,lastYearProfitRate ,(float(lastYearProfit)/float(lastYearProfitTry))*100 AS lastYearProfitTryRate
+	FROM	TB9   
+	ORDER BY jum,bu,tim,pc,yearNetsale desc
+</select>
+
+
+
+
+
+<!-- 91) SELECT  LV_TEST1  -->
+<select id="selectCloseBefProfitInqList1" resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+<![CDATA[
+	SELECT 	jum						AS jum						--점
+			,bu						AS bu						--부
+			,tim					AS tim						--팀
+			,pc						AS pc						--PC	
+			,class1					AS class1					--클래스1		
+			,trim(MS0506)		  	AS jumNm					--점명
+			,trim(MS0507)			AS buNm 					--부명
+			,trim(MS0508)			AS timNm 					--팀명
+			,trim(MS0509)			AS pcNm 					--pc명
+			,trim(MS0510)			AS class1Nm					--코너명
+			
+			,sum(yearNetsale)		AS yearNetsale				--당년 순매출	
+			,sum(yearDiscount)		AS yearDiscount				--당년 할인액
+			,sum(yearTotalsale)		AS yearTotalsale			--당년 총매출	
+			,(SELECT sum(yearTry) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+										Group by jum,bu,tim,pc,corno)	AS yearTry			--당년 매출목표
+			,(SELECT sum(yearProfitTry) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1
+										Group by jum,bu,tim,pc,corno)	AS yearProfitTry	--당년 이익목표			
+			,sum(yearProfit)		AS yearProfit				--당년 이익액	
+			,CASE WHEN sum(yearNetsale) > -1 THEN (float(sum(yearProfit))/float(sum(yearNetsale)))*100
+											 ELSE (float(sum(yearProfit))/float(sum(yearNetsale)))*100*-1
+				END					AS	yearProfitRate			--당년 이익률
+			, '｜' AS sep01
+			
+			,sum(yearNetsaleL)		AS lastYearNetsale				--전년 순매출
+			,sum(yearDiscountL)		AS lastYearDiscount				--전년 할인액
+			,sum(yearTotalsaleL)	AS lastYearTotalsale			--전년 총매출			
+			,(SELECT sum(yearTryL) 		FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1 
+										Group by jum,bu,tim,pc,corno)	AS lastYearTry			--전년 매출목표
+			,(SELECT sum(yearProfitTryL) FROM SESSION.TEMP_TB2 B	WHERE fromSaleDate=#{fromDate} AND toSaleDate=#{toDate} AND A.jum=B.jum AND A.bu=B.bu AND A.tim=B.tim AND A.pc=B.pc AND corno=class1
+										Group by jum,bu,tim,pc,corno)	AS lastYearProfitTry	--전년 이익목표			
+			,sum(yearProfitL)		AS lastYearProfit			--전년 이익액		
+			,CASE WHEN sum(yearNetsaleL) > -1 THEN (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100
+									 		  ELSE (float(sum(yearProfitL))/float(sum(yearNetsaleL)))*100*-1
+				END			 		AS	lastYearProfitRate		--전년 이익률						
+	
+	FROM 	SESSION.TEMP_TB1 A
+		LEFT OUTER JOIN ${dbType}spfrdb.spfm05pf
+			ON MS0501=jum AND MS0505=class1			
+	WHERE	exists(SELECT * FROM ${dbType}SPFRDB.SPFM04PF2  				
+					WHERE MS04201=jum AND MS04202=bu AND MS04203=tim AND MS04204=pc AND MS04221='Y')
+			AND jum = SUBSTR(#{tim},1,2)
+			AND bu  = SUBSTR(#{tim},3,2)
+			AND tim = SUBSTR(#{tim},5,2)
+			AND pc 	= SUBSTR(#{pc},7,2)
+]]>	
+		<if test="saleForm != null and saleForm !='' and saleForm !='ALL'">
+			AND saleForm = #{saleForm}
+		</if>	
+	GROUP BY jum,bu,tim,pc,class1,MS0506,MS0507,MS0508,MS0509,MS0510
+	ORDER BY jum,bu,tim,pc,class1
+</select>
+
+<!-- 92) SELECT  LV_TEST2  -->
+<select id="selectCloseBefProfitInqList2" resultType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqModel" parameterType="com.saydept.api.spf.saleNews.closeBefProfitInq.model.CloseBefProfitInqParamModel">
+	SELECT 	*
+	FROM 	SESSION.TEMP_TB1	
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

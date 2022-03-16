@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.comm.CommMapper">
+
+
+	<!-- 공통코드 조회 -->
+	<select id="selectCommCodeList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommCodeList*/
+		SELECT	TB1.GS0201 			AS groupCd
+		,			TB1.GS0202 		AS codeId
+		,			TB1.GS0203 		AS groupNm
+		,			TB1.GS0204 		AS codeNm
+		FROM 	SPORDB.SPOG02PF TB1
+		WHERE 		TB1.GS0201 	= 	#{groupCd}
+		ORDER BY TB1.GS0202 
+	</select>
+	
+	<!-- 매장목록 조회 -->
+	<select id="selectCommStoreList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommStoreList*/
+		SELECT	TB1.MS0101 			AS storeCd
+		,			TB1.MS0102 		AS storeNm
+		FROM 	SPFRDB.SPFM01PF TB1
+		<!-- WHERE 		TB1.MS0101	 = #{storeCd}
+		AND 	TB1.MS0116 IS NULL  -->
+	</select>
+	
+	<!-- POS목록 조회 -->
+	<select id="selectCommPosList" resultType="commModel" parameterType="commModel" fetchSize="100">
+		/*selectCommPosList*/
+		SELECT	TB1.P01HRNO			AS posNo
+		FROM 	SPOTNRDB.SPOPF01 TB1
+		WHERE 		TB1.P01HSCD = #{posNo}
+		AND 	TB1.p01HSyy 	= '2018'
+		AND 	TB1.p01HSmm 	= '01'
+		AND 	TB1.p01HSDD		= '01'
+		GROUP BY TB1.P01HRNO
+	</select>
+	
+
+
+
+</mapper>

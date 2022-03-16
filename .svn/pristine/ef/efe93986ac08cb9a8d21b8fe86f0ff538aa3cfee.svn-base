@@ -1,0 +1,5 @@
+package com.saydept.api.login.model;
+
+public class LoginModel {
+
+}

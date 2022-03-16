@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.login.LoginMapper">
+
+	<select id="selectGridList" resultType="com.saydept.api.login.model.LoginModel">
+		/*selectGridList*/
+		SELECT 	PD1802
+		,		PD1806
+		FROM 	SPORDB.SPOM18PF
+	</select>
+
+</mapper>

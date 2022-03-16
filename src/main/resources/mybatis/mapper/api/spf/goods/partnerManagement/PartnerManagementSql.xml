@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.partnerManagement.PartnerManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="partnerManagementModel" type="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectPartnerManagement" resultType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel" parameterType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel">
+		SELECT				
+					---협력업체 정보
+						TRIM(MS0802)	AS 	partnerNm
+					,	MS0803			AS	busiNum
+					,	TRIM(MS0804)	AS 	busiNm
+					,	TRIM(MS0805)	AS	owner
+					,	MS0806||MS0807	AS	jumin
+					,	trim(MS0808)||trim(MS0809)||trim(MS0810) AS tel
+					,	MS0811||MS0812	AS address
+					,	TRIM(MS0813)||' '||TRIM(MS0814)||' '||TRIM(MS0815)	AS addressNm
+					,	TRIM(MS0816)	AS 	service
+					,	TRIM(MS0836)	AS	serviceSect 
+					,	MS0818 	AS	imprest
+					,	MS0819	AS	payment
+					,	MS0820	AS	paymentCd
+					,	MS0821	AS	billDt
+					,	MS0824	AS	paymentLateCd
+					,	MS0827	AS	bankDiv
+					,	MS0828	AS	bankCd
+					,	MS0829	AS	bankNum
+					,	TRIM(MS0830)	AS	bankNm
+					,	MS0831  AS 	paymentCondition
+					,	MS0834	AS	calcdiv
+					,	MS0832	AS	ContractDt
+					,	MS0842	AS	openDt
+					,	MS0835	AS	endCd
+					,	MS0817	AS	areaDiv
+					,	MS0823	AS 	manageBu
+					,	MS0833	AS	tradeStop
+					,	MS0839	AS	ParterdelDt
+					,	MS0825||MS0826	AS	fax
+					,	MS0844 	AS email
+					,	MS0841  AS manager
+				
+					
+					FROM ${dbType}SPFRDB.SPFM08PF  
+				WHERE MS0801=#{jum} AND MS0802 =#{partner}
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectPartnerManagementList" resultType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel" parameterType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel" fetchSize="1000">
+		/*selectPartnerManagementList*/
+		SELECT ...
+	</select>
+
+	<!-- 수정 -->
+	<update id="updatePartnerManagement" parameterType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel">
+		/*updatePartnerManagement*/
+		UPDATE SPFRDB.SPFM08PFT
+		SET 
+			MS0801        			=#{jum}
+			,MS0802       			=#{partner}
+			,MS0803       			=#{busiNum}
+			,MS0804       			=#{busiNm}
+			,MS0805       			=#{owner}
+			,MS0806       			=#{jumin1}
+			,MS0807       			=#{jumin2}
+			,MS0808       			=#{tel1}
+			,MS0809       			=#{tel2}
+			,MS0810       			=#{tel3}
+			,MS0811       			=#{address1}
+			,MS0812       			=#{address2}
+			,MS0813       			=#{addressNm}
+			              			              
+			,MS0816       			=#{service}   
+			,MS0817       			=#{areaDiv}   
+			,MS0818       			=#{imprest}   
+			,MS0819       			=#{payment}   
+			,MS0820       			=#{paymentCd} 
+			,MS0821       			=#{billDt}    
+			              			
+			,MS0823       			=#{manageBu}        
+			,MS0824       			=#{paymentLateCd}   
+			,MS0825       			=#{fax1}            
+			,MS0826       			=#{fax2}            
+			,MS0828       			=#{bankCd}   
+			              				              			
+			,MS0831       			=#{paymentCondition}    
+			,MS0832       			=#{contractDt}          
+			,MS0833       			=#{tradeStop}           
+			,MS0834       			=#{calcdiv}             
+			,MS0835       			=#{endCd}               
+			,MS0836       			=#{serviceSect}         
+			,MS0837       			=#{startDt}             
+			              				                  			  
+			,MS0840       			=#{userId}  
+			,MS0842       			=#{openDt}  
+			,MS0844       			=#{email}  
+			WHERE MS0801=#{jum} AND MS0802 =#{partner}
+	</update>             			
+                          			
+	<!-- 등록 -->
+	<insert id="insertPartnerManagement" parameterType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel">
+		INSERT INTO SPFRDB.SPFM08PFT
+		(
+			MS0801 
+			,MS0802 
+			,MS0803 
+			,MS0804 
+			,MS0805 
+			,MS0806
+			,MS0807
+			,MS0808 
+			,MS0809 
+			,MS0810 
+			,MS0811
+			,MS0812
+			,MS0813
+			
+			,MS0816
+			,MS0817
+			,MS0818
+			,MS0819
+			,MS0820
+			,MS0821
+			
+			,MS0823
+			,MS0824
+			,MS0825
+			,MS0826
+			,MS0828
+			
+			
+			,MS0831
+			,MS0832
+			,MS0833
+			,MS0834
+			,MS0835
+			,MS0836
+			,MS0837
+			
+		
+			,MS0840
+			,MS0842
+			,MS0844
+			
+		)
+		VALUES
+		(
+			#{jum}
+			,#{partner}
+			,#{busiNum}
+			,#{busiNm}
+			,#{owner}
+			,#{jumin1}
+			,#{jumin2}
+			,#{tel1}
+			,#{tel2}
+			,#{tel3}
+			,#{address1}
+			,#{address2}
+			,#{addressNm}
+			
+			
+			,#{service}
+			,#{areaDiv}
+			,#{imprest}
+			,#{payment}
+			,#{paymentCd}
+			,#{billDt}
+			
+			
+			,#{manageBu}
+			,#{paymentLateCd}
+			,#{fax1}
+			,#{fax2}
+			
+			,#{bankCd}
+			
+			
+			,#{paymentCondition}
+			,#{contractDt}
+			,#{tradeStop}
+			,#{calcdiv}
+			,#{endCd}
+			,#{serviceSect}
+			,#{startDt}
+			
+			,#{userId}
+			,#{openDt}
+			,#{email}
+			
+			
+		)
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deletePartnerManagement" parameterType="com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel">
+		/*deletePartnerManagement*/
+		UPDATE SPFRDB.SPFM08PFT
+			SET MS0839 =#{startDt}
+		
+		WHERE MS0801=#{jum} AND MS0802 =#{partner}
+	</delete>
+
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.timManagement.TimManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectTimManagement" resultType="com.saydept.api.spf.org.timManagement.model.TimManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.timManagement.model.TimManagementSaveModel" fetchSize="1000">
+		 SELECT
+         MS0301 as ms03Jum
+        ,MS0302 as ms03Bu
+        ,MS0303 as ms03Tim
+        ,MS0304 as ms03JumNm
+        ,MS0305 as ms03BuNm
+        ,MS0306 as ms03TimNm
+        ,MS0307 as ms0307
+        ,MS0308 as ms0308
+        ,MS0309 as ms0309
+        ,MS0310 as ms0310
+        ,MS0311 as ms0311
+        ,MS0312 as ms0312
+        ,MS0313 as ms0313
+        ,MS0314 as ms0314
+        ,MS0315 as ms0315
+        ,MS0316 as ms0316
+        ,MS0317 as ms0317
+        ,MS0318 as ms0318
+
+	FROM SPFRDB.SPFM03PX
+        WHERE MS0301 = #{ms03Jum}
+        AND   MS0302 = #{ms03Bu}
+        AND   MS0303 = #{ms03Tim}
+
+	</select> 
+	
+	<!-- 부서조회  -->
+	<select id="selectBuList" resultType="com.saydept.api.spf.org.timManagement.model.TimManagementModel" 
+				parameterType="com.saydept.api.spf.org.timManagement.model.TimManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0201) 	AS jum /*점*/
+				,TRIM(TB1.MS0202) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0204 ) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0202)||'-'||TRIM(TB1.MS0204) AS buCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE  	TRIM(TB1.MS0201)  = #{jum}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+				
+				ORDER BY TRIM(TB1.MS0201),TRIM(TB1.MS0202)
+				
+	</select> 
+	
+<!-- 팀조회  -->
+	<select id="selectTimList" resultType="com.saydept.api.spf.org.timManagement.model.TimManagementModel" 
+				parameterType="com.saydept.api.spf.org.timManagement.model.TimManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0301) 	AS jum 			/*점*/
+				,TRIM(TB1.MS0302) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0303) 	AS tim			/* 조직코드 */
+				,TRIM(TB1.MS0304 ) 	AS jumNm		/* 조직명 */
+				,TRIM(TB1.MS0305 ) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0306 ) 	AS timNm		/* 조직명 */
+				,TRIM(TB1.MS0303)||' - '||TRIM(TB1.MS0306) AS timCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM03PF TB1
+		WHERE  	    TRIM(TB1.MS0301)  = #{jum}
+				AND TRIM(TB1.MS0302)  = #{bu}
+				AND TB1.MS0302 &gt;='70'
+				AND TB1.MS0318 = ''
+				
+				ORDER BY TRIM(TB1.MS0301),TRIM(TB1.MS0302),TRIM(TB1.MS0303)
+				
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updateTimManagement"  
+				parameterType="com.saydept.api.spf.org.timManagement.model.TimManagementSaveModel">
+         
+         UPDATE  SPFRDB.SPFM03LF1 SET
+          MS0302 = #{ms03JumNm}
+         ,MS0303 = #{ms03Sano}
+         ,MS0304 = #{ms03Dname}
+         ,MS0305 = #{ms03Juno1}
+         ,MS0306 = #{ms03Juno2}
+         ,MS0307 = #{ms03Post1}
+         ,MS0308 = #{ms03Post2}
+         ,MS0313 = #{ms03Address}
+         ,MS0310 = #{ms03Phone1}
+         ,MS0311 = #{ms03Phone2}
+         ,MS0312 = #{ms03Phone3}
+         ,MS0314 = #{ms03Crdate}
+         ,MS0315 = #{ms03Camonth}
+         ,MS0316 = #{ms03Deldate}
+         ,MS0317 = #{ms03Adddate}
+         ,MS0321 = #{ms03Uptdate}
+         WHERE MS0301 = #{ms03Jum}
+	</update> 
+	
+	
+<!-- 인서트 1행  -->
+	<insert id="insertTimManagement"  
+				parameterType="com.saydept.api.spf.org.timManagement.model.TimManagementSaveModel">
+         
+         INSERT INTO  SPFRDB.SPFM02LF1 VALUES
+         (
+          #{ms02Jum}
+         ,''
+         ,#{ms02Sano}
+         ,''
+         ,#{ms02Juno1}
+         ,#{ms02Juno2}
+         ,#{ms02Post1}
+         ,#{ms02Post2}
+         ,#{ms02Phone1}
+         ,#{ms02Phone2}
+         ,#{ms02Phone3}
+         ,''
+         ,#{ms02Crdate}
+         ,#{ms02Camonth}
+         ,#{ms02Deldate}
+         ,#{ms02Adddate}
+         ,#{ms02Uptdate}
+		 ,#{ms02Adduser}
+		 ,#{ms02Uptuser}
+		 )	
+	</insert>
+		
+</mapper>

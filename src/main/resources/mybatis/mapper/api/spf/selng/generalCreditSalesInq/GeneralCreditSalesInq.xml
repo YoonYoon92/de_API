@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.generalCreditSalesInq.GeneralCreditSalesInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectGeneralCreditSalesInqList" resultType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqModel" parameterType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" fetchSize="1000">
+		/*selectGeneralCreditSalesInqList*/
+		/*  1: 일반외상, 2: 사용매출  */
+		
+				SELECT  CASE WHEN IS3801='1' THEN '일반외상'
+					 WHEN IS3801='2' THEN '사용매출'
+					                 ELSE '기타' 
+					                 END            AS CLASSFICATION
+		,		IS3802||IS3803||IS3804              AS SALEDATE
+		,       IS3806                              AS REGI
+		,       IS3807                              AS RECEIPT
+		,       IS3808                              AS SLPNO
+		,       IS3805||IS3809||IS3810||IS3811      AS ORGCD
+		,       IS3812||'-'||IS3813                 AS CLASSNO
+		,       MS0604                              AS CLASSNM
+		,       IS3814                              AS SINGLEITEMNO
+		,       MS0706                              AS SINGLEITEMNM
+		,       IS3815                              AS UNITPRICE
+		,       IS3816                              AS QUANTITY
+		,       IS3817                              AS NETAMOUNT
+		,       IS3818                              AS SALEAMOUNT
+		,       IS3819                              AS TOTALAMOUNT
+		,       IS3820                              AS CREDITAMOUNT
+		,       IS3820-IS3817                       AS ETCAMOUNT 
+		FROM 	${dbType}SPFRDB.SPFI38PF sp
+		 
+				LEFT OUTER JOIN ${dbType}SPFRDB.SPFM06PF
+				
+				ON MS0601=IS3805 AND MS0602=IS3812 AND MS0603=IS3813
+				LEFT OUTER JOIN ${dbType}SPFRDB.SPFM07PF
+				
+				ON MS0701=IS3805 AND MS0702=IS3809 AND MS0703=IS3814
+		WHERE   IS3801 = #{saleCls}                    		--구분: 1:일반외상, 2: 사용매출
+		AND     IS3802||IS3803||IS3804 &gt;= #{startDt}         --startDt
+		AND     IS3802||IS3803||IS3804 &lt;= #{endDt}           --endDt
+		AND     IS3805 = #{jum}                       		    --jum
+		<if test="bu != null and bu !=''">
+		AND     IS3809 =  SUBSTR(#{bu},3,2)                       		    --bu
+		</if>
+		<if test="tim != null and tim !=''">
+		AND     IS3810 = SUBSTR(#{tim},5,2)                            		--tim
+		</if>
+		<if test="pc != null and pc !=''">
+		AND     IS3811 = SUBSTR(#{pc},7,2)                           		--pc
+		</if>
+		<if test="combinePay != null and combinePay != ''">
+		AND     IS3819 &lt;&gt; IS3820
+		</if> 
+		ORDER BY CLASSFICATION, SALEDATE, REGI, RECEIPT
+
+	</select>
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectGeneralCreditSalesInqListTr" resultType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqTrModel" parameterType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" fetchSize="1000">
+		/*selectGeneralCreditSalesInqListTr*/
+		/*  5: 특판, 7: cod  */
+		
+		SELECT  P01HWCC  
+		,       P01HSYY  
+		,       P01HSMM  
+		,       P01HSDD  
+		,       P01HTHH  
+		,       P01HTMM  
+		,       P01HTSS  
+		,       P01HSCD  
+		,       P01HRNO  
+		,       P01HTNO  
+		,       P01HSEQ  
+		,       P01HOPN  
+		,       P01HICN  
+		,       P01HJCN  
+		,       P01HSGU  
+		,       P01HSG1  
+		,       P01HSM1  
+		,       P01HSG2  
+		,       P01HSM2  
+		,       P01HSG3  
+		,       P01HSM3  
+		,       P01HSG4  
+		,       P01HSM4  
+		,       P01HSG5  
+		,       P01HSM5  
+		,       P01HEGM  
+		,       P01CODG  
+		,       P01CODN  
+		,       P01DATA1 
+		,       P01DATA2 
+		,       P01DATA3 
+		,       P01DATA4 
+		,       P01DATA5 
+		,       P01DATA6 
+		,       P01DATA7 
+		,       P01DATA8 
+		,       P01DATA9 
+		,       P01RDATE 
+		,       P01RTIME 
+		FROM 	${dbType}SPOTNRDB.SPOPF01 s
+		
+		WHERE 	P01HSYY||P01HSMM||P01HSDD &gt;= #{startDt}
+		AND 	P01HSYY||P01HSMM||P01HSDD &lt;= #{endDt}
+		AND 	P01HSCD = #{jum}
+		AND     (P01HSG1= CASE WHEN #{saleCls}='3' THEN '5' ELSE '7' END OR 
+				 P01HSG2= CASE WHEN #{saleCls}='3' THEN '5' ELSE '7' END OR 
+				 P01HSG3= CASE WHEN #{saleCls}='3' THEN '5' ELSE '7' END OR 
+				 P01HSG4= CASE WHEN #{saleCls}='3' THEN '5' ELSE '7' END OR 
+				 P01HSG5= CASE WHEN #{saleCls}='3' THEN '5' ELSE '7' END)
+	</select>
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectGeneralCreditSalesInqListM06" resultType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" parameterType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" fetchSize="1000">
+		/*selectGeneralCreditSalesInqListM06*/
+		SELECT  MS0604   AS CLASSNM
+		,       MS0601||MS0618||MS0619||MS0620 AS ORGCD
+		FROM 	${dbType}SPFRDB.SPFM06PF
+		
+		WHERE   MS0601=#{jum}
+		AND     MS0602=SUBSTR(#{classCd},1,5)
+		AND     MS0603=SUBSTR(#{classCd},6,2)
+	</select>
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectGeneralCreditSalesInqListM07" resultType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" parameterType="com.saydept.api.spf.selng.generalCreditSalesInq.model.GeneralCreditSalesInqParamModel" fetchSize="1000">
+		/*selectGeneralCreditSalesInqListM07*/
+		SELECT  MS0706   AS SINGLEITEMNM				
+		,		MS0704||MS0705   AS CLASSCD
+		,		MS0604   AS CLASSNM
+		,       MS0601||MS0618||MS0619||MS0620 AS ORGCD
+		FROM 	${dbType}SPFRDB.SPFM07PF
+		
+				INNER JOIN ${dbType}SPFRDB.SPFM06PF
+				ON MS0601=MS0701 AND MS0602=MS0704 AND MS0603=MS0705
+		WHERE   MS0701=#{jum}				
+		AND     MS0702=#{buCd}
+		AND     MS0703=#{singleItemCd}
+	</select>
+
+</mapper>

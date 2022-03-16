@@ -1,0 +1,12 @@
+package com.saydept.api.dashboard.model;
+
+import lombok.Data;
+
+@Data
+public class EventSaleUnitModel {
+
+	private String 	saleDate; // 영업일
+	private String 	eventNm; // 행사명
+	private Long 	netSale; // 순매출
+
+}

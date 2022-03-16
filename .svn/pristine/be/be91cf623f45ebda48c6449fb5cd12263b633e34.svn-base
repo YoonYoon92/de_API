@@ -1,0 +1,14 @@
+package com.saydept.api.dashboard.model;
+
+import lombok.Data;
+
+@Data
+public class ComplainModel {
+
+	private String rcpDate; //접수일
+	private String endDate; //종료일
+	private String rcpSeq;	//접수번호
+	private String bu;		//발생부서
+	private String title; 	//발생내용
+	private String yn;		//처리완료여부
+}

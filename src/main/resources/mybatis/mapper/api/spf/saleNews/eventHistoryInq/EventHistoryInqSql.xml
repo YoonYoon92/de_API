@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.eventHistoryInq.EventHistoryInqMapper">
+
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectEventHistoryInqList" resultType="com.saydept.api.spf.saleNews.eventHistoryInq.model.EventHistoryInqModel" parameterType="com.saydept.api.spf.saleNews.eventHistoryInq.model.EventHistoryInqModel">
+		/*selectEventHistoryInqList*/
+				SELECT     	MS4101||'-'||MS4102		AS eventCd
+							,MS4103
+							,MS4104					AS eventNm
+							,MS4105||MS4106||MS4107  AS eventstartDt
+							,MS4108||MS4109||MS4110  AS eventendDt
+							,DAYS(MS4108||'-'||MS4109||'-'||MS4110)-DAYS(MS4105||'-'||MS4106||'-'||MS4107) AS Dqty
+				FROM 		${dbType}SPFRDB.SPFM41PF A
+				WHERE 		MS4105=SUBSTR(#{startDt},1,4) AND
+							MS4106=SUBSTR(#{startDt},5,2)
+				ORDER BY MS4105||MS4106||MS4107 DESC
+	</select>
+
+
+</mapper>

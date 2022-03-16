@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.dashboard.DashboardMapper">
+	
+	<!-- 단일 조회 -->
+	<select id="selectDashboard" resultType="com.saydept.api.dashboard.model.DashboardModel" parameterType="com.saydept.api.dashboard.model.DashboardModel">
+		/*selectDashboard호출된 커리를 확인하기 위해 사용 쿼리상단에 찍힘*/
+		SELECT ...
+	</select>
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDashboardList" resultType="com.saydept.api.dashboard.model.DashboardModel" parameterType="com.saydept.api.dashboard.model.DashboardModel" fetchSize="1000">
+		/*selectDashboardList*/
+		SELECT ...
+	</select>
+	
+	<!-- 수정 -->
+	<update id="updateDashboard" parameterType="com.saydept.api.dashboard.model.DashboardModel">
+		/*updateDashboard*/
+		UPDATE ...
+	</update>
+	
+	<!-- 등록 -->
+	<insert id="insertDashboard" parameterType="com.saydept.api.dashboard.model.DashboardModel">
+		/*insertDashboard*/
+		INSERT ...
+	</insert>
+	
+	<!-- 삭제 -->
+	<delete id="deleteDashboard" parameterType="com.saydept.api.dashboard.model.DashboardModel">
+		/*deleteDashboard*/
+		DELETE ...
+	</delete>
+	
+</mapper>

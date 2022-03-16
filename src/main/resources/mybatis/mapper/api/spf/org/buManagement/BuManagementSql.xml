@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.buManagement.BuManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectBuManagement" resultType="com.saydept.api.spf.org.buManagement.model.BuManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.buManagement.model.BuManagementSaveModel" fetchSize="1000">
+		 SELECT
+         MS0201 as ms02Jum
+        ,MS0202 as ms02Bu
+        ,MS0203 as ms02JumNm
+        ,MS0204 as ms02BuNm
+        ,MS0205 as ms0205
+        ,MS0206 as ms0206
+        ,MS0207 as ms0207
+        ,MS0208 as ms0208
+        ,MS0213 as ms0213
+        ,MS0210 as ms0210
+        ,MS0211 as ms0211
+        ,MS0212 as ms0212
+        ,MS0214 as ms0214
+        ,MS0215 as ms0215
+        ,MS0216 as ms0216
+
+	FROM SPFRDB.SPFM02PX
+        WHERE MS0201 = #{ms02Jum}
+        AND   MS0202 = #{ms02Bu}
+
+	</select> 
+	
+	<!-- 부서조회  -->
+	<select id="selectBuList" resultType="com.saydept.api.spf.org.buManagement.model.BuManagementModel" 
+				parameterType="com.saydept.api.spf.org.buManagement.model.BuManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0201) 	AS jum /*점*/
+				,TRIM(TB1.MS0202) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0202)||' - '||TRIM(TB1.MS0204) AS buCom /*조직코드명*/
+				,TRIM(TB1.MS0204 ) 	AS buNm			/* 조직명 */
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE  	TRIM(TB1.MS0201)  = #{jum}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+				
+				ORDER BY TRIM(TB1.MS0201),TRIM(TB1.MS0202)
+				
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updateBuManagement"  
+				parameterType="com.saydept.api.spf.org.buManagement.model.BuManagementSaveModel">
+         
+         UPDATE  SPFRDB.SPFM02LF1 SET
+          MS0202 = #{ms02JumNm}
+         ,MS0203 = #{ms02Sano}
+         ,MS0204 = #{ms02Dname}
+         ,MS0205 = #{ms0205}
+         ,MS0206 = #{ms0206}
+         ,MS0207 = #{ms0207}
+         ,MS0208 = #{ms0208}
+         ,MS0213 = #{ms0213}
+         ,MS0210 = #{ms0210}
+         ,MS0211 = #{ms0211}
+         ,MS0212 = #{ms0212}
+         ,MS0214 = #{ms0214}
+         ,MS0215 = #{ms0215}
+         ,MS0216 = #{ms0216}
+         ,MS0217 = #{ms0217}
+         ,MS0218 = #{ms0218}
+         ,MS0219 = #{ms0219}
+         ,MS0221 = #{ms0221}
+         WHERE MS0301 = #{ms03Jum}
+	</update> 
+	
+	
+<!-- 인서트 1행  -->
+	<insert id="insertBuManagement"  
+				parameterType="com.saydept.api.spf.org.buManagement.model.BuManagementSaveModel">
+         
+         INSERT INTO  SPFRDB.SPFM02LF1 VALUES
+         (
+          #{ms02Jum}
+         ,''
+         ,#{ms02Sano}
+         ,''
+         ,#{ms02Juno1}
+         ,#{ms02Juno2}
+         ,#{ms02Post1}
+         ,#{ms02Post2}
+         ,#{ms02Phone1}
+         ,#{ms02Phone2}
+         ,#{ms02Phone3}
+         ,''
+         ,#{ms02Crdate}
+         ,#{ms02Camonth}
+         ,#{ms02Deldate}
+         ,#{ms02Adddate}
+         ,#{ms02Uptdate}
+		 ,#{ms02Adduser}
+		 ,#{ms02Uptuser}
+		 )	
+	</insert>
+		
+</mapper>

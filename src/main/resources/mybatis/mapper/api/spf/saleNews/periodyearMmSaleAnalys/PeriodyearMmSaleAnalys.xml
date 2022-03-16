@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.periodyearMmSaleAnalys.PeriodyearMmSaleAnalysMapper">
+
+
+	<select id="getPeriodyearMmSaleAnalyslist"
+		parameterType="com.saydept.api.spf.saleNews.periodyearMmSaleAnalys.model.PeriodyearMmSaleAnalysParamModel"
+		resultType="com.saydept.api.spf.saleNews.periodyearMmSaleAnalys.model.PeriodyearMmSaleAnalysModel">
+
+
+with
+t1(smm,thissplan,thisnetsale,lastsplan,lastnetsale)as(
+        SELECT
+        SUBSTR(IS5201,5,2)
+--        ,A.splan splan
+        ,(CASE WHEN SUBSTR(IS5201,5,2) = AA.mm THEN A.splan - AA.splan ELSE A.splan END) splan
+        ,int(SUM(IS5213/1000))
+        ,0
+        ,0
+        FROM SPFRDB.SPFI52PF
+        LEFT OUTER JOIN
+                (SELECT
+                SUBSTR(IS06101,5,2) AS mm
+                ,SUM(IS06106) AS splan
+                FROM SPFRDB.SPFI06PF1
+		       <where>
+		         <choose>
+		            <when test="tim != null and tim != ''">
+		               TRIM(IS06102)=SUBSTR(#{tim},1,2) AND TRIM(IS06103)=SUBSTR(#{tim},3,2) AND TRIM(IS06104)=SUBSTR(#{tim},5,2)
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{toDate},1,4)
+		            </when>
+		            <when test="bu != null and bu != ''">
+		               TRIM(IS06102)=SUBSTR(#{bu},1,2) and TRIM(IS06103)=SUBSTR(#{bu},3,2)
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{toDate},1,4)
+		            </when>
+		            <otherwise>
+		               TRIM(IS06102) = #{jum}
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{toDate},1,4)
+		            </otherwise>
+		         </choose>
+		      </where>
+                GROUP BY IS06101
+                ) A
+        ON A.mm = SUBSTR(IS5201,5,2)
+        LEFT OUTER JOIN
+                (SELECT SUBSTR(IS05101,5,2) AS mm
+                ,SUM(IS05106) AS splan
+                FROM SPFRDB.SPFI05PF1
+				<where>
+		         <choose>
+		            <when test="tim != null and tim != ''">
+		               TRIM(IS05102)=SUBSTR(#{tim},1,2) AND TRIM(IS05103)=SUBSTR(#{tim},3,2) AND TRIM(IS05104)=SUBSTR(#{tim},5,2)
+		               AND SUBSTR(IS05101,1,6) = SUBSTR(#{toDate},1,6)
+		            </when>
+		            <when test="bu != null and bu != ''">
+		               TRIM(IS05102)=SUBSTR(#{bu},1,2) and TRIM(IS05103)=SUBSTR(#{bu},3,2)
+		               AND SUBSTR(IS05101,1,6) = SUBSTR(#{toDate},1,6)
+		            </when>
+		            <otherwise>
+		               TRIM(IS05102) = #{jum}
+		               AND SUBSTR(IS05101,1,6) = SUBSTR(#{toDate},1,6)
+		            </otherwise>
+		         </choose>
+		      </where>
+                AND NOT EXISTS(SELECT IS5201 FROM SPFRDB.SPFI52PF WHERE IS5201 = IS05101)
+                GROUP BY SUBSTR(IS05101,5,2)
+                ) AA
+        ON AA.mm = SUBSTR(IS5201,5,2)
+       <where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               TRIM(IS5203)=SUBSTR(#{tim},1,2) AND TRIM(IS5204)=SUBSTR(#{tim},3,2) AND TRIM(IS5205)=SUBSTR(#{tim},5,2)
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{toDate},1,4)
+            </when>
+            <when test="bu != null and bu != ''">
+               TRIM(IS5203)=SUBSTR(#{bu},1,2) and TRIM(IS5204)=SUBSTR(#{bu},3,2)
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{toDate},1,4)
+            </when>
+            <otherwise>
+               TRIM(IS5203) = #{jum}
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{toDate}, 1,4)
+            </otherwise>
+         </choose>
+      </where>
+        GROUP BY SUBSTR(IS5201,5,2),(CASE WHEN SUBSTR(IS5201,5,2) = AA.mm THEN A.splan - AA.splan ELSE A.splan END)
+),
+
+t2(smm,thissplan,thisnetsale,lastsplan,lastnetsale)as(
+        SELECT
+        SUBSTR(IS5201,5,2)
+        ,0
+        ,0
+        ,B.splan
+        ,int(SUM(IS5213/1000))
+        FROM SPFRDB.SPFI52PF
+        LEFT OUTER JOIN
+                (SELECT
+                SUBSTR(IS06101,5,2) AS mm
+                ,SUM(IS06106) AS splan
+                FROM SPFRDB.SPFI06PF1
+		       <where>
+		         <choose>
+		            <when test="tim != null and tim != ''">
+		               TRIM(IS06102)=SUBSTR(#{tim},1,2) AND TRIM(IS06103)=SUBSTR(#{tim},3,2) AND TRIM(IS06104)=SUBSTR(#{tim},5,2)
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{frDate},1,4)
+		            </when>
+		            <when test="bu != null and bu != ''">
+		               TRIM(IS06102)=SUBSTR(#{bu},1,2) and TRIM(IS06103)=SUBSTR(#{bu},3,2)
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{frDate},1,4)
+		            </when>
+		            <otherwise>
+		               TRIM(IS06102) = #{jum}
+		               AND SUBSTR(IS06101,1,4) = SUBSTR(#{frDate},1,4)
+		            </otherwise>
+		         </choose>
+		      </where>
+                GROUP BY IS06101
+                ) B
+        ON B.mm = SUBSTR(IS5201,5,2)
+
+        <where>
+         <choose>
+            <when test="tim != null and tim != ''">
+               TRIM(IS5203)=SUBSTR(#{tim},1,2) AND TRIM(IS5204)=SUBSTR(#{tim},3,2) AND TRIM(IS5205)=SUBSTR(#{tim},5,2)
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{frDate},1,4)
+            </when>
+            <when test="bu != null and bu != ''">
+               TRIM(IS5203)=SUBSTR(#{bu},1,2) and TRIM(IS5204)=SUBSTR(#{bu},3,2)
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{frDate},1,4)
+            </when>
+            <otherwise>
+               TRIM(IS5203) = #{jum}
+               AND SUBSTR(IS5201,1,4) = SUBSTR(#{frDate}, 1,4)
+            </otherwise>
+         </choose>
+      </where>
+      
+        GROUP BY SUBSTR(IS5201,5,2),B.splan
+),
+
+t3(smm,thissplan,thisnetsale,lastsplan,lastnetsale) AS (
+    SELECT smm,sum(thissplan),sum(thisnetsale),sum(lastsplan),sum(lastnetsale)
+    FROM   (
+            SELECT smm,thissplan,thisnetsale,0 lastsplan,0 lastnetsale FROM t1
+            UNION ALL
+            SELECT smm,0 thissplan,0 thisnetsale,lastsplan,lastnetsale FROM t2
+           ) TTT
+           GROUP BY smm
+)
+
+
+select   smm              as smm
+        ,sum(thissplan)   as thisYySplan
+        ,sum(thisnetsale) as thisYyNetsale
+        ,sum(lastsplan)   as lastYySplan
+        ,sum(lastnetsale) as lastYyNetsale
+        ,TRUNC((FLOAT(sum(thisnetsale)) / FLOAT(sum(thissplan)) * 100),2) achivmentrate
+        ,TRUNC((FLOAT(sum(thisnetsale))-FLOAT(sum(lastnetsale)))*100/FLOAT(abs(sum(lastnetsale))),2) incrsrate
+        from t3
+        GROUP BY smm
+        HAVING sum(thisnetsale) > 0 OR sum(thissplan) > 0
+        ORDER BY smm	
+
+
+	</select>
+
+</mapper>
+
+

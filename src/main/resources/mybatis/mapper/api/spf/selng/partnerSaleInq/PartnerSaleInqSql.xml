@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.partnerSaleInq.PartnerSaleInqMapper">
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectPartnerSaleInqList" resultType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" 
+										parameterType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" fetchSize="1000">
+			
+			SELECT	IS1010			AS	item
+				,	TRIM(MS0706)	AS	itemNm	
+				,	IS1015 			AS	qty
+				,	MS0718			AS	unit
+				,	IS1016			AS	netSale
+				,	IS1017 			AS	dcnt
+				,	IS1018			AS	totSale
+				,	IS1011||IS1012||IS1013	AS	gls
+				,	IS1008||'-'||IS1009		AS	cls
+				,	IS1014					AS	partner
+				,	IS1004||'-'||IS1005||'-'||IS1006	AS org
+				
+				
+				FROM ${dbType}SPFRDB.SPFI10PF
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM07PF 
+			ON	MS0703=IS1010
+			
+			<where>
+				<choose>
+					<when test="cls1 !=null and cls1 !='' ">
+						IS1001=#{startDt} AND IS1014=#{partner} AND IS1008=#{cls1} AND IS1009=#{cls2}
+					</when>
+					<when test="partner !=null and partner !='' ">
+						IS1001=#{startDt} AND IS1014=#{partner}
+					</when>
+					<when test="gls !=null and gls !='' ">
+						IS1001=#{startDt} AND IS1011=SUBSTR(#{gls},1,1) AND IS1012=substr(#{gls},2,1) and IS1013=substr(#{gls},3,3)
+					</when>
+				</choose>
+			</where>
+	</select>
+	<select id="selectPartnerList" resultType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" 
+										parameterType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" fetchSize="1000">
+			SELECT 	MS0801
+				,	MS0802	AS partner
+				,	trim(MS0804)||'('||MS0802||')' 	AS partnerNm	
+				FROM ${dbType}SPFRDB.SPFM08PF
+				
+				WHERE MS0802='505332'
+	</select>
+	
+	<select id="selectGlsList" resultType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" 
+										parameterType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" fetchSize="1000">
+			SELECT 	MS1301||MS1302||MS1303	AS gls
+				,	TRIM(MS1307)||'('||MS1301||MS1302||MS1303||')'	AS	glsNm
+			
+			FROM ${dbType}SPFRDB.SPFM13PF
+			WHERE MS1301||MS1302||MS1303='17299'
+	</select>
+	
+		<select id="selectClsList" resultType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" 
+										parameterType="com.saydept.api.spf.selng.partnerSaleInq.model.PartnerSaleInqModel" fetchSize="1000">
+			SELECT	MS0602		AS	cls1
+				,	MS0603		AS	cls2
+				,	MS0604||'('||MS0602||MS0603||')'	AS	clsNm
+				,	MS0602||MS0603	AS	cls
+				FROM ${dbType}SPFRDB.SPFM06PF 
+				WHERE MS0607 =#{partner}
+
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.admin.userProgListManagement.UserProgListManagementMapper">
+
+<!-- 인서트 1행  -->
+	<insert id="insertUserProgListManagement"  
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementSaveModel">
+
+				INSERT INTO ${dbType}WEBRDB.WEBY01PF
+
+				WITH
+				T1(SABUN,PGMID,STS,FDATE,LDATE,CNT,FILL1,FILL2)
+				AS (
+				VALUES
+				 ('201092', '${zd0203}', '3' , '' , '' , 0 , '' , '' )
+				,('209009', '${zd0203}', '3' , '' , '' , 0 , '' , '' )
+				,('212015', '${zd0203}', '3' , '' , '' , 0 , '' , '' )
+				,('219001', '${zd0203}', '3' , '' , '' , 0 , '' , '' )
+				)						   
+				
+				SELECT DISTINCT SABUN,PGMID,STS,FDATE,LDATE,CNT,FILL1,FILL2
+				        FROM T1
+				WHERE NOT EXISTS (SELECT * FROM WEBRDB.WEBY01PF WHERE WBY01SABUN = SABUN AND WBY01PGMID = PGMID)
+
+	</insert>
+	
+<!-- 인서트 2행  -->
+	<insert id="insertUserProgListManagement1"  
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementSaveModel">
+
+				INSERT INTO ${dbType}WEBRDB.WEBZ02PF
+
+				WITH
+				T1(td0201,td0202,td0203,td0204,td0205,td0206,td0207,td0208,td0209)
+				AS (
+				VALUES 
+				('${zd0201}', '${zd0202}', '${zd0203}' , '${zd0204}' , '${zd0205}' , 0 , '' ,'${zd0208}', '' )
+					)				   
+				
+				SELECT DISTINCT td0201,td0202,td0203,td0204,td0205,td0206,td0207,td0208,td0209
+				        FROM T1
+				WHERE NOT EXISTS (SELECT * FROM ${dbType}WEBRDB.WEBZ02PF WHERE ZD0203 = td0203)
+
+	</insert>
+
+	<!-- 목록조회 1건  -->
+	<select id="selectUserProgListManagement" resultType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementSaveModel" 
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementSaveModel" fetchSize="1000">
+				
+		SELECT 
+		 ZD0201 AS zd0201
+		,ZD0202 AS zd0202
+		,ZD0203 AS zd0203
+		,ZD0204 AS zd0204
+		,ZD0205 AS zd0205
+		,ZD0206 AS zd020
+		,ZD0207 AS zd0207
+		,ZD0208 AS zd0208
+		,ZD0209 AS zd0209
+
+		FROM ${dbType}WEBRDB.WEBZ02PF
+			WHERE ZD0203 = #{zd0203}
+			
+			FETCH FIRST 1 ROWS ONLY
+
+	</select> 
+	
+	<!-- 목록조회  -->
+	<select id="selectPgmList" resultType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" 
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" fetchSize="1000">
+
+		 SELECT 
+		 ZD0201 AS zd0201
+		,ZD0202 AS zd0202
+		,ZD0203 AS zd0203
+		,ZD0204 AS zd0204
+		,ZD0205 AS zd0205
+		,ZD0206 AS zd020
+		,ZD0207 AS zd0207
+		,ZD0208 AS zd0208
+		,ZD0209 AS zd0209
+
+		FROM ${dbType}WEBRDB.WEBZ02PF
+		
+	</select> 
+	
+	<!-- selectMenuGroupIdList  -->
+	<select id="selectMenuGroupIdList" resultType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" 
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" fetchSize="1000">
+
+			SELECT ZD0101 zd0101 
+			FROM ${dbType}WEBRDB.WEBZ01PF 
+			GROUP BY ZD0101               
+		 	ORDER BY CASE WHEN ZD0101 = '00' THEN '99' ELSE '00' END
+		 		,ZD0101 
+		
+	</select> 
+	
+	<!-- selectMenuIdList  -->
+	<select id="selectMenuIdList" resultType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" 
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementModel" fetchSize="1000">
+
+			SELECT ZD0102				as zd0102
+					,ZD0102||' '||ZD0103 as zd0102Com
+			FROM ${dbType}WEBRDB.WEBZ01PF WHERE ZD0101=#{zd0101}
+			GROUP BY ZD0101,ZD0102,ZD0103                                 
+		 	ORDER BY CASE WHEN ZD0101 = '00' THEN '99' ELSE '00' END
+		 		,ZD0101                                               
+		
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updateUserProgListManagement"  
+				parameterType="com.saydept.api.admin.userProgListManagement.model.UserProgListManagementSaveModel">
+         UPDATE  ${dbType}WEBRDB.WEBZ02PF SET
+		 ZD0201 = #{zd0201}
+		,ZD0202 = #{zd0202}
+		,ZD0203 = #{zd0203}
+		,ZD0204 = #{zd0204}
+		,ZD0205 = #{zd0205}
+		,ZD0206 = #{zd0206}
+		,ZD0207 = #{zd0207}
+		,ZD0208 = #{zd0208}
+		,ZD0209 = #{zd0209}
+         
+         WHERE MS0101 = #{zd0203}
+	</update> 
+	
+
+		
+</mapper>

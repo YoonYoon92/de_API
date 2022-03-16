@@ -1,0 +1,49 @@
+package com.saydept.api.spf.saleNews.clsSaleNews;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsModel;
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsParamModel;
+
+@Mapper
+public interface ClsSaleNewsMapper {
+	
+	//부 목록 조회
+	List<ClsSaleNewsModel> getBulistCls(ClsSaleNewsParamModel storeParam);
+
+	//일 목표 조회
+	//lsSaleNewsModel getDaySaleGoal(ClsSaleNewsParamModel data);
+
+	//월 목표 조회
+	//ClsSaleNewsModel getMonthSaleGoal(ClsSaleNewsParamModel data);
+	
+	//년 목표 조회
+	//ClsSaleNewsModel getYearSaleGoal(ClsSaleNewsParamModel request);
+
+	//일 실적 조회
+	//ClsSaleNewsModel getDaySalePer(ClsSaleNewsParamModel data);
+
+	//당월 실적 조회
+	//ClsSaleNewsModel getMonthSalePer(ClsSaleNewsParamModel data);
+	
+	//실적 한번에 조회
+	ClsSaleNewsModel getTotalSalePerCorp(ClsSaleNewsParamModel data);
+
+	//당일 총매출 조회
+	ClsSaleNewsModel getddTotsaleCls(ClsSaleNewsParamModel data);
+	
+	//당일 에누리 조회
+	ClsSaleNewsModel getddDsicountCls(ClsSaleNewsParamModel data);
+	
+	//당일 순매출 조회
+	ClsSaleNewsModel getddNetsaleCls(ClsSaleNewsParamModel data);
+	
+	//당월 순매출 조회
+	ClsSaleNewsModel getmmNetsaleCls(ClsSaleNewsParamModel data);
+	
+	//당년 순매출 조회
+	ClsSaleNewsModel getyyNetsaleCls(ClsSaleNewsParamModel data);
+	
+}

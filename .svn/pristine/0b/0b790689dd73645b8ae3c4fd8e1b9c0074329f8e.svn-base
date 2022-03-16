@@ -1,0 +1,13 @@
+package com.saydept.api.login.model;
+
+import lombok.Data;
+
+@Data
+public class LoginModel {
+
+	private String userId;
+	private String userPw;
+	
+	private String pd1802;
+	private String pd1806;
+}

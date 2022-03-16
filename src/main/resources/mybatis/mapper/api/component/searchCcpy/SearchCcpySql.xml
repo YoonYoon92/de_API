@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.component.searchCcpy.SearchCcpyMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="BuyReqDocRegistModel" type="com.saydept.api.component.searchClass.model.SearchClassModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSearchCcpy" resultType="com.saydept.api.component.searchCcpy.model.SearchCcpyModel" parameterType="com.saydept.api.component.searchCcpy.model.SearchCcpyParamModel" fetchSize="1000">
+		/*selectSearchClass*/
+		SELECT 	MS0801                 			  AS jum 
+		,		MS0802	               			  AS ccpy
+		,		MS0803	               			  AS bizrNo
+		,		TRIM(SUBSTR(MS0804,1,29))||X'0F'  AS cmpNm
+		, 		MS0805                 			  AS rprsntvNm
+		,		MS0808||MS0809||MS0810 			  AS tel
+		,       MS0813                 			  AS addr1		
+		FROM 	${dbType}SPFRDB.SPFM08PF sp  
+		WHERE	
+				MS0801 = #{jum} 
+		AND    (MS0802 LIKE '%${searchCcpy}%'
+		OR      MS0803 LIKE '%${searchCcpy}%'	   
+		OR		UPPER(MS0804) LIKE UPPER('%${searchCcpyFullCharUpper}%')
+		OR		LOWER(MS0804) LIKE LOWER('%${searchCcpyFullCharLower}%')
+		OR		UPPER(MS0804) LIKE UPPER('%${searchCcpyUpper}%') 
+		OR		LOWER(MS0804) LIKE LOWER('%${searchCcpyLower}%')
+		OR		MS0804 LIKE '%${searchCcpyFullChar}%'
+		OR		MS0804 LIKE '%${searchCcpy}%'
+		OR		MS0804 LIKE LOWER('%${searchCcpy}%')
+		OR		MS0804 LIKE UPPER('%${searchCcpy}%')
+		) 
+				
+		ORDER BY MS0802
+	</select>
+
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.directoryOfPartnersInq.DirectoryOfPartnersInqMapper">
+
+
+	<select id="getDirectoryOfPartnersInqlist"
+		parameterType="com.saydept.api.spf.saleNews.directoryOfPartnersInq.model.DirectoryOfPartnersInqParamModel"
+		resultType="com.saydept.api.spf.saleNews.directoryOfPartnersInq.model.DirectoryOfPartnersInqModel">
+
+
+
+SELECT MS0801 Jum
+        , trim(MS0805) RepName
+        , MS0802 CustNum
+        , trim(MS0804) TradeName
+        , substring(MS0803,1,3) || ' - ' || substring(MS0803,4,2) || ' - ' || substring(MS0803,6,5) CorpRegNum
+        , MS0806 || ' - ' || MS0807 Jumin
+        FROM ${dbType}SPFRDB.SPFM08PF
+
+	<where>
+         <choose>
+            <when test="serchName != ''">
+				MS0801= #{jum}
+				AND ms0805 like '%' || '${serchName}' || '%' 
+				
+            </when>
+            <when test="onlineChk != ''">
+				MS0801= #{jum}
+				AND MS0804 like '%' || '${onlineChk}' || '%' 
+				
+            </when>
+            <when test="corpNo != ''">
+				MS0801= #{jum}
+				AND MS0803 like '%' || #{corpNo} || '%' 
+				
+				
+            </when>
+            <otherwise>
+				MS0801= #{jum}
+            </otherwise>
+         </choose>
+      </where>
+      
+      
+	</select>
+
+</mapper>
+
+

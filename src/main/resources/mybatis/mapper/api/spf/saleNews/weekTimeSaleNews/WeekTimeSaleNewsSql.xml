@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.weekTimeSaleNews.WeekTimeSaleNewsMapper">
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectWeekTimeSaleNewsList" resultType="com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsParamModel" fetchSize="1000">
+		/*selectWeekTimeSaleNewsList*/
+        
+		WITH 
+		
+		/**
+		 * 시간대별 실적(11시이전)
+		 */                         
+		TA01A AS (
+			SELECT 	'12' AS NO1, 
+					'~11:00' AS SALETIME, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5012 ELSE 0 END) AS SALEDAY6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5012 ELSE 0 END) AS SALEDAY5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5012 ELSE 0 END) AS SALEDAY4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5012 ELSE 0 END) AS SALEDAY3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5012 ELSE 0 END) AS SALEDAY2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5012 ELSE 0 END) AS SALEDAY1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5012 ELSE 0 END) AS SALEDAY,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS SALEDAYCUSTOM
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}			
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &lt;= '10'
+		)
+		
+		/**
+		 * 시간대별 실적(11~12시)
+		 */
+		,                         
+		TA01B AS (
+			SELECT 	'12' AS NO1, 
+					'~13:00' AS SALETIME, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5012 ELSE 0 END) AS SALEDAY6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5012 ELSE 0 END) AS SALEDAY5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5012 ELSE 0 END) AS SALEDAY4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5012 ELSE 0 END) AS SALEDAY3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5012 ELSE 0 END) AS SALEDAY2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5012 ELSE 0 END) AS SALEDAY1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5012 ELSE 0 END) AS SALEDAY,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS SALEDAYCUSTOM
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}			
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &lt;= '12'
+			AND     IS5007 &gt;= '11'
+		)
+		
+		/**
+		 * 시간대별 실적 (13~21)
+		 */  
+		,                        
+		TA01C AS (
+			SELECT 	IS5007 AS NO1, 
+					'~'||SUBSTR(DIGITS(IS5007+1),9,2)||':00' AS SALETIME, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5012 ELSE 0 END) AS SALEDAY6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5012 ELSE 0 END) AS SALEDAY5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5012 ELSE 0 END) AS SALEDAY4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5012 ELSE 0 END) AS SALEDAY3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5012 ELSE 0 END) AS SALEDAY2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5012 ELSE 0 END) AS SALEDAY1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5012 ELSE 0 END) AS SALEDAY,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS SALEDAYCUSTOM
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &gt;= '13'
+			AND     IS5007 &lt;= '20'
+			GROUP BY IS5007, IS5007
+		)
+		
+		/**
+		 * 시간대별 실적(22시이후)
+		 */
+		,                          
+		TA01D AS (
+			SELECT 	'23' AS NO1, 
+					'~24:00' AS SALETIME, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5012 ELSE 0 END) AS SALEDAY6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5012 ELSE 0 END) AS SALEDAY5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5012 ELSE 0 END) AS SALEDAY4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5012 ELSE 0 END) AS SALEDAY3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5012 ELSE 0 END) AS SALEDAY2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5012 ELSE 0 END) AS SALEDAY1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5012 ELSE 0 END) AS SALEDAY,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS SALEDAYCUSTOM
+			FROM	${dbType}SPFRDB.SPFI50PF
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+			AND     IS5007 &gt;= '21'
+		)
+		
+		
+		/**
+		 * 일 실적 합계
+		 */
+		,
+		TA02 AS (
+			SELECT  '25' AS NO1,
+					'실적 계' AS GUBUN, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD_1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5012 ELSE 0 END) AS DAYSALEAMOUNTD,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS SALEDAYCUSTOM
+			FROM 	${dbType}SPFRDB.SPFI50PF 
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+		)
+		
+		
+		/**
+		 * 일 목표
+		 */
+		,
+		TA03 AS ( 
+			SELECT 	'26' AS NO1, 
+					'목표' AS GUBUN, 
+					SUM(CASE WHEN IS05101=#{d6Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_6,
+					SUM(CASE WHEN IS05101=#{d5Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_5,
+					SUM(CASE WHEN IS05101=#{d4Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_4,
+					SUM(CASE WHEN IS05101=#{d3Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_3,
+					SUM(CASE WHEN IS05101=#{d2Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_2,
+					SUM(CASE WHEN IS05101=#{d1Day}     THEN IS05106*1000 ELSE 0 END) AS DAYGOALD_1,
+					SUM(CASE WHEN IS05101=#{startDate} THEN IS05106*1000 ELSE 0 END) AS DAYGOALD,
+					''
+			FROM	${dbType}SPFRDB.SPFI05PF1  
+			WHERE 	IS05101 &lt;= #{startDate}
+			AND     IS05101 &gt;= #{d6Day}
+			AND 	IS05102 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS05103 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS05104 = SUBSTR(#{tim},5,2)
+			</if>
+			GROUP BY '26', '목표'
+		)
+		
+		
+		/**
+		 * 실적 - 목표 차액
+		 */
+		,
+		TA04 AS (
+			SELECT 	'27' AS NO1,
+					'차액' AS GUBUN,
+					TA02.DAYSALEAMOUNTD_6-TA03.DAYGOALD_6 AS DIFFD_6,
+					TA02.DAYSALEAMOUNTD_5-TA03.DAYGOALD_5 AS DIFFD_5,
+					TA02.DAYSALEAMOUNTD_4-TA03.DAYGOALD_4 AS DIFFD_4,
+					TA02.DAYSALEAMOUNTD_3-TA03.DAYGOALD_3 AS DIFFD_3,
+					TA02.DAYSALEAMOUNTD_2-TA03.DAYGOALD_2 AS DIFFD_2,
+					TA02.DAYSALEAMOUNTD_1-TA03.DAYGOALD_1 AS DIFFD_1,
+					TA02.DAYSALEAMOUNTD  -TA03.DAYGOALD   AS DIFFD,
+					''
+			FROM 	TA02, TA03
+		)
+		
+		/**
+		 * 일 달성율
+		 */
+		,
+		TA05 AS (
+			SELECT 	'28' AS NO1,
+					'달성율' AS GUBUN,
+					FLOAT(TA02.DAYSALEAMOUNTD_6) /FLOAT(TA03.DAYGOALD_6)*100 AS ACHIVERAT_6,
+					FLOAT(TA02.DAYSALEAMOUNTD_5) /FLOAT(TA03.DAYGOALD_5)*100 AS ACHIVERAT_5,
+					FLOAT(TA02.DAYSALEAMOUNTD_4) /FLOAT(TA03.DAYGOALD_4)*100 AS ACHIVERAT_4,
+					FLOAT(TA02.DAYSALEAMOUNTD_3) /FLOAT(TA03.DAYGOALD_3)*100 AS ACHIVERAT_3,
+					FLOAT(TA02.DAYSALEAMOUNTD_2) /FLOAT(TA03.DAYGOALD_2)*100 AS ACHIVERAT_2,
+					FLOAT(TA02.DAYSALEAMOUNTD_1) /FLOAT(TA03.DAYGOALD_1)*100 AS ACHIVERAT_1,
+					FLOAT(TA02.DAYSALEAMOUNTD  ) /FLOAT(TA03.DAYGOALD  )*100 AS ACHIVERAT,
+					''
+			FROM 	TA02, TA03
+		)
+		    
+		/**
+		 * 일 고객수 합계
+		 */
+		,
+		TA051 AS (
+			SELECT  '29' AS NO1,
+					'고객수' AS GUBUN, 
+					SUM(CASE WHEN IS5001=#{d6Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_6,
+					SUM(CASE WHEN IS5001=#{d5Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_5,
+					SUM(CASE WHEN IS5001=#{d4Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_4,
+					SUM(CASE WHEN IS5001=#{d3Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_3,
+					SUM(CASE WHEN IS5001=#{d2Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_2,
+					SUM(CASE WHEN IS5001=#{d1Day}     THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD_1,
+					SUM(CASE WHEN IS5001=#{startDate} THEN IS5015 ELSE 0 END) AS DAYSALEAMOUNTD,
+					''
+			FROM 	${dbType}SPFRDB.SPFI50PF 
+			WHERE 	IS5001 &lt;= #{startDate}
+			AND     IS5001 &gt;= #{d6Day}
+			AND 	IS5003 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5004 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5005 = SUBSTR(#{tim},5,2)
+			</if>
+		)
+		
+		/**
+		 * 전년실적
+		 */
+		,
+		TA06 AS ( 
+			SELECT 	'30' AS NO1, 
+					'전년실적' AS GUBUN, 
+					SUM(CASE WHEN IS5201=#{oldD6Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_6,
+					SUM(CASE WHEN IS5201=#{oldD5Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_5,
+					SUM(CASE WHEN IS5201=#{oldD4Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_4,
+					SUM(CASE WHEN IS5201=#{oldD3Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_3,
+					SUM(CASE WHEN IS5201=#{oldD2Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_2,
+					SUM(CASE WHEN IS5201=#{oldD1Day}      THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT_1,
+					SUM(CASE WHEN IS5201=#{oldStartDate}  THEN IS5213 ELSE 0 END) AS LASTYEARSALEAMOUNT,
+					SUM(CASE WHEN IS5201=#{oldStartDate}  THEN IS5216 ELSE 0 END) AS LASTYEARSALECUSTOM
+			FROM	${dbType}SPFRDB.SPFI52PF  
+			WHERE 	IS5201 &lt;= #{oldStartDate}
+			AND     IS5201 &gt;= #{oldD6Day} 
+			AND 	IS5203 = #{jum}
+			<if test="bu != null and bu !=''">
+			AND 	IS5204 = SUBSTR(#{bu},3,2)
+			</if>
+			<if test="tim != null and tim !=''">
+			AND 	IS5205 = SUBSTR(#{tim},5,2)
+			</if>
+			GROUP BY '29', '전년실적'
+		)
+		
+		/**
+		 * 전년대비 신장율
+		 */
+		,
+		TA07 AS (
+			SELECT 	'31' AS NO1,
+					'신장율' AS GUBUN,
+					(FLOAT(TA02.DAYSALEAMOUNTD_6) -FLOAT(TA06.LASTYEARSALEAMOUNT_6))/FLOAT(ABS(LASTYEARSALEAMOUNT_6))*100 AS STRECHRAT_6,
+					(FLOAT(TA02.DAYSALEAMOUNTD_5) -FLOAT(TA06.LASTYEARSALEAMOUNT_5))/FLOAT(ABS(LASTYEARSALEAMOUNT_5))*100 AS STRECHRAT_5,
+					(FLOAT(TA02.DAYSALEAMOUNTD_4) -FLOAT(TA06.LASTYEARSALEAMOUNT_4))/FLOAT(ABS(LASTYEARSALEAMOUNT_4))*100 AS STRECHRAT_4,
+					(FLOAT(TA02.DAYSALEAMOUNTD_3) -FLOAT(TA06.LASTYEARSALEAMOUNT_3))/FLOAT(ABS(LASTYEARSALEAMOUNT_3))*100 AS STRECHRAT_3,
+					(FLOAT(TA02.DAYSALEAMOUNTD_2) -FLOAT(TA06.LASTYEARSALEAMOUNT_2))/FLOAT(ABS(LASTYEARSALEAMOUNT_2))*100 AS STRECHRAT_2,
+					(FLOAT(TA02.DAYSALEAMOUNTD_1) -FLOAT(TA06.LASTYEARSALEAMOUNT_1))/FLOAT(ABS(LASTYEARSALEAMOUNT_1))*100 AS STRECHRAT_1,
+					(FLOAT(TA02.DAYSALEAMOUNTD) -FLOAT(TA06.LASTYEARSALEAMOUNT))/FLOAT(ABS(LASTYEARSALEAMOUNT))*100       AS STRECHRAT,
+					''
+			FROM 	TA02, TA06
+		)    
+		
+		
+		
+		
+		
+		
+		/**
+		 * 시간대별 속보 화면 union 
+		 */
+		 
+		 
+		SELECT * FROM TA01A 
+		UNION ALL
+		SELECT * FROM TA01B 
+		UNION ALL
+		SELECT * FROM TA01C
+		UNION ALL
+		SELECT * FROM TA01D 
+		UNION ALL
+		SELECT * FROM TA02
+		UNION ALL
+		SELECT * FROM TA03
+		UNION ALL
+		SELECT * FROM TA04
+		UNION ALL
+		SELECT * FROM TA05
+		UNION ALL
+		SELECT * FROM TA051
+		UNION ALL
+		SELECT * FROM TA06
+		UNION ALL
+		SELECT * FROM TA07
+		ORDER BY NO1 
+
+	</select>
+	
+	
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectWeekTimeSaleNewsOrgList" resultType="com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsOrgModel" parameterType="com.saydept.api.spf.saleNews.weekTimeSaleNews.model.WeekTimeSaleNewsParamModel" fetchSize="1000">
+		/*selectWeekTimeSaleNewsOrgList*/
+		
+		WITH
+
+		/**
+		 *   조직별 시간대 매출
+		 */
+		TA01 AS (
+		SELECT	IS5003||IS5004||IS5005 	AS ORGCD,
+				SUM(CASE WHEN IS5007 &lt;='10' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE11PRE,
+				SUM(CASE WHEN IS5007 &gt;='11' AND IS5007&lt;='12' THEN IS5012 ELSE 0 END) 		AS TIMEZONE13PRE,
+				SUM(CASE WHEN IS5007     ='13' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE14PRE,
+				SUM(CASE WHEN IS5007     ='14' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE15PRE,
+				SUM(CASE WHEN IS5007     ='15' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE16PRE,
+				SUM(CASE WHEN IS5007     ='16' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE17PRE,
+				SUM(CASE WHEN IS5007     ='17' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE18PRE,
+				SUM(CASE WHEN IS5007     ='18' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE19PRE,
+				SUM(CASE WHEN IS5007     ='19' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE20PRE,
+				SUM(CASE WHEN IS5007     ='20' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE21PRE,
+				SUM(CASE WHEN IS5007 &gt;='21' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE24PRE,
+				SUM(IS5015)							     										AS CUSTOMERCNT
+		FROM 	${dbType}SPFRDB.SPFI50PF  
+		WHERE 	IS5001=#{startDate}
+		AND 	IS5003 = #{jum}
+		GROUP BY IS5003||IS5004||IS5005
+		)
+		
+		/**
+		 *   조직별 시간대 매출(접 합계)
+		 */
+		,
+		TA01T AS (
+		SELECT	IS5003||'9999' 	AS ORGCD,
+				SUM(CASE WHEN IS5007 &lt;='10' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE11PRE,
+				SUM(CASE WHEN IS5007 &gt;='11' AND IS5007&lt;='12' THEN IS5012 ELSE 0 END) 		AS TIMEZONE13PRE,
+				SUM(CASE WHEN IS5007     ='13' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE14PRE,
+				SUM(CASE WHEN IS5007     ='14' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE15PRE,
+				SUM(CASE WHEN IS5007     ='15' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE16PRE,
+				SUM(CASE WHEN IS5007     ='16' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE17PRE,
+				SUM(CASE WHEN IS5007     ='17' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE18PRE,
+				SUM(CASE WHEN IS5007     ='18' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE19PRE,
+				SUM(CASE WHEN IS5007     ='19' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE20PRE,
+				SUM(CASE WHEN IS5007     ='20' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE21PRE,
+				SUM(CASE WHEN IS5007 &gt;='21' 					   THEN IS5012 ELSE 0 END) 		AS TIMEZONE24PRE,
+				SUM(IS5015)							     										AS CUSTOMERCNT
+		FROM 	${dbType}SPFRDB.SPFI50PF  
+		WHERE 	IS5001=#{startDate}
+		AND 	IS5003 = #{jum}
+		GROUP BY IS5003||'9999'
+		)
+		
+		/**
+		 *  조직별 매출 일매출 실적(당년,전년)
+		 */
+		,
+		TA02 AS (
+		SELECT 	IS5203||IS5204||IS5205       								    AS ORGCD,
+				SUM(CASE WHEN IS5201=#{startDate} THEN IS5213 ELSE 0 END) 	    AS DAYSALEAMOUNT,
+				SUM(CASE WHEN IS5201=#{oldStartDate} THEN IS5213 ELSE 0 END) 	AS OLDDAYSALEAMOUNT
+		FROM 	${dbType}SPFRDB.SPFI52PF  
+		WHERE   (IS5201=#{startDate}
+		OR      IS5201=#{oldStartDate})
+		AND 	IS5203 = #{jum}
+		GROUP BY IS5203||IS5204||IS5205
+		)
+		
+		/**
+		 *  조직별 매출 일매출 실적(당년,전년) (점합계)
+		 */
+		,
+		TA02T AS (
+		SELECT 	IS5203||'9999'               								    AS ORGCD,
+				SUM(CASE WHEN IS5201=#{startDate} THEN IS5213 ELSE 0 END) 	    AS DAYSALEAMOUNT,
+				SUM(CASE WHEN IS5201=#{oldStartDate} THEN IS5213 ELSE 0 END) 	AS OLDDAYSALEAMOUNT
+		FROM 	${dbType}SPFRDB.SPFI52PF  
+		WHERE   (IS5201=#{startDate}
+		OR      IS5201=#{oldStartDate})
+		AND 	IS5203 = #{jum}
+		GROUP BY IS5203||'9999'
+		)
+		
+		/**
+		 *  조직별 매출 일매출 목표
+		 */
+		,
+		TA03 AS (
+		SELECT 	IS05102||IS05103||IS05104       		AS ORGCD,
+				SUM(IS05106*1000)				    	AS DAYGOAL
+		FROM 	${dbType}SPFRDB.SPFI05PF1  
+		WHERE   IS05101=#{startDate}
+		AND 	IS05102=#{jum}
+		GROUP BY IS05102||IS05103||IS05104
+		)
+		
+		/**
+		 *  조직별 매출 일매출 목표(점 합계)
+		 */
+		,
+		TA03T AS (
+		SELECT 	IS05102||'9999'                 		AS ORGCD,
+				SUM(IS05106*1000)				    	AS DAYGOAL
+		FROM 	${dbType}SPFRDB.SPFI05PF1  
+		WHERE   IS05101=#{startDate}
+		AND 	IS05102=#{jum}
+		GROUP BY IS05102||'9999'
+		)
+		
+		/**
+		 *  title name
+		 */
+		,
+		TATITLE AS (
+		SELECT	
+		
+				'000000'           AS ORGCD,         
+				'점'                AS JUMNM,         
+		      	'부'                AS BUNM,          
+		      	'팀'                AS TEAMNM,        
+				11                 AS TIMEZONE11PRE, 
+				13                 AS TIMEZONE13PRE, 
+				14                 AS TIMEZONE14PRE, 
+				15                 AS TIMEZONE15PRE, 
+				16                 AS TIMEZONE16PRE, 
+				17                 AS TIMEZONE17PRE, 
+				18                 AS TIMEZONE18PRE, 
+				19                 AS TIMEZONE19PRE, 
+				20                 AS TIMEZONE20PRE, 
+				21                 AS TIMEZONE21PRE, 
+				24                 AS TIMEZONE24PRE, 
+				31                 AS DAYSALEAMOUNT, 
+				32                 AS DAYGOAL,       
+				33                 AS DAYDIFFERENCE, 
+				34                 AS DAYACHIEVEMENTRATE,
+				35                 AS CUSTOMERCNT,      
+				36                 AS OLDDAYSALEAMOUNT, 
+				37                 AS STRECHRAT 
+		FROM 	${dbType}SPFRDB.SPFM01PF 
+		GROUP BY '000000',             
+				'점'       ,             
+		      	'부'       ,             
+		      	'팀'       ,             
+				11,         
+				13,         
+				14,         
+				15,         
+				16,         
+				17,         
+				18,         
+				19,         
+				20,         
+				21,         
+				24,         
+				31,         
+				32,         
+				33,         
+				34,
+				35,         
+				36,         
+				37         
+		)
+		
+		
+		SELECT * FROM TATITLE
+		UNION ALL
+		SELECT 
+				MS0301||MS0302||MS0303      			AS ORGCD,
+				MS0304									AS JUMNM,
+				MS0305									AS BUNM,
+				MS0306									AS TEAMNM,
+				TA01.TIMEZONE11PRE                      AS TIMEZONE11PRE,
+		        TA01.TIMEZONE13PRE                      AS TIMEZONE13PRE,
+		        TA01.TIMEZONE14PRE                      AS TIMEZONE14PRE,
+		        TA01.TIMEZONE15PRE                      AS TIMEZONE15PRE,
+		        TA01.TIMEZONE16PRE                      AS TIMEZONE16PRE,
+		        TA01.TIMEZONE17PRE                      AS TIMEZONE17PRE,
+		        TA01.TIMEZONE18PRE                      AS TIMEZONE18PRE,
+		        TA01.TIMEZONE19PRE                      AS TIMEZONE19PRE,
+		        TA01.TIMEZONE20PRE                      AS TIMEZONE20PRE,
+		        TA01.TIMEZONE21PRE                      AS TIMEZONE21PRE,
+		        TA01.TIMEZONE24PRE                      AS TIMEZONE24PRE,
+				TA02.DAYSALEAMOUNT                      AS DAYSALEAMOUNT,
+				TA03.DAYGOAL							AS DAYGOAL,
+				TA02.DAYSALEAMOUNT - TA03.DAYGOAL       AS DAYDIFFERENCE,
+				FLOAT(TA02.DAYSALEAMOUNT)/FLOAT(TA03.DAYGOAL)*100 AS DAYACHIEVEMENTRATE,
+				TA01.CUSTOMERCNT                        AS CUSTOMERCNT,
+				TA02.OLDDAYSALEAMOUNT                   AS OLDDAYSALEAMOUNT,   
+				(FLOAT(TA02.DAYSALEAMOUNT) -FLOAT(TA02.OLDDAYSALEAMOUNT))/FLOAT(ABS(TA02.OLDDAYSALEAMOUNT))*100 AS STRECHRAT
+		FROM 	${dbType}SPFRDB.SPFM03PF  				
+				--시간대 속보
+				LEFT OUTER JOIN TA01
+				ON  MS0301||MS0302||MS0303=TA01.ORGCD
+				--일실적(당일,전년동일)
+				LEFT OUTER JOIN TA02
+				ON  MS0301||MS0302||MS0303=TA02.ORGCD
+				--일목표(당일)
+				LEFT OUTER JOIN TA03
+				ON  MS0301||MS0302||MS0303=TA03.ORGCD
+		WHERE   
+		        --속보조회 가능 조직 조회
+		        EXISTS (SELECT 	* 
+		        		FROM 	${dbType}SPFRDB.SPFM04PF2 
+		        		WHERE 	MS04201=MS0301 AND MS04202=MS0302 AND MS04203=MS0303 AND MS04221='Y')
+		        AND (DAYGOAL &lt;&gt; 0 OR
+		             DAYSALEAMOUNT &lt;&gt; 0 OR 
+		             OLDDAYSALEAMOUNT &lt;&gt; 0)
+		
+		UNION ALL		
+		SELECT 
+				TA01T.ORGCD, '합계', '합계', '합    계                  ',
+				TA01T.TIMEZONE11PRE,
+				TA01T.TIMEZONE13PRE,
+				TA01T.TIMEZONE14PRE,
+				TA01T.TIMEZONE15PRE,
+				TA01T.TIMEZONE16PRE,
+				TA01T.TIMEZONE17PRE,
+				TA01T.TIMEZONE18PRE,
+				TA01T.TIMEZONE19PRE,
+				TA01T.TIMEZONE20PRE,
+				TA01T.TIMEZONE21PRE,
+				TA01T.TIMEZONE24PRE,
+				TA02T.DAYSALEAMOUNT                      AS DAYSALEAMOUNT,
+				TA03T.DAYGOAL							 AS DAYGOAL,
+				TA02T.DAYSALEAMOUNT - TA03T.DAYGOAL       AS DAYDIFFERENCE,
+				FLOAT(TA02T.DAYSALEAMOUNT)/FLOAT(TA03T.DAYGOAL)*100 AS DAYACHIEVEMENTRATE,
+				CUSTOMERCNT,
+				TA02T.OLDDAYSALEAMOUNT                   AS OLDDAYSALEAMOUNT,   
+				(FLOAT(TA02T.DAYSALEAMOUNT) -FLOAT(TA02T.OLDDAYSALEAMOUNT))/FLOAT(ABS(TA02T.OLDDAYSALEAMOUNT))*100  AS STRECHRAT		
+		FROM    TA03T
+			 	LEFT JOIN TA02T
+		     	ON TA03T.ORGCD=TA02T.ORGCD 
+		     	LEFT JOIN TA01T
+		     	ON TA01T.ORGCD=TA03T.ORGCD
+		ORDER BY ORGCD
+
+	</select>
+	
+</mapper>

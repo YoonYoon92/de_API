@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.saleNews.clsDanPumCdInq.ClsDanPumCdInqMapper">
+
+
+	<select id="getClsDanPumCdInqlist"
+		parameterType="com.saydept.api.spf.saleNews.clsDanPumCdInq.model.ClsDanPumCdInqParamModel"
+		resultType="com.saydept.api.spf.saleNews.clsDanPumCdInq.model.ClsDanPumCdInqModel">
+
+
+
+SELECT MS0703 danpumNo
+        ,TRIM(MS0707) danpumNm
+        ,MS0708 danpumCd
+        ,MS0713 wonGa
+        ,MS0714 maeGa
+        ,MS0704 clsNo1
+        ,MS0705 clsNo2
+        ,TRIM(MS0507) buNm
+        ,TRIM(MS0508) tmNm
+        ,TRIM(MS0509) pcNm
+        ,TRIM(MS0510) clsNm
+        ,CASE WHEN MS0713=0 OR MS0714=0 THEN 0 ELSE
+                        (
+                        -- 과세
+                        CASE WHEN SUBSTRING(MS0704,5,1)='1' OR SUBSTRING(MS0704,5,1)='3' OR SUBSTRING(MS0704,5,1)='5' THEN (MS0714-(MS0713 * 1.1))/MS0714 * 100
+                        -- 면세
+                             WHEN SUBSTRING(MS0704,5,1)='2' OR SUBSTRING(MS0704,5,1)='4' OR SUBSTRING(MS0704,5,1)='7' THEN (MS0714 - MS0713)/MS0714 * 100
+                        ELSE 0 END
+                         )
+                         END marginYul
+        ,TRIM(MS0718) eachUnit
+        FROM ${dbType}SPFRDB.SPFM07LF6
+        LEFT OUTER JOIN SPFRDB.SPFM05PF
+        ON MS0501 = MS0701 AND MS0505 = MS0704
+
+	<where>
+         <choose>
+            <when test="clsNo1 != '' and clsNo2 = ''">
+				MS0701 = #{jum}
+				AND MS0704 like '%' || #{clsNo1} || '%' 
+				
+            </when>
+            <when test="clsNo1 != '' and clsNo2 != ''">
+				MS0701 = #{jum}
+				AND MS0704 like '%' || #{clsNo1} || '%' 
+				AND MS0705 like '%' || #{clsNo2} || '%' 
+			
+            </when>
+			<when test="danPumNo != ''">
+				MS0701 = #{jum}
+				AND MS0703 like '%' || #{danPumNo} || '%' 
+			
+            </when>
+            <otherwise>
+				MS0701 != #{jum}
+            </otherwise>
+         </choose>
+      </where>
+
+
+	</select>
+
+</mapper>
+
+

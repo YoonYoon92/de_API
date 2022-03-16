@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.giftEvent.giftEventInq.GiftEventInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	
+	<!-- 사은행사 내역 리스트 -->
+	<select id="selectGiftEventInqList" resultType="com.saydept.api.spf.giftEvent.giftEventInq.model.GiftEventInqModel" 
+									parameterType="com.saydept.api.spf.giftEvent.giftEventInq.model.GiftEventInqModel" fetchSize="1000">
+
+		SELECT 	JS0101 AS eventYY
+		,		JS0102 AS eventNo
+		,		JS0103||JS0104||JS0105 AS frEventDay
+		,		JS0106||JS0107||JS0108 AS toEventDay
+		,		JS0109	AS eventName
+		,		JS0303	AS saleLevel
+		,		JS0304	AS eventGift
+		,		JS0305	AS eventGoods
+		,		JS0306 	AS eventEtc
+		
+		FROM ${dbType}SPFRDB.SPFJ01PF 
+			INNER JOIN	${dbType}SPFRDB.SPFJ03PF 
+			ON	JS0300=JS0100 AND JS0301=JS0101 AND JS0302=JS0102
+		WHERE	JS0100= #{jum}
+			AND JS0103||JS0104||JS0105  &lt;= #{searchDay}
+			AND JS0106||JS0107||JS0108  &gt;= #{searchDay}
+		ORDER BY JS0102 DESC, JS0303
+
+	</select>
+
+
+</mapper>	

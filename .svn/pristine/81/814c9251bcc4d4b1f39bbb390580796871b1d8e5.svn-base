@@ -1,0 +1,163 @@
+package com.saydept.api.spf.saleNews.corpSaleNews;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel;
+import com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel;
+import com.saydept.utils.SayUtils;
+
+@Service
+public class CorpSaleNewsService {
+
+	@Autowired
+	private CorpSaleNewsMapper corpSaleNewsMapper;
+	
+	@Autowired
+	private SayUtils sayUtils;
+
+	public List<CorpSaleNewsModel> corpSaleNewsList(CorpSaleNewsParamModel request) throws ParseException {
+		// TODO Auto-generated method stub
+		
+		List<CorpSaleNewsModel> resultList = new ArrayList<CorpSaleNewsModel>();
+
+		String beforeDay = sayUtils.getCusomDay(request.getSearchDay(), -1 );
+		String beforeYear = sayUtils.getCusomYear(request.getSearchDay(), -1 );
+		
+		if( request.getSerchLevel().equals("jum") ) {	//등급이 점일때
+			
+			/**
+			 * 1. 해당 부 리스트 조회
+			 */
+			List<CorpSaleNewsModel> buList = corpSaleNewsMapper.getBulist(request);
+			for( CorpSaleNewsModel data :  buList) {
+				
+//				CorpSaleNewsModel model = new CorpSaleNewsModel();
+//				model.setBu( data.getBu() );
+//				model.setBuNm( data.getBuNm() );
+				
+				resultList.add( data );
+			}
+			
+			/**
+			 * 2. 부 리스트 일 목표 조회
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				CorpSaleNewsModel daySaleGoal =  corpSaleNewsMapper.getDaySaleGoal(request);
+				data.setDayTry( daySaleGoal == null ? 0 : daySaleGoal.getDayTry() );
+			}
+			
+			/**
+			 * 3. 부 리스트 월 목표 조회
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				CorpSaleNewsModel monthSaleGoal =  corpSaleNewsMapper.getMonthSaleGoal(request);
+				data.setMmTry( monthSaleGoal == null ? 0 : monthSaleGoal.getMmTry() );
+			}
+			
+			/**
+			 * 4. 부 리스트 년 목표 조회
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				CorpSaleNewsModel yearSaleGoal =  corpSaleNewsMapper.getYearSaleGoal(request);
+				data.setYyTry( yearSaleGoal == null ? 0 : yearSaleGoal.getYyTry() );
+			}
+			
+			
+			/**
+			 * 4. 부 리스트 일 실적 조회
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				CorpSaleNewsModel daySalePer =  corpSaleNewsMapper.getDaySalePer(request);
+				data.setDayNetsale( daySalePer == null ? 0 : daySalePer.getDayNetsale() );
+				data.setDayDsicount( daySalePer == null ? 0 : daySalePer.getDayDsicount() );
+				
+				data.setMmNetsale( daySalePer == null ? 0 : daySalePer.getDayNetsale() );
+				data.setMmDsicount( daySalePer == null ? 0 : daySalePer.getDayDsicount() );
+				
+				data.setYyNetsale( daySalePer == null ? 0 : daySalePer.getDayNetsale() );
+				data.setYyDsicount( daySalePer == null ? 0 : daySalePer.getDayDsicount() );
+			}
+			
+			/**
+			 * 5. 부 리스트 당월 실적 조회 (종료일의 -1일)
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				request.setSearchDay( request.getSearchDay().substring(6, request.getSearchDay().length()).equals("01") == true ? request.getSearchDay() : beforeDay );
+				CorpSaleNewsModel monthSalePer =  corpSaleNewsMapper.getMonthSalePer(request);
+				if( request.getSearchDay().substring(6, request.getSearchDay().length()).equals("01") ) {
+					data.setMmNetsale( monthSalePer == null ? 0 : data.getMmNetsale());
+					data.setYyNetsale( monthSalePer == null ? 0 : data.getYyNetsale());
+				}else {
+					data.setMmNetsale( monthSalePer == null ? 0 : data.getMmNetsale() + monthSalePer.getMmNetsale() );
+					data.setYyNetsale( monthSalePer == null ? 0 : data.getYyNetsale() + monthSalePer.getYyNetsale() );
+				}
+				
+			}
+			
+			/**
+			 * 6. 부 리스트 당년(전월까지) 실적 조회 
+			 * 
+			 */
+			for( CorpSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				request.setSearchDay( beforeYear );
+				
+				//전년(일)
+				CorpSaleNewsModel daySalePer =  corpSaleNewsMapper.getDaySalePer(request);
+				data.setDayLastyearSplan( daySalePer == null ? 0 : daySalePer.getDayNetsale());
+				
+				//전년(월,년)
+				CorpSaleNewsModel monthSalePer =  corpSaleNewsMapper.getMonthSalePer(request);
+				data.setMmLastyearSplan( monthSalePer == null ? 0 : monthSalePer.getMmNetsale());
+				data.setYyLastyearSplan( monthSalePer == null ? 0 : monthSalePer.getYyNetsale());
+				
+			}
+			
+			for( CorpSaleNewsModel result : resultList ) {
+				
+//				일 달성율 = ( SPFI52PF.IS5213 일-순매출실적 / SPFI05PF.IS0506 일-매출계획목표 ) * 100
+//				월 진도율 = ( SPFI53PF.IS5309 월-순매출실적 / SPFI06PF.IS0568 월-매출계획목표 ) * 100
+//				년 진도율 = ( SPFI53PF.IS5315 년-순매출실적 / SPFI06PF.IS0630 년-매출계획목표 ) * 100
+
+				
+				result.setDayAchivmentrate( ( (result.getDayNetsale() / 1000) / result.getDayTry()) * 100 );	//일 당성율
+				result.setMmAchivmentrate( ( (result.getMmNetsale() / 1000) / result.getMmTry()) * 100 );		//월 당성율
+				result.setYyAchivmentrate( ( (result.getYyNetsale() / 1000) / result.getYyTry()) * 100 );		//년 당성율
+				
+//				일 신장율 = ( ( SPFI52PF.IS5213 당일실적 - SPFI52PF.IS5213 전년실적 ) / SPFI52PF.IS5213 전년실적 ) * 100
+//				월 신장율 = ( ( SPFI53PF.IS5309 당월실적 - SPFI53PF.IS5309 전년실적 ) / SPFI53PF.IS5309 전년실적 ) * 100
+//				년 신장율 = ( ( SPFI53PF.IS5315 당년실적 - SPFI53PF.IS5315 전년실적 ) / SPFI53PF.IS5315 전년실적 ) * 100
+				
+				result.setDayIncrsrate( ( ( result.getDayNetsale() - result.getDayLastyearSplan() ) / result.getDayLastyearSplan() ) * 100 );
+				result.setMmIncrsrate( ( ( result.getDayNetsale() - result.getDayLastyearSplan() ) / result.getDayLastyearSplan() ) * 100 );
+				result.setYyIncrsrate( ( ( result.getDayNetsale() - result.getDayLastyearSplan() ) / result.getDayLastyearSplan() ) * 100 );
+				
+				
+			}
+//		}
+//			
+//		}else if( request.getSerchLevel().equals("bu") ) {
+//			//등급이 부일때
+//		}else if( request.getSerchLevel().equals("tim") ) {
+//			//등급이 팀일때
+//		}else if( request.getSerchLevel().equals("pc") ) {
+//			//등급이 세분류일때
+//		}else if( request.getSerchLevel().equals("coner") ) {
+//			//등급이 코너일때
+//		}else {
+//			resultList = new ArrayList<CorpSaleNewsModel>();
+		}
+		
+		return resultList;
+	}
+}

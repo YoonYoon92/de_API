@@ -1,0 +1,129 @@
+package com.saydept.api.dashboard;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.saydept.api.dashboard.model.DashboardModel;
+
+@CrossOrigin(origins = "*")
+@RestController
+public class DashboardController {
+	
+	@Autowired
+	private DashboardService dashboardService;
+	
+	/**
+	 * 주석 작성법: 생성한 함수 위에서 /** 입력후 엔터키 입력 
+	 */
+
+	/**
+	 * API 상태체크
+	 * @return
+	 */
+	@RequestMapping(value = "api/dashboard", method = RequestMethod.GET)
+	public String condition() {
+    	return this.getClass().getName() + " : " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+	}
+	/**
+	 * 배포상태확인
+	 */
+	
+	/**
+	 * 단일 대상 조회
+	 * 작성방법은 select'업무를 구분할 명칭' 
+	 * Ex) 금일 매출합계 조회 : selectTodayTotalSale
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/selectDashboard", method = RequestMethod.POST)
+	public DashboardModel selectDashboard(@RequestBody DashboardModel request)throws Exception {
+		
+		DashboardModel result = dashboardService.selectDashboard(request);
+    	return result;
+	}
+	
+	/**
+	 * 복수 대상 조회
+	 * 작성방법은 select'업무를 구분할 명칭'List 
+	 * Ex) 금일 매출 목록 조회 selectTodaySaleList
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/selectDashboardList", method = RequestMethod.POST)
+	public List<DashboardModel> selectDashboardList(@RequestBody DashboardModel request)throws Exception {
+		
+		List<DashboardModel> result = dashboardService.selectDashboardList(request);
+    	return result;
+	}
+	
+	/**
+	 * 데이터 수정
+	 * 작성방법은 update'업무를 구분할 명칭'
+	 * Ex) 회원정보수정 updateMemberInfo
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/dashboard/updateDashboard", method = RequestMethod.POST)
+	public int updateDashboard(@RequestBody DashboardModel request)throws Exception {
+		
+		int result = dashboardService.updateDashboard(request);
+    	return result;
+	}
+	
+	/**
+	 * 데이터 등록
+	 * 작성방법은 insert'업무를 구분할 명칭' 
+	 * Ex) 신규회원등록 insertNewMember
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/dashboard/insertDashboard", method = RequestMethod.POST)
+	public int insertDashboard(@RequestBody DashboardModel request)throws Exception {
+		
+		int result = dashboardService.insertDashboard(request);
+    	return result;
+	}
+	
+	/**
+	 * 데이터 수정+등록 Ex) 데이터가 없으면 insert 없으면 update 작업을 동시 처리할때
+	 * 작성방법은 save'업무를 구분할 명칭'
+	 * Ex) 회원포인트 등록(없으면 신규 있으면 기존 포인트 + 입력한 포인트) saveMemberPoint
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/dashboard/saveDashboard", method = RequestMethod.POST)
+	public int saveDashboard(@RequestBody DashboardModel request)throws Exception {
+		
+		int result = dashboardService.saveDashboard(request);
+    	return result;
+	}
+	
+	/**
+	 * 데이터 삭제
+	 * 작성방법은 delete'업무를 구분할 명칭'
+	 * Ex) 상품삭제 deleteGoods
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "api/dashboard/dashboard/deleteDashboard", method = RequestMethod.POST)
+	public int deleteDashboard(@RequestBody DashboardModel request)throws Exception {
+		
+		int result = dashboardService.deleteDashboard(request);
+    	return result;
+	}
+	
+}

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.orgnztInq.OrgnztInqMapper">
+
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+
+		
+		SELECT 	MS0101			AS orgCode	
+				,TRIM(MS0102)	AS nm
+				,SUBSTR(MS0103,1,3)||'-'||SUBSTR(MS0103,4,2)||'-'||SUBSTR(MS0103,6,5)			as col1
+				,TRIM(MS0104)	as col2
+				,TRIM(MS0113) 	as col3
+		FROM ${dbType}SPFRDB.SPFM01PF
+		
+	</select>
+	<select id="jumselectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+	
+		SELECT	MS0201			AS 	jum
+			,	MS0202			AS	bu
+			,	MS0202 			AS	orgCode
+			,	trim(MS0204)	AS	nm	
+			,   MS0207			AS  col4
+			,	MS0206			AS  col5
+			,	MS0208			AS  col6
+			,	MS0214			AS  col7
+			,	COUNT(DISTINCT MS0306) 	AS  col1
+			,	COUNT(DISTINCT MS0408) 	AS  col2
+			,	COUNT(DISTINCT MS0505)	AS  col3
+		
+		FROM ${dbType}SPFRDB.SPFM02PF 
+		
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM03PF 
+				ON MS0201=MS0301 AND MS0202=MS0302 
+			
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF 
+				ON MS0201=MS0401 AND MS0202=MS0402
+			
+			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF 
+				ON MS0201=MS0501 AND MS0202=MS0502
+				
+		WHERE MS0201=#{jum} AND MS0202>='60'
+		GROUP BY MS0201,MS0202,MS0204,MS0207,MS0206,MS0208,MS0214
+		ORDER BY MS0202
+		
+	</select>
+	
+	<select id="buselectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+				SELECT 	MS0301		AS	jum
+					,	MS0302		AS	bu		
+					,	MS0303		as	pc
+					,	MS0303		AS	orgCode
+					,	trim(MS0306)	as	nm
+					,	MS0307		as	col5
+					,	MS0308		as	col6
+					,	MS0309		as	col4
+					,	MS0312		as	col1
+					,	MS0318		as	col7
+					,	COUNT(DISTINCT MS0404)	as	col2
+					,	COUNT(DISTINCT MS0505)	as	col3
+				
+				FROM ${dbType}SPFRDB.SPFM03PF
+		
+					LEFT OUTER JOIN ${dbType}SPFRDB.SPFM04PF 
+					ON MS0301=MS0401 AND MS0302=MS0402 AND MS0303 = MS0403
+					
+					LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF 
+					ON MS0301=MS0501 AND MS0302=MS0502 AND MS0303=MS0503  AND MS0515=''
+					
+					WHERE MS0301=#{jum} AND MS0302=SUBSTR(#{bu},3,2)
+					GROUP BY MS0301,MS0302,MS0303,MS0306,MS0307,MS0308,MS0309,MS0312,MS0318
+					ORDER BY MS0303
+		
+	</select>
+	
+		<select id="timselectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+				SELECT	MS0401			AS	jum
+					,	MS0402			AS	bu
+					,	MS0403			AS	tim
+					,	MS0404			AS	pc
+					,	MS0404			AS	orgcode
+					,	trim(MS0408)	AS	nm
+					,	MS0409			AS	col1
+					,	MS0412			AS	col2
+					,	MS0410			AS	col3
+					,	MS0410			AS	col4
+					,	trim(MS0415)	AS	col5
+					,	MS0416 			AS	col6
+				
+				FROM ${dbType}SPFRDB.SPFM04PF
+				WHERE MS0401=#{jum} AND MS0402=SUBSTR(#{bu},3,2) AND MS0403=SUBSTR(#{tim},5,2)
+		
+	</select>
+	
+		<select id="pcselectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+				SELECT	MS0505		as	orgcode
+					,	trim(MS0510)	as	nm
+					,	MS0518			as	col1
+					,	MS0512			as	col2
+					,	MS0513			as	col3
+					,	MS0514			as	col4
+					,	SUBSTR(MS0521,2,1)	as	col5
+		 		FROM ${dbType}SPFRDB.SPFM05PF 
+				WHERE MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515=''
+				ORDER BY MS0505
+			
+	</select>
+	   <select id="selectzoneStoreList" parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel" 
+						resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+						
+			SELECT 	MS2105 as zoneCd
+					,trim(MS2106) as zoneNm
+			FROM ${dbType}SPFRDB.SPFM21PF
+		<where>
+			<choose>
+				<when test="pc != null and pc != '' ">
+				MS2101=SUBSTR(#{pc},1,2)
+				AND	  MS2102=SUBSTR(#{pc},3,2)
+				AND	  MS2103=SUBSTR(#{pc},5,2)
+				AND	  MS2104=SUBSTR(#{pc},7,2)
+				AND   MS2113='' 
+				</when>
+				<when test="tim != null and tim != '' ">
+				MS2101=SUBSTR(#{tim},1,2)
+				AND	  MS2102=SUBSTR(#{tim},3,2)
+				AND	  MS2103=SUBSTR(#{tim},5,2)
+				AND   MS2113='' 
+				</when>
+				<when test="tim = null and tim = '' ">
+				MS2101=SUBSTR(#{bu},1,2)
+				AND	  MS2102=SUBSTR(#{bu},3,2)
+				AND   MS2113='' 
+				</when>
+			</choose>
+		</where>
+			
+		
+			
+	</select>			
+	
+	   <select id="zoneStoreList" parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel" 
+						resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel">
+						
+		SELECT 	MS2101	AS jum
+		,	MS2102	AS	bu
+		,	MS2103	AS	tim
+		,	MS2104	AS	pc
+		,	MS2105	AS	orgCode
+		,	trim(MS2106)	AS 	nm
+		,	MS2104	AS	col1
+		,	MS2109	AS 	col2
+		,	MS2110	AS 	col3
+		,	MS2107	AS	col4
+		,	MS2108	AS	col5
+		
+		FROM ${dbType}SPFRDB.SPFM21PF
+		
+		<where> 
+			<choose>
+				<when test="pc != null and pc != '' ">
+				MS2101=#{jum} AND MS2102=SUBSTR(#{bu},3,2)  AND	MS2103=SUBSTR(#{tim},5,2) AND MS2104=SUBSTR(#{pc},7,2) AND MS2113 =''
+				</when>
+				<when test="tim != null and tim != '' ">
+				MS2101=#{jum} AND MS2102=SUBSTR(#{bu},3,2)  AND	MS2103=SUBSTR(#{tim},5,2) AND MS2113 =''
+				</when>
+				<when test="bu != null and bu != '' ">
+				MS2101=#{jum} AND MS2102=SUBSTR(#{bu},3,2) AND MS2113 =''  
+				</when>
+			</choose>
+		</where>
+	</select>			
+		<select id="zoneselectOrgnztInqList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+				SELECT	MS0505		as	orgcode
+					,	trim(MS0510)	as	nm
+					,	MS0518			as	col1
+					,	MS0512			as	col2
+					,	MS0513			as	col3
+					,	MS0514			as	col4
+					,	SUBSTR(MS0521,2,1)	as	col5
+		 		FROM ${dbType}SPFRDB.SPFM05PF
+		 		<where>
+		 			<choose>
+		 			<when test="pc != null and pc != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515='' AND MS0518=#{zone}
+					</when>
+					<when test="tim != null and tim != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) 
+						AND MS0515='' AND MS0518=#{zone}
+					</when>
+						<when test="bu != null and bu != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) 
+						AND MS0515='' AND MS0518=#{zone}
+					</when>
+					</choose>
+				</where> 
+				ORDER BY MS0505
+			
+	</select>
+	<select id="recycleStoreList" resultType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqModel"  
+		parameterType="com.saydept.api.spf.org.orgnztInq.model.OrgnztInqParamModel">
+				SELECT 	MS0502
+						,MS0503 
+						,MS0504
+						,MS0505	as orgcode
+						,MS0510	as nm
+						,MS0516	as col1
+						,MS0515	as col2
+						,MS05103	
+						,M06MIN	
+						,M06DT	
+						,D_CLSCNT	as col3
+						,D_UPCNT	as col4
+				FROM SPFRDB.SPFM05LF1
+					LEFT OUTER JOIN(SELECT MS0601,MS0602,MIN(MS0627) M06MIN,MAX(MS0627) AS M06DT,COUNT(MS0603) AS D_CLSCNT 
+									FROM SPFRDB.SPFM06PF 
+									GROUP BY MS0601,MS0602
+									) A
+									ON A.MS0601 = MS0501 AND A.MS0602 = MS0505 
+								
+					LEFT OUTER JOIN(SELECT MS05101,MS05102,MS05103
+									FROM SPFRDB.SPFM051PF 
+									) B
+									ON B.MS05101 = MS0501 AND (B.MS05102 = MS0505 OR B.MS05103 = MS0505) 
+				 	LEFT OUTER JOIN (SELECT MS1602,MS1603,COUNT(MS1602) AS D_UPCNT
+				 					 FROM SPFRDB.SPFM16LF2
+				 					 GROUP BY  MS1602,MS1603
+					) C
+					ON C.MS1602=MS0501 AND C.MS1603=MS0505
+		 		<where>
+		 			<choose>
+		 			<when test="pc != null and pc != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515!='' AND (B.MS05103 IS NULL  ) 
+					</when>
+					<when test="tim != null and tim != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) 
+						AND MS0515!='' AND (B.MS05103 IS NULL  ) 
+					</when>
+						<when test="bu != null and bu != '' ">
+				 		MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) 
+						AND MS0515!='' AND (B.MS05103 IS NULL  ) 
+					</when>
+					</choose>
+				</where> 
+				ORDER BY  MS0502,MS0503,MS0504,MS0505
+			
+	</select>
+</mapper>

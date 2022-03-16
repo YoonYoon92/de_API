@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.app.appMemUpt.AppMemUptMapper">
+	<insert id="insertAppMemUpt" parameterType="com.saydept.api.app.appMemUpt.model.AppMemUptParamModel">
+		INSERT INTO WEBRDB.WEBA02PF
+	(
+		WA02UPTDAT
+		,WA02UPTTIM
+		,WA02JUMIN1
+		,WA02JUMIN2
+		,WA02ID    
+		,WA02HPTEL 
+		,WA02UPTTEL
+		,WA02DPOST 
+		,WA02ADDRA 
+		,WA02ADDR1 
+		,WA02ADDR2 
+		,WA02ADDR3 
+		,WA02ADDR4 
+		,WA02ADDR5 
+		,WA02ADDR6 
+		,WA02ADDR7 
+		,WA02ADDR8 
+		,WA02ADDRCD
+		,WA02BUIDCD
+		,WA02DM    
+		,WA02CREDIT
+		,WA02LG    
+		,WA02FIL1  
+		,WA02FIL2  
+		,WA02FIL3  
+	)
+		VALUES(
+		#{uptDate}		
+		,#{uptTime}		
+		,#{citizenNo1}
+		,#{citizenNo2}
+		,#{id}
+		,#{hptel}
+		,#{uptHptel}
+		,#{postAddr}	
+		,#{allAddr}		
+		,#{addr1}		
+		,#{addr2}		
+		,#{addr3}		
+		,#{addr4}		
+		,#{addr5}		
+		,#{addr6}		
+		,#{addr7}		
+		,#{addr8}		
+		,#{addrCode}	
+		,#{buildCode}
+		,''
+		,''
+		,''
+		,#{fill}
+		,#{fill}
+		,#{fill}
+		
+		)
+	</insert>
+
+
+</mapper>
+
+

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.cardApprLogInq.CardApprLogInqMapper">
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectCardApprLogInqList" resultType="com.saydept.api.spf.selng.cardApprLogInq.model.CardApprLogInqModel" parameterType="com.saydept.api.spf.selng.cardApprLogInq.model.CardApprLogInqParamModel" fetchSize="1000">
+		/*selectCardApprLogInqList*/
+		
+		WITH    TA01 (APPRDATE, VAN, SEQ, WCC, REGI, RECEIPT, REPLYCD, MSG, APPRCARDCO, APPRMAEIPCO, REQC, CARDNO, CARDNOMASK, APPNO, AMT, SDATETIME, RDATETIME, RSEC) AS
+				(	SELECT  P09SDATE APPRDATE,
+							'NICE' VAN,
+					        P09JSEQ SEQ, 
+					        SUBSTR(P09PDAT,61,1) WCC,
+					        SUBSTR(P09PDAT,23,4) REGI, 
+					        P09HTNO RECEIPT, 
+					        SUBSTR(P09RCVD,56,4) REPLYCD,
+					        CASE WHEN P09MSG2 = ''
+					             THEN SUBSTR(P09RCVD,272,30) 
+					             ELSE P09MSG2 END           MSG,
+					        CASE WHEN SUBSTR(P09RCVD,177,22) = '' 
+					        	 THEN P09MSG1 
+					        	 ELSE TRIM(SUBSTR(P09RCVD,177,22))||TRIM(SUBSTR(P09RCVD,199,22)) END APPRCARDCO,
+					        CASE WHEN SUBSTR(P09RCVD,199,22) = '' 
+					             THEN P09MSG1 
+					             ELSE TRIM(SUBSTR(P09RCVD,177,22))||TRIM(SUBSTR(P09RCVD,199,22)) END APPRMAEIPCO,
+					        P09REQC REQC,
+					        SUBSTR(P09RCVD,63,16) CARDNO,			        
+					        SUBSTR(P09PDAT,64,16) CARDNOMASK,
+					        SUBSTR(P09RCVD,248,8) APPNO, 
+					        P09AMT AMT,
+					        P09SDATE||P09STIME SDATETIME, 
+					        P09RDATE||P09RTIME RDATETIME,
+					        TIME(SUBSTR(P09RTIME,1,2)||':'||SUBSTR(P09RTIME,3,2)||':'||SUBSTR(P09RTIME,5,2))
+					        -TIME(SUBSTR(P09STIME,1,2)||':'||SUBSTR(P09STIME,3,2)||':'||SUBSTR(P09STIME,5,2)) RSEC
+					FROM    ${dbType}SPOTNRDB.SPOIC09
+					WHERE   	P09SDATE &gt;= #{startDate}
+					        AND P09SDATE &lt;= #{endDate}
+										
+					UNION ALL
+					SELECT   P07SDATE APPRDATE,
+					 		'KIS' VAN,
+					        P07JSEQ SEQ, 
+					        SUBSTR(P07PDAT,61,1) WCC,
+					        SUBSTR(P07PDAT,23,4) REGI, 
+					        P07HTNO RECEIPT, 
+					        SUBSTR(P07RCVD,56,4) REPLYCD,
+					        CASE WHEN P07MSG2 = ''
+					             THEN SUBSTR(P07RCVD,272,30) 
+					             ELSE P07MSG2 END           MSG,
+					        CASE WHEN SUBSTR(P07RCVD,177,22) = '' 
+					        	 THEN P07MSG1 
+					        	 ELSE TRIM(SUBSTR(P07RCVD,177,22))||TRIM(SUBSTR(P07RCVD,199,22)) END APPRCARDCO,
+					        CASE WHEN SUBSTR(P07RCVD,199,22) = '' 
+					             THEN P07MSG1 
+					             ELSE TRIM(SUBSTR(P07RCVD,177,22))||TRIM(SUBSTR(P07RCVD,199,22)) END APPRMAEIPCO,
+					        P07REQC REQC,
+					        SUBSTR(P07RCVD,63,16) CARDNO,			        
+					        SUBSTR(P07PDAT,64,16) CARDNOMASK,
+					        SUBSTR(P07RCVD,248,8) APPNO, 
+					        P07AMT AMT,
+					        P07SDATE||P07STIME SDATETIME, 
+					        P07RDATE||P07RTIME RDATETIME,
+					        TIME(SUBSTR(P07RTIME,1,2)||':'||SUBSTR(P07RTIME,3,2)||':'||SUBSTR(P07RTIME,5,2))
+					        -TIME(SUBSTR(P07STIME,1,2)||':'||SUBSTR(P07STIME,3,2)||':'||SUBSTR(P07STIME,5,2)) RSEC
+					FROM    ${dbType}SPOTNRDB.SPOIC07
+					WHERE   	P07SDATE &gt;= #{startDate}
+					        AND P07SDATE &lt;= #{endDate}
+				)
+		
+		SELECT 	APPRDATE, 
+				VAN, 
+				SEQ, 
+				CASE WHEN WCC='A' THEN 'SWIPE('||WCC||')' 
+				     WHEN WCC='I' THEN 'IC('||WCC||')'
+				     WHEN WCC='F' THEN 'FALLBACK('||WCC||')'
+				     WHEN WCC='@' THEN 'MANUAL('||WCC||')'
+				     WHEN WCC='Z' THEN '수기IC('||WCC||')'
+				     ELSE '기타('||WCC||')' 
+				     END                                  AS WCC, 
+				REGI, RECEIPT, 
+				REPLYCD, MSG, 
+				H04HNAME AS CARDCONM, 
+				APPRCARDCO, APPRMAEIPCO,
+		        CASE WHEN REQC='0200' THEN '승인('||REQC||')'
+		             WHEN REQC='0420' THEN '취소('||REQC||')'
+		             ELSE '기타('||REQC||')'
+		             END                                  AS REQC, 
+				SUBSTR(CARDNO,1,LENGTH(TRIM(CARDNOMASK))) AS CARDNONONMASK, 
+				CARDNOMASK, 
+				APPNO, 
+				AMT, 
+				SDATETIME, 
+				RDATETIME, 
+				RSEC, 
+				S02TCDNO AS CONFCARDNO, 
+			   	CASE WHEN S02TCDNO IS NOT NULL THEN '확정' ELSE '' END AS CONFIRM			
+		FROM 	TA01
+		LEFT OUTER JOIN ${dbType}SCDRDB.SCDS02LF3 sl  
+		ON 		S02JUM = '01' AND
+				S02TCDNO = SUBSTR(CARDNOMASK,1,16) AND 
+				S02MAEY1=SUBSTR(SDATETIME,1,2) AND S02MAEY2=SUBSTR(SDATETIME,3,2) AND
+				S02MAEM =SUBSTR(SDATETIME,5,2) AND S02MAED =SUBSTR(SDATETIME,7,2) AND
+				S02APPNO = SUBSTR(APPNO,1,8) AND 
+				S02UPTCOD = CASE WHEN (REQC='0420') THEN '1' ELSE '' END AND 
+				S02SUNMAE = AMT *  CASE WHEN (REQC='0420') THEN '-1' ELSE '1' END 
+		LEFT OUTER JOIN ${dbType}SCDRDB.SCDH04PF
+		ON      H04COMPGU='01' AND H04WHEGU='76' AND H04SEQNO=S02SEQNO 
+				
+		WHERE   APPRDATE &lt;&gt; '' 
+		<if test="searchCardNo !=null and searchCardNo !=''">
+			AND 	CARDNO LIKE '%${searchCardNo}%' 
+		</if>
+		<if test="searchRegi !=null and searchRegi !=''">
+			AND     REGI   = #{searchRegi} 
+		</if>
+		<if test="searchWCC !=null and searchWCC !=''">
+			AND     WCC = #{searchWCC}
+		</if>
+		<if test="searchCardCoNm !=null and searchCardCoNm !=''">
+			AND     (APPRCARDCO LIKE '%${searchCardCoNm}%'
+			OR		UPPER(APPRCARDCO) LIKE UPPER('%${searchCardCoNmFullCharUpper}%')
+			OR		LOWER(APPRCARDCO) LIKE LOWER('%${searchCardCoNmFullCharLower}%')
+			OR		UPPER(APPRCARDCO) LIKE UPPER('%${searchCardCoNmUpper}%') 
+			OR		LOWER(APPRCARDCO) LIKE LOWER('%${searchCardCoNmLower}%')
+			OR		APPRCARDCO LIKE '%${searchCardCoNmFullChar}%'
+			OR		APPRCARDCO LIKE LOWER('%${searchCardCoNm}%')
+			OR		APPRCARDCO LIKE UPPER('%${searchCardCoNm}%'))
+		</if>
+		
+	</select>
+	
+	
+	<!-- 프리픽스 마스터 조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectCardPrefixInqList" resultType="com.saydept.api.spf.selng.cardApprLogInq.model.CardApprLogInqParamModel" parameterType="com.saydept.api.spf.selng.cardApprLogInq.model.CardApprLogInqParamModel" fetchSize="1000">
+		/*selectCardPrefixInqList*/
+		
+		WITH   TA01 ( NUM, REPNO, CARDCONM) AS 
+		(
+			SELECT '6'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,6)
+			
+			UNION ALL 
+			SELECT '5'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,5)
+			
+			UNION ALL 
+			SELECT '4'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,4)
+			
+			UNION ALL
+			SELECT '3'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,3)
+			
+			UNION ALL
+			SELECT '2'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,2)
+			
+			UNION ALL
+			SELECT '1'    AS NUM,
+			       CM0102 AS REPNO, 
+				   CM0103 AS CARDCONM
+			FROM ${dbType}SPORDB.SPOCDM01PC sp
+			      --CM0100 = 01: 일반, 02: 식품
+			WHERE CM0100='01' AND CM0101=SUBSTR(${searchCardNo},1,1)
+			
+			UNION ALL
+			SELECT '0'      AS NUM,
+			       '999999' AS REPNO,
+			       '기타'    AS CARDCONM
+			FROM SYSIBM.SYSDUMMY1
+		)
+		
+		SELECT NUM, REPNO, CARDCONM
+		FROM TA01  
+		ORDER BY NUM DESC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	
+</mapper>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.yearCornerSaleNews.YearCornerSaleNewsMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="yearCornerSaleNewsModel" type="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectYearCornerSaleNews" resultType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsParamModel">
+		/*selectYearCornerSaleNews*/
+		SELECT...
+
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	
+	<!-- 최근 1년동안의 매출코너 리스트  -->
+	<select id="selectYearCornerSaleNewsListCorner" resultType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsParamModel" fetchSize="1000">
+		/*selectYearCornerSaleNewsList*/
+		SELECT 	IS0109||IS0110 AS coner
+			,MS0510 AS conerNm			
+		
+		FROM 	SPFRDB.SPFI01LF3 TB1
+			INNER JOIN SPFRDB.SPFM05PF 
+				ON 	MS0501=IS0103 
+				AND MS0505=IS0104	
+		
+		WHERE	TB1.IS0103 = #{jum} 
+			AND TB1.IS0106 = SUBSTR(#{bu},3,2)
+			<if test="tim != null and tim != ''">
+			AND		TB1.IS0107 = SUBSTR(#{tim},5,2)
+			</if>
+			<if test="pc != null and pc != ''">
+			AND		TB1.IS0108 = SUBSTR(#{pc},7,2)
+			</if>
+			<if test="coner != null and coner != ''">
+			AND		TB1.IS0104 = #{coner}
+			</if>
+			AND TB1.IS0102 &gt;= #{frDate}
+			AND TB1.IS0102 &lt;= #{toDate}
+		
+		GROUP BY IS0109
+			,IS0110
+			,MS0510
+					
+		ORDER BY IS0109 ,IS0110
+	</select>
+	
+	<!-- 코너별로 그룹, 기간별로 case - select 하여  1년 동안의 매출 한번에 가져오기  -->	
+	<select id="selectYearCornerSaleNewsList" resultType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsParamModel" fetchSize="1000">
+		/*selectYearCornerSaleNewsList*/
+		WITH 
+		<!-- ta0 : 선택한 조회일자의 월에 매출이 있는 코너번호만 검출 -->
+		ta0(coner) AS(
+		SELECT 	IS0109||IS0110 coner
+		
+		FROM	SPFRDB.SPFI01LF3 TB1
+		
+		WHERE	TB1.IS0103 = #{jum} 
+			AND TB1.IS0106 = SUBSTR(#{bu},3,2)
+			<if test="tim != null and tim != ''">
+			AND		TB1.IS0107 = SUBSTR(#{tim},5,2)
+			</if>
+			<if test="pc != null and pc != ''">
+			AND		TB1.IS0108 = SUBSTR(#{pc},7,2)
+			</if>
+			<if test="coner != null and coner != ''">
+			AND		TB1.IS0104 = #{coner}
+			</if>
+			AND TB1.IS0102 &gt;= #{m00FrDate}
+			AND TB1.IS0102 &lt;= #{toDate}
+		
+		GROUP BY IS0109
+			,IS0110 	
+		),		
+		
+		ta1(coner, conerNm, m12Netsale,m11Netsale,m10Netsale,m09Netsale,m08Netsale,m07Netsale,m06Netsale,m05Netsale,m04Netsale,m03Netsale,m02Netsale,m01Netsale,m00Netsale
+		,m12Discount,m11Discount,m10Discount,m09Discount,m08Discount,m07Discount,m06Discount,m05Discount,m04Discount,m03Discount,m02Discount,m01Discount,m00Discount
+		,m12Totsale,m11Totsale,m10Totsale,m09Totsale,m08Totsale,m07Totsale,m06Totsale,m05Totsale,m04Totsale,m03Totsale,m02Totsale,m01Totsale,m00Totsale) 
+		AS (
+		SELECT 	IS0109||IS0110 AS coner
+			,MS0510 AS conerNm
+			,SUM(CASE WHEN IS0102&gt;=#{m12FrDate} AND IS0102&lt;=#{m12ToDate} THEN IS0129 ELSE 0 END)/1000 m12Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m11FrDate} AND IS0102&lt;=#{m11ToDate} THEN IS0129 ELSE 0 END)/1000 m11Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m10FrDate} AND IS0102&lt;=#{m10ToDate} THEN IS0129 ELSE 0 END)/1000 m10Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m09FrDate} AND IS0102&lt;=#{m09ToDate} THEN IS0129 ELSE 0 END)/1000 m09Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m08FrDate} AND IS0102&lt;=#{m08ToDate} THEN IS0129 ELSE 0 END)/1000 m08Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m07FrDate} AND IS0102&lt;=#{m07ToDate} THEN IS0129 ELSE 0 END)/1000 m07Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m06FrDate} AND IS0102&lt;=#{m06ToDate} THEN IS0129 ELSE 0 END)/1000 m06Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m05FrDate} AND IS0102&lt;=#{m05ToDate} THEN IS0129 ELSE 0 END)/1000 m05Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m04FrDate} AND IS0102&lt;=#{m04ToDate} THEN IS0129 ELSE 0 END)/1000 m04Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m03FrDate} AND IS0102&lt;=#{m03ToDate} THEN IS0129 ELSE 0 END)/1000 m03Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m02FrDate} AND IS0102&lt;=#{m02ToDate} THEN IS0129 ELSE 0 END)/1000 m02Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m01FrDate} AND IS0102&lt;=#{m01ToDate} THEN IS0129 ELSE 0 END)/1000 m01Netsale
+			,SUM(CASE WHEN IS0102&gt;=#{m00FrDate} AND IS0102&lt;=#{m00ToDate} THEN IS0129 ELSE 0 END)/1000 m00Netsale
+			
+			,SUM(CASE WHEN IS0102&gt;=#{m12FrDate} AND IS0102&lt;=#{m12ToDate} THEN IS0130 ELSE 0 END)/1000 m12Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m11FrDate} AND IS0102&lt;=#{m11ToDate} THEN IS0130 ELSE 0 END)/1000 m11Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m10FrDate} AND IS0102&lt;=#{m10ToDate} THEN IS0130 ELSE 0 END)/1000 m10Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m09FrDate} AND IS0102&lt;=#{m09ToDate} THEN IS0130 ELSE 0 END)/1000 m09Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m08FrDate} AND IS0102&lt;=#{m08ToDate} THEN IS0130 ELSE 0 END)/1000 m08Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m07FrDate} AND IS0102&lt;=#{m07ToDate} THEN IS0130 ELSE 0 END)/1000 m07Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m06FrDate} AND IS0102&lt;=#{m06ToDate} THEN IS0130 ELSE 0 END)/1000 m06Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m05FrDate} AND IS0102&lt;=#{m05ToDate} THEN IS0130 ELSE 0 END)/1000 m05Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m04FrDate} AND IS0102&lt;=#{m04ToDate} THEN IS0130 ELSE 0 END)/1000 m04Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m03FrDate} AND IS0102&lt;=#{m03ToDate} THEN IS0130 ELSE 0 END)/1000 m03Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m02FrDate} AND IS0102&lt;=#{m02ToDate} THEN IS0130 ELSE 0 END)/1000 m02Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m01FrDate} AND IS0102&lt;=#{m01ToDate} THEN IS0130 ELSE 0 END)/1000 m01Discount
+			,SUM(CASE WHEN IS0102&gt;=#{m00FrDate} AND IS0102&lt;=#{m00ToDate} THEN IS0130 ELSE 0 END)/1000 m00Discount
+			
+			,SUM(CASE WHEN IS0102&gt;=#{m12FrDate} AND IS0102&lt;=#{m12ToDate} THEN IS0131 ELSE 0 END)/1000 m12Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m11FrDate} AND IS0102&lt;=#{m11ToDate} THEN IS0131 ELSE 0 END)/1000 m11Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m10FrDate} AND IS0102&lt;=#{m10ToDate} THEN IS0131 ELSE 0 END)/1000 m10Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m09FrDate} AND IS0102&lt;=#{m09ToDate} THEN IS0131 ELSE 0 END)/1000 m09Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m08FrDate} AND IS0102&lt;=#{m08ToDate} THEN IS0131 ELSE 0 END)/1000 m08Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m07FrDate} AND IS0102&lt;=#{m07ToDate} THEN IS0131 ELSE 0 END)/1000 m07Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m06FrDate} AND IS0102&lt;=#{m06ToDate} THEN IS0131 ELSE 0 END)/1000 m06Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m05FrDate} AND IS0102&lt;=#{m05ToDate} THEN IS0131 ELSE 0 END)/1000 m05Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m04FrDate} AND IS0102&lt;=#{m04ToDate} THEN IS0131 ELSE 0 END)/1000 m04Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m03FrDate} AND IS0102&lt;=#{m03ToDate} THEN IS0131 ELSE 0 END)/1000 m03Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m02FrDate} AND IS0102&lt;=#{m02ToDate} THEN IS0131 ELSE 0 END)/1000 m02Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m01FrDate} AND IS0102&lt;=#{m01ToDate} THEN IS0131 ELSE 0 END)/1000 m01Totsale
+			,SUM(CASE WHEN IS0102&gt;=#{m00FrDate} AND IS0102&lt;=#{m00ToDate} THEN IS0131 ELSE 0 END)/1000 m00Totsale			
+		
+		FROM 	SPFRDB.SPFI01LF3 TB1
+			INNER JOIN SPFRDB.SPFM05PF 
+				ON 	MS0501=IS0103 
+				AND MS0505=IS0104	
+		
+		WHERE	TB1.IS0103 = #{jum} 
+			AND TB1.IS0106 = SUBSTR(#{bu},3,2)
+			<if test="tim != null and tim != ''">
+			AND		TB1.IS0107 = SUBSTR(#{tim},5,2)
+			</if>
+			<if test="pc != null and pc != ''">
+			AND		TB1.IS0108 = SUBSTR(#{pc},7,2)
+			</if>
+			<if test="coner != null and coner != ''">
+			AND		TB1.IS0104 = #{coner}
+			</if>
+			AND TB1.IS0102 &gt;= #{frDate}
+			AND TB1.IS0102 &lt;= #{toDate}
+			AND 	EXISTS(SELECT * FROM TA0 WHERE TA0.coner = TB1.IS0104)
+		
+		GROUP BY IS0109
+			,IS0110
+			,MS0510
+			,SUBSTR(TB1.IS0102,1,6)		
+		
+		ORDER BY IS0109,is0110
+		)
+		
+		SELECT coner,conerNm
+			, sum(m12Netsale)   as m12Netsale
+			, sum(m11Netsale)   as m11Netsale
+			, sum(m10Netsale)   as m10Netsale
+			, sum(m09Netsale)   as m09Netsale
+			, sum(m08Netsale)   as m08Netsale
+			, sum(m07Netsale)   as m07Netsale
+			, sum(m06Netsale)   as m06Netsale
+			, sum(m05Netsale)   as m05Netsale
+			, sum(m04Netsale)   as m04Netsale
+			, sum(m03Netsale)   as m03Netsale
+			, sum(m02Netsale)   as m02Netsale
+			, sum(m01Netsale)   as m01Netsale
+			, sum(m00Netsale)   as m00Netsale
+			, sum(m12Discount)  as m12Discount
+			, sum(m11Discount)  as m11Discount
+			, sum(m10Discount)  as m10Discount
+			, sum(m09Discount)  as m09Discount
+			, sum(m08Discount)  as m08Discount
+			, sum(m07Discount)  as m07Discount
+			, sum(m06Discount)  as m06Discount
+			, sum(m05Discount)  as m05Discount
+			, sum(m04Discount)  as m04Discount
+			, sum(m03Discount)  as m03Discount
+			, sum(m02Discount)  as m02Discount
+			, sum(m01Discount)  as m01Discount
+			, sum(m00Discount)  as m00Discount
+			, sum(m12Totsale)   as m12Totsale
+			, sum(m11Totsale)   as m11Totsale
+			, sum(m10Totsale)   as m10Totsale
+			, sum(m09Totsale)   as m09Totsale
+			, sum(m08Totsale)   as m08Totsale
+			, sum(m07Totsale)   as m07Totsale
+			, sum(m06Totsale)   as m06Totsale
+			, sum(m05Totsale)   as m05Totsale
+			, sum(m04Totsale)   as m04Totsale
+			, sum(m03Totsale)   as m03Totsale
+			, sum(m02Totsale)   as m02Totsale
+			, sum(m01Totsale)   as m01Totsale
+			, sum(m00Totsale)	as m00Totsale
+			, '|'				as sep
+		FROM ta1
+		WHERE m12Totsale+m11Totsale+m10Totsale+m09Totsale+m08Totsale+m07Totsale+m06Totsale+m05Totsale+m04Totsale+m03Totsale+m02Totsale+m01Totsale+m00Totsale > 0
+		GROUP BY coner,conerNm
+		ORDER BY CONER 			
+			
+			
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateYearCornerSaleNews" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel">
+		/*updateYearCornerSaleNews*/
+		UPDATE ...
+	</update>		
+
+	<!-- 등록 -->
+	<insert id="insertYearCornerSaleNews" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel">
+		/*insertYearCornerSaleNews*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteYearCornerSaleNews" parameterType="com.saydept.api.spf.saleNews.yearCornerSaleNews.model.YearCornerSaleNewsModel">
+		/*deleteYearCornerSaleNews*/
+		DELETE ...
+	</delete>
+
+</mapper>

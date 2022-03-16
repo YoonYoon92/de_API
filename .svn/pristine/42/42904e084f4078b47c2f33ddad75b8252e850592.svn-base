@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+        <!-- changes from the defaults for testing -->
+        <setting name="cacheEnabled" value="false" />
+        <setting name="useGeneratedKeys" value="false" />
+        <setting name="callSettersOnNulls" value="true"/>
+        <setting name="defaultExecutorType" value="REUSE" />
+    </settings>
+    
+    <typeAliases>
+    	<typeAlias alias="dashboardModel" type="com.saydept.api.dashboard.model.DashboardModel"/>
+    	
+    	<!-- 공통코드 -->
+    	<typeAlias alias="commModel" type="com.saydept.api.comm.model.CommModel"/>	
+    	
+    	<!-- 프로그램 -->
+    	<typeAlias alias="progModel" type="com.saydept.api.comm.model.ProgModel"/>	
+    	
+    	<!-- 조직 -->
+    	<typeAlias alias="storeModel" type="com.saydept.api.comm.model.StoreModel"/>	
+    	
+    	
+    	<typeAlias alias="corpSaleNewsModel" type="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsModel"/>
+    	<typeAlias alias="corpSaleNewsParamModel" type="com.saydept.api.spf.saleNews.corpSaleNews.model.CorpSaleNewsParamModel"/>
+    	
+    </typeAliases>
+</configuration>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.goods.regiMasterSendInq.RegiMasterSendInqMapper">
+
+	<select id="getRegiMasterSendInqlist"
+		parameterType="com.saydept.api.spf.goods.regiMasterSendInq.model.RegiMasterSendInqParamModel"
+		resultType="com.saydept.api.spf.goods.regiMasterSendInq.model.RegiMasterSendInqModel" fetchSize="1000">
+
+			 SELECT
+			 MS2503 regiNo
+			,CASE WHEN A.MS0510 != '' THEN TRIM(A.MS0510) ELSE TRIM(replace(PD1806,'　','')) END regiNm
+			,MS2506 AS code0
+			,CASE WHEN TRIM(MS2504) = '' THEN '' ELSE SUBSTR(MS2504,1,4)||'/'||SUBSTR(MS2504,5,2)||'/'||SUBSTR(MS2504,7,2)||' '||SUBSTR(MS2505,1,2)||':'||SUBSTR(MS2505,3,2) END AS date0
+			--,MS2509 AS code1
+			--,MS2507 AS date1
+			--,MS2508 AS TIME1
+			,MS2509 AS code2
+			,CASE WHEN TRIM(MS2507) = '' THEN '' ELSE SUBSTR(MS2507,1,4)||'/'||SUBSTR(MS2507,5,2)||'/'||SUBSTR(MS2507,7,2)||' '||SUBSTR(MS2508,1,2)||':'||SUBSTR(MS2508,3,2) END AS date2
+			,CASE WHEN TRIM(MS2512) = '' THEN '' ELSE SUBSTR(MS2512,1,5)||'-'||SUBSTR(MS2512,5,2) END AS code3
+			,CASE WHEN TRIM(MS2510) = '' THEN '' ELSE SUBSTR(MS2510,1,4)||'/'||SUBSTR(MS2510,5,2)||'/'||SUBSTR(MS2510,7,2)||' '||SUBSTR(MS2511,1,2)||':'||SUBSTR(MS2511,3,2) END AS date3
+			,MS2515 AS code4
+			,CASE WHEN TRIM(MS2513) = '' THEN '' ELSE SUBSTR(MS2513,1,4)||'/'||SUBSTR(MS2513,5,2)||'/'||SUBSTR(MS2513,7,2)||' '||SUBSTR(MS2514,1,2)||':'||SUBSTR(MS2514,3,2) END AS date4
+			,MS2518 AS code5
+			,CASE WHEN TRIM(MS2516) = '' THEN '' ELSE SUBSTR(MS2516,1,4)||'/'||SUBSTR(MS2516,5,2)||'/'||SUBSTR(MS2516,7,2)||' '||SUBSTR(MS2517,1,2)||':'||SUBSTR(MS2517,3,2) END AS date5
+			,MS2521 AS code6
+			,CASE WHEN TRIM(MS2519) = '' THEN '' ELSE SUBSTR(MS2519,1,4)||'/'||SUBSTR(MS2519,5,2)||'/'||SUBSTR(MS2519,7,2)||' '||SUBSTR(MS2520,1,2)||':'||SUBSTR(MS2520,3,2) END AS date6
+			,MS2524 AS code7
+			,CASE WHEN TRIM(MS2522) = '' THEN '' ELSE SUBSTR(MS2522,1,4)||'/'||SUBSTR(MS2522,5,2)||'/'||SUBSTR(MS2522,7,2)||' '||SUBSTR(MS2523,1,2)||':'||SUBSTR(MS2523,3,2) END AS date7
+			,MS2527 AS code8
+			,CASE WHEN TRIM(MS2525) = '' THEN '' ELSE SUBSTR(MS2525,1,4)||'/'||SUBSTR(MS2525,5,2)||'/'||SUBSTR(MS2525,7,2)||' '||SUBSTR(MS2526,1,2)||':'||SUBSTR(MS2526,3,2) END AS date8
+			,MS2530 AS code9
+			,CASE WHEN TRIM(MS2528) = '' THEN '' ELSE SUBSTR(MS2528,1,4)||'/'||SUBSTR(MS2528,5,2)||'/'||SUBSTR(MS2528,7,2)||' '||SUBSTR(MS2529,1,2)||':'||SUBSTR(MS2529,3,2) END AS date9
+			FROM ${dbType}SPFRDB.SPFM25PF
+				LEFT OUTER JOIN SPORDB.SPOM18PF
+		        ON PD1801 = '01' AND PD1802 = MS2503
+		        LEFT OUTER JOIN SPORDB.SPOM11LF2
+		        ON PD1115 = '01' AND PD1104 = MS2503 AND PD1107 = '' AND PD1110 ='O'
+		        LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF A
+        		ON A.MS0501 = '01' AND A.MS0505 = PD1105
+	<where>
+         <choose>
+			<when test="regiNo != ''">
+				MS2501 = #{jum}
+					AND #{regiNo} = MS2503
+					AND LENGTH(TRIM(MS2503)) = 4
+					AND TRIM(MS2503) != ''
+            </when>
+            <when test="bu != ''">
+				MS2501 = #{jum}
+					AND SUBSTR(#{bu},3,2) = MS2502
+					AND LENGTH(TRIM(MS2503)) = 4
+					AND TRIM(MS2503) != ''
+            </when>
+            <otherwise>
+				MS2501 = #{jum}
+					AND LENGTH(TRIM(MS2503)) = 4
+					AND TRIM(MS2503) != ''
+					AND TRIM(MS2503) &gt;= '4000'
+            </otherwise>
+         </choose>
+      </where>
+      
+                ORDER BY MS2504 DESC, MS2507 DESC, MS2513 DESC, MS2516 DESC, MS2519 DESC, MS2522 DESC, MS2525 DESC, MS2528 DESC
+	</select>
+	
+	<select id="getRegiMasterSendInqSearchList"
+		parameterType="com.saydept.api.spf.goods.regiMasterSendInq.model.RegiMasterSendInqSearchModel"
+		resultType="com.saydept.api.spf.goods.regiMasterSendInq.model.RegiMasterSendInqSearchModel" fetchSize="1000">
+
+		SELECT  
+				 MS2503 regiNo
+		        ,MS2503 regiNm
+		        ,1 rcptNo
+		
+		FROM ${dbType}SPFRDB.SPFM25PF
+		WHERE MS2501 = ${jum}
+		AND MS2502 = SUBSTR(${bu},3,2) 
+		AND LENGTH(TRIM(MS2503)) = 4
+		
+		
+	</select>
+
+</mapper>
+
+

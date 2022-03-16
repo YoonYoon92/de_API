@@ -1,0 +1,32 @@
+package com.saydept.api.comm;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.saydept.api.comm.model.CommModel;
+
+	@Service
+	public class CommService {
+
+	@Autowired
+	private CommMapper commMapper;
+
+	//공통코드 조회
+	public List<CommModel> selectCommCodeList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommCodeList(request);
+	}
+
+	//매장목록 조회
+	public List<CommModel> selectCommStoreList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommStoreList(request);
+	}
+
+	//POS목록 조화
+	public List<CommModel> selectCommPosList(CommModel request) {
+		// TODO Auto-generated method stub
+		return commMapper.selectCommPosList(request);
+	}
+
+}

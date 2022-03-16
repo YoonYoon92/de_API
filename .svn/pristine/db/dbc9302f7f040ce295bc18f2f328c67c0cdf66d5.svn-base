@@ -1,0 +1,102 @@
+package com.saydept.api.spf.saleNews.clsSaleNews;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsModel;
+import com.saydept.api.spf.saleNews.clsSaleNews.model.ClsSaleNewsParamModel;
+import com.saydept.utils.SayUtils;
+
+@Service
+public class ClsSaleNewsService {
+
+	@Autowired
+	private ClsSaleNewsMapper clsSaleNewsMapper;
+	
+	@Autowired
+	private SayUtils sayUtils;
+
+	public List<ClsSaleNewsModel> clsSaleNewsList(ClsSaleNewsParamModel request) throws ParseException {
+		// TODO Auto-generated method stub
+		
+		List<ClsSaleNewsModel> resultList = new ArrayList<ClsSaleNewsModel>();
+
+		String beforeDay = sayUtils.getCusomDay(request.getSearchDay(), -1 );
+		String beforeYear = sayUtils.getCusomYear(request.getSearchDay(), -1 );
+		System.out.println("before jum");
+		if( request.getSerchLevel().equals("jum") ) {	//등급이 점일때
+			System.out.println("if jum");
+			/**
+			 * 1. 해당 부 리스트 조회
+			 */
+			List<ClsSaleNewsModel> buList = clsSaleNewsMapper.getBulistCls(request);
+			for( ClsSaleNewsModel data :  buList) {
+				ClsSaleNewsModel model = new ClsSaleNewsModel();
+				model.setBu( data.getBu() );
+				model.setBuNm( data.getBuNm() );
+				model.setCls( data.getCls() );
+				model.setClsNm( data.getClsNm() );
+				model.setDdTotsale( data.getDdTotsale() );
+				model.setDdDsicount( data.getDdDsicount() );
+				model.setDdNetsale( data.getDdNetsale() );
+				model.setMmNetsale( data.getMmNetsale() );
+				model.setYyNetsale( data.getYyNetsale() );
+				
+				resultList.add( model );
+				//resultList.add( data );
+			}
+			System.out.println("bu list end");
+
+			/**
+			 * 리스트 일 총매출
+			 */
+			for( ClsSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				ClsSaleNewsModel ddTotsale =  clsSaleNewsMapper.getddTotsaleCls(request);
+				//data.setddTotsale( ddTotsale == null ? 0 : ddTotsale.getddTotsale() );
+				}
+			System.out.println("dd totsale end");
+			/**
+			 * 리스트 일 할인
+			 */
+			for( ClsSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				ClsSaleNewsModel ddDsicount =  clsSaleNewsMapper.getddTotsaleCls(request);
+				//data.setddDsicount( ddDsicount == null ? 0 : ddDsicount.getddDsicount() );
+				}
+			System.out.println("dd discount end");
+			/**
+			 * 리스트 일 순매출
+			 */
+			for( ClsSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				ClsSaleNewsModel ddNetsale =  clsSaleNewsMapper.getddTotsaleCls(request);
+				//data.setDayTry( getddNetsale == null ? 0 : getddNetsale.getDayTry() );
+				}
+			System.out.println("dd netsale end");
+			/**
+			 * 리스트 월 순매출
+			 */
+			for( ClsSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				ClsSaleNewsModel mmNetsale =  clsSaleNewsMapper.getddTotsaleCls(request);
+				//data.setDayTry( mmNetsale == null ? 0 : mmNetsale.getDayTry() );
+				}
+			/**
+			 * 리스트 년 순매출
+			 */
+			for( ClsSaleNewsModel data: resultList ) {
+				request.setBu( data.getBu() );
+				ClsSaleNewsModel yyNetsale =  clsSaleNewsMapper.getddTotsaleCls(request);
+				//data.setDayTry( yyNetsale == null ? 0 : yyNetsale.getDayTry() );
+				}
+			
+		}
+		
+		return resultList;
+	}
+}

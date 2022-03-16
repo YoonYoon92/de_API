@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.saydept.api.spf.selng.receiptInfoInq.ReceiptInfoInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="receiptInfoInqModel" type="com.saydept.api.tasks.receiptInfoInq.model.ReceiptInfoInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+
+	<select id="selectReceiptInfoInq" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel">
+		
+		SELECT  P01DATA1               as data1
+		        ,P01DATA2               as data2
+		        ,P01DATA3               as data3
+		        ,P01DATA4               as data4
+		        ,P01DATA5               as data5
+		        ,P01DATA6               as data6
+		        ,P01DATA7               as data7
+		        ,P01DATA8               as data8
+		        ,P01DATA9               as data9
+		FROM SPOTNRDB.SPOPF01
+		WHERE P01HSYY=substr(#{startDt},1,4) AND P01HSMM=substr(#{startDt},5,2) AND P01HSDD=substr(#{startDt},7,2) 
+				AND P01HSCD='01' AND P01HRNO=#{posNum} AND P01HTNO=#{receiptNum} AND P01HSEQ=1
+	</select>
+	<select id="searchVan" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel"  >
+		SELECT NVL(trim(P15VAN),'') van
+		 FROM SPOTNRDB.SPOPF15LF2 
+		WHERE P15JUM='01' AND P15APPNO =#{appNo} AND P15DATE=#{startDt} AND P15TCDNO =#{cardNo}
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectReceiptInfoInqList" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" fetchSize="1000">
+		/*selectReceiptInfoInqList*/
+		SELECT 	P01HSYY||P01HSMM||P01HSDD 	as  dt
+	        	,P01HTHH||P01HTMM||P01HTSS 	as time
+	        	,P01HRNO                as pos
+	        	,P01HTNO                as receipt
+	        	,P01HSEQ                as serialNum
+	        	,P01HOPN                as cashier
+	        	,P01HSGU                as saleDiv
+		        ,CASE WHEN P01HSG1='1' THEN '현금'  
+					  WHEN P01HSG1='2' THEN '카드'
+					  WHEN P01HSG1='3' THEN '카드'
+					  WHEN P01HSG1='4' THEN '외상'
+					  WHEN P01HSG1='5' THEN '특판'
+					  WHEN P01HSG1='6' THEN '직불카드'
+					  WHEN P01HSG1='7' THEN 'COD'
+					  WHEN P01HSG1='8' THEN '자사상품권'
+					  WHEN P01HSG1='9' THEN '타사상품권'
+					  WHEN P01HSG1='A' THEN '자상환불'
+					  WHEN P01HSG1='B' THEN '선수현금'
+					  WHEN P01HSG1='C' THEN '선수카드'
+					  WHEN P01HSG1='D' THEN '선수상품'
+					  WHEN P01HSG1='E' THEN '장바구니'
+					  WHEN P01HSG1='F' THEN '제휴상품권'
+					  WHEN P01HSG1='G' THEN '사용매출'
+					  WHEN P01HSG1='H' THEN '포인트결제'
+					  WHEN P01HSG1='J' THEN '현대상품권'
+					  WHEN P01HSG1='K' THEN 'SK상품권'
+					  WHEN P01HSG1='L' THEN 'LG상품권'
+					  WHEN P01HSG1='I' THEN '제휴환불'
+					  WHEN P01HSG1='M' THEN '통판'
+					  WHEN P01HSG1='N' THEN '갤럭시아'
+					  WHEN P01HSG1='O' THEN '포인트환불'
+					  WHEN P01HSG1='P' THEN '포인트반품'
+					  WHEN P01HSG1=''  THEN ''
+					  ELSE '기타' END AS payDiv1 
+					  
+					  ,P01HSM1 as payPrice1
+					  
+				,CASE WHEN P01HSG2='1' THEN '현금'  
+					  WHEN P01HSG2='2' THEN '카드'
+					  WHEN P01HSG2='3' THEN '카드'
+					  WHEN P01HSG2='4' THEN '외상'
+					  WHEN P01HSG2='5' THEN '특판'
+					  WHEN P01HSG2='6' THEN '직불카드'
+					  WHEN P01HSG2='7' THEN 'COD'
+					  WHEN P01HSG2='8' THEN '자사상품권'
+					  WHEN P01HSG2='9' THEN '타사상품권'
+					  WHEN P01HSG2='A' THEN '자상환불'
+					  WHEN P01HSG2='B' THEN '선수현금'
+					  WHEN P01HSG2='C' THEN '선수카드'
+					  WHEN P01HSG2='D' THEN '선수상품'
+					  WHEN P01HSG2='E' THEN '장바구니'
+					  WHEN P01HSG2='F' THEN '제휴상품권'
+					  WHEN P01HSG2='G' THEN '사용매출'
+					  WHEN P01HSG2='H' THEN '포인트결제'
+					  WHEN P01HSG2='J' THEN '현대상품권'
+					  WHEN P01HSG2='K' THEN 'SK상품권'
+					  WHEN P01HSG2='L' THEN 'LG상품권'
+					  WHEN P01HSG2='I' THEN '제휴환불'
+					  WHEN P01HSG2='M' THEN '통판'
+					  WHEN P01HSG2='N' THEN '포인트상품권'
+					  WHEN P01HSG2='O' THEN '포인트환불'
+					  WHEN P01HSG2='P' THEN '포인트반품'
+					  WHEN P01HSG2=''  THEN ''
+					  ELSE '기타' END AS payDiv2
+					  
+					  ,P01HSM2 as payPrice2
+					  
+				,CASE WHEN P01HSG3='1' THEN '현금'  
+					  WHEN P01HSG3='2' THEN '카드'
+					  WHEN P01HSG3='3' THEN '카드'
+					  WHEN P01HSG3='4' THEN '외상'
+					  WHEN P01HSG3='5' THEN '특판'
+					  WHEN P01HSG3='6' THEN '직불카드'
+					  WHEN P01HSG3='7' THEN 'COD'
+					  WHEN P01HSG3='8' THEN '자사상품권'
+					  WHEN P01HSG3='9' THEN '타사상품권'
+					  WHEN P01HSG3='A' THEN '자상환불'
+					  WHEN P01HSG3='B' THEN '선수현금'
+					  WHEN P01HSG3='C' THEN '선수카드'
+					  WHEN P01HSG3='D' THEN '선수상품'
+					  WHEN P01HSG3='E' THEN '장바구니'
+					  WHEN P01HSG3='F' THEN '제휴상품권'
+					  WHEN P01HSG3='G' THEN '사용매출'
+					  WHEN P01HSG3='H' THEN '포인트결제'
+					  WHEN P01HSG3='J' THEN '현대상품권'
+					  WHEN P01HSG3='K' THEN 'SK상품권'
+					  WHEN P01HSG3='L' THEN 'LG상품권'
+					  WHEN P01HSG3='I' THEN '제휴환불'
+					  WHEN P01HSG3='M' THEN '통판'
+					  WHEN P01HSG3='N' THEN '포인트상품권'
+					  WHEN P01HSG3='O' THEN '포인트환불'
+					  WHEN P01HSG3='P' THEN '포인트반품'
+					  WHEN P01HSG3=''  THEN ''
+					  ELSE '기타' END AS payDiv3
+					  
+					  ,P01HSM3 as payPrice3
+					  
+				,CASE WHEN P01HSG4='1' THEN '현금'  
+					  WHEN P01HSG4='2' THEN '카드'
+					  WHEN P01HSG4='3' THEN '카드'
+					  WHEN P01HSG4='4' THEN '외상'
+					  WHEN P01HSG4='5' THEN '특판'
+					  WHEN P01HSG4='6' THEN '직불카드'
+					  WHEN P01HSG4='7' THEN 'COD'
+					  WHEN P01HSG4='8' THEN '자사상품권'
+					  WHEN P01HSG4='9' THEN '타사상품권'
+					  WHEN P01HSG4='A' THEN '자상환불'
+					  WHEN P01HSG4='B' THEN '선수현금'
+					  WHEN P01HSG4='C' THEN '선수카드'
+					  WHEN P01HSG4='D' THEN '선수상품'
+					  WHEN P01HSG4='E' THEN '장바구니'
+					  WHEN P01HSG4='F' THEN '제휴상품권'
+					  WHEN P01HSG4='G' THEN '사용매출'
+					  WHEN P01HSG4='H' THEN '포인트결제'
+					  WHEN P01HSG4='J' THEN '현대상품권'
+					  WHEN P01HSG4='K' THEN 'SK상품권'
+					  WHEN P01HSG4='L' THEN 'LG상품권'
+					  WHEN P01HSG4='I' THEN '제휴환불'
+					  WHEN P01HSG4='M' THEN '통판'
+					  WHEN P01HSG4='N' THEN '포인트상품권'
+					  WHEN P01HSG4='O' THEN '포인트환불'
+					  WHEN P01HSG4='P' THEN '포인트반품'
+					  WHEN P01HSG4=''  THEN ''
+					  ELSE '기타' END AS payDiv4
+					  
+					  ,P01HSM4 as payPrice4
+					  
+				,CASE WHEN P01HSG5='1' THEN '현금'  
+					  WHEN P01HSG5='2' THEN '카드'
+					  WHEN P01HSG5='3' THEN '카드'
+					  WHEN P01HSG5='4' THEN '외상'
+					  WHEN P01HSG5='5' THEN '특판'
+					  WHEN P01HSG5='6' THEN '직불카드'
+					  WHEN P01HSG5='7' THEN 'COD'
+					  WHEN P01HSG5='8' THEN '자사상품권'
+					  WHEN P01HSG5='9' THEN '타사상품권'
+					  WHEN P01HSG5='A' THEN '자상환불'
+					  WHEN P01HSG5='B' THEN '선수현금'
+					  WHEN P01HSG5='C' THEN '선수카드'
+					  WHEN P01HSG5='D' THEN '선수상품'
+					  WHEN P01HSG5='E' THEN '장바구니'
+					  WHEN P01HSG5='F' THEN '제휴상품권'
+					  WHEN P01HSG5='G' THEN '사용매출'
+					  WHEN P01HSG5='H' THEN '포인트결제'
+					  WHEN P01HSG5='J' THEN '현대상품권'
+					  WHEN P01HSG5='K' THEN 'SK상품권'
+					  WHEN P01HSG5='L' THEN 'LG상품권'
+					  WHEN P01HSG5='I' THEN '제휴환불'
+					  WHEN P01HSG5='M' THEN '통판'
+					  WHEN P01HSG5='N' THEN '포인트상품권'
+					  WHEN P01HSG5='O' THEN '포인트환불'
+					  WHEN P01HSG5='P' THEN '포인트반품'
+					  WHEN P01HSG5=''  THEN ''
+					  ELSE '기타' END AS payDiv5 
+			  
+			  		,P01HSM5 as payPrice5
+			  	,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM1 THEN SUBSTR(P01DATA1,7,17)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM1 THEN SUBSTR(P01DATA2,7,17)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM1 THEN SUBSTR(P01DATA3,7,17)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM1 THEN SUBSTR(P01DATA4,7,17)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM1 THEN SUBSTR(P01DATA5,7,17)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM1 THEN SUBSTR(P01DATA6,7,17)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM1 THEN SUBSTR(P01DATA7,7,17)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM1 THEN SUBSTR(P01DATA8,7,17)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM1 THEN SUBSTR(P01DATA9,7,17)
+
+			       WHEN SUBSTR(P01DATA1,1,1)='X'  THEN SUBSTR(P01DATA1,6,16)
+			       WHEN SUBSTR(P01DATA2,1,1)='X'  THEN SUBSTR(P01DATA2,6,16)
+			       WHEN SUBSTR(P01DATA3,1,1)='X'  THEN SUBSTR(P01DATA3,6,16)
+			       WHEN SUBSTR(P01DATA4,1,1)='X'  THEN SUBSTR(P01DATA4,6,16)
+			       WHEN SUBSTR(P01DATA5,1,1)='X'  THEN SUBSTR(P01DATA5,6,16)
+			       WHEN SUBSTR(P01DATA6,1,1)='X'  THEN SUBSTR(P01DATA6,6,16)
+			     
+			       ELSE '' END cardNo1
+			 
+			   ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM2 THEN SUBSTR(P01DATA1,7,17)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM2 THEN SUBSTR(P01DATA2,7,17)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM2 THEN SUBSTR(P01DATA3,7,17)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM2 THEN SUBSTR(P01DATA4,7,17)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM2 THEN SUBSTR(P01DATA5,7,17)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM2 THEN SUBSTR(P01DATA6,7,17)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM2 THEN SUBSTR(P01DATA7,7,17)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM2 THEN SUBSTR(P01DATA8,7,17)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM2 THEN SUBSTR(P01DATA9,7,17)
+			       ELSE '' END cardNo2
+			     ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM3 THEN SUBSTR(P01DATA1,7,17)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM3 THEN SUBSTR(P01DATA2,7,17)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM3 THEN SUBSTR(P01DATA3,7,17)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM3 THEN SUBSTR(P01DATA4,7,17)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM3 THEN SUBSTR(P01DATA5,7,17)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM3 THEN SUBSTR(P01DATA6,7,17)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM3 THEN SUBSTR(P01DATA7,7,17)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM3 THEN SUBSTR(P01DATA8,7,17)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM3 THEN SUBSTR(P01DATA9,7,17)
+			       ELSE '' END cardNo3
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM4 THEN SUBSTR(P01DATA1,7,17)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM4 THEN SUBSTR(P01DATA2,7,17)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM4 THEN SUBSTR(P01DATA3,7,17)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM4 THEN SUBSTR(P01DATA4,7,17)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM4 THEN SUBSTR(P01DATA5,7,17)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM4 THEN SUBSTR(P01DATA6,7,17)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM4 THEN SUBSTR(P01DATA7,7,17)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM4 THEN SUBSTR(P01DATA8,7,17)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM4 THEN SUBSTR(P01DATA9,7,17)
+			       ELSE '' END cardNo4
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM5 THEN SUBSTR(P01DATA1,7,17)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM5 THEN SUBSTR(P01DATA2,7,17)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM5 THEN SUBSTR(P01DATA3,7,17)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM5 THEN SUBSTR(P01DATA4,7,17)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM5 THEN SUBSTR(P01DATA5,7,17)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM5 THEN SUBSTR(P01DATA6,7,17)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM5 THEN SUBSTR(P01DATA7,7,17)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM5 THEN SUBSTR(P01DATA8,7,17)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM5 THEN SUBSTR(P01DATA9,7,17)
+			       ELSE '' END cardNo5
+			   ,    
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM1 THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM1 THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM1 THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM1 THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM1 THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM1 THEN SUBSTR(P01DATA6,2,4)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM1 THEN SUBSTR(P01DATA7,2,4)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM1 THEN SUBSTR(P01DATA8,2,4)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM1 THEN SUBSTR(P01DATA9,2,4)
+
+			       WHEN SUBSTR(P01DATA1,1,1)='X'   THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='X'   THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='X'   THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='X'   THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='X'   THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='X'   THEN SUBSTR(P01DATA6,2,4)
+			
+			       ELSE '' END chit1
+			 
+			   ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM2 THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM2 THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM2 THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM2 THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM2 THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM2 THEN SUBSTR(P01DATA6,2,4)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM2 THEN SUBSTR(P01DATA7,2,4)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM2 THEN SUBSTR(P01DATA8,2,4)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM2 THEN SUBSTR(P01DATA9,2,4)
+			       ELSE '' END chit2
+			     ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM3 THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM3 THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM3 THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM3 THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM3 THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM3 THEN SUBSTR(P01DATA6,2,4)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM3 THEN SUBSTR(P01DATA7,2,4)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM3 THEN SUBSTR(P01DATA8,2,4)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM3 THEN SUBSTR(P01DATA9,2,4)
+			       ELSE '' END chit3
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM4 THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM4 THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM4 THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM4 THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM4 THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM4 THEN SUBSTR(P01DATA6,2,4)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM4 THEN SUBSTR(P01DATA7,2,4)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM4 THEN SUBSTR(P01DATA8,2,4)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM4 THEN SUBSTR(P01DATA9,2,4)
+			       ELSE '' END chit4
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM5 THEN SUBSTR(P01DATA1,2,4)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM5 THEN SUBSTR(P01DATA2,2,4)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM5 THEN SUBSTR(P01DATA3,2,4)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM5 THEN SUBSTR(P01DATA4,2,4)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM5 THEN SUBSTR(P01DATA5,2,4)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM5 THEN SUBSTR(P01DATA6,2,4)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM5 THEN SUBSTR(P01DATA7,2,4)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM5 THEN SUBSTR(P01DATA8,2,4)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM5 THEN SUBSTR(P01DATA9,2,4)
+			       ELSE '' END chit5
+			       
+			, CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM1 THEN SUBSTR(P01DATA1,55,8)
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM1 THEN SUBSTR(P01DATA2,55,8)
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM1 THEN SUBSTR(P01DATA3,55,8)
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM1 THEN SUBSTR(P01DATA4,55,8)
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM1 THEN SUBSTR(P01DATA5,55,8)
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM1 THEN SUBSTR(P01DATA6,55,8)
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM1 THEN SUBSTR(P01DATA7,55,8)
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM1 THEN SUBSTR(P01DATA8,55,8)
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM1 THEN SUBSTR(P01DATA9,55,8)
+			       
+		
+			       WHEN SUBSTR(P01DATA1,1,1)='X'   THEN SUBSTR(P01DATA1,30,30)
+			       WHEN SUBSTR(P01DATA2,1,1)='X'   THEN SUBSTR(P01DATA2,30,30)
+			       WHEN SUBSTR(P01DATA3,1,1)='X'   THEN SUBSTR(P01DATA3,30,30)
+			       WHEN SUBSTR(P01DATA4,1,1)='X'   THEN SUBSTR(P01DATA4,30,30)
+			       WHEN SUBSTR(P01DATA5,1,1)='X'   THEN SUBSTR(P01DATA5,30,30)
+			       WHEN SUBSTR(P01DATA6,1,1)='X'   THEN SUBSTR(P01DATA6,30,30)
+			   
+			       ELSE '' END appNo1
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM2 THEN SUBSTR(P01DATA1,55,8) 
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM2 THEN SUBSTR(P01DATA2,55,8) 
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM2 THEN SUBSTR(P01DATA3,55,8) 
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM2 THEN SUBSTR(P01DATA4,55,8) 
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM2 THEN SUBSTR(P01DATA5,55,8) 
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM2 THEN SUBSTR(P01DATA6,55,8) 
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM2 THEN SUBSTR(P01DATA7,55,8) 
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM2 THEN SUBSTR(P01DATA8,55,8) 
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM2 THEN SUBSTR(P01DATA9,55,8) 
+			       ELSE '' END appNo2
+			     ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM3 THEN SUBSTR(P01DATA1,55,8) 
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM3 THEN SUBSTR(P01DATA2,55,8) 
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM3 THEN SUBSTR(P01DATA3,55,8) 
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM3 THEN SUBSTR(P01DATA4,55,8) 
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM3 THEN SUBSTR(P01DATA5,55,8) 
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM3 THEN SUBSTR(P01DATA6,55,8) 
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM3 THEN SUBSTR(P01DATA7,55,8) 
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM3 THEN SUBSTR(P01DATA8,55,8) 
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM3 THEN SUBSTR(P01DATA9,55,8) 
+			       ELSE '' END appNo3
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM4 THEN SUBSTR(P01DATA1,55,8) 
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM4 THEN SUBSTR(P01DATA2,55,8) 
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM4 THEN SUBSTR(P01DATA3,55,8) 
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM4 THEN SUBSTR(P01DATA4,55,8) 
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM4 THEN SUBSTR(P01DATA5,55,8) 
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM4 THEN SUBSTR(P01DATA6,55,8) 
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM4 THEN SUBSTR(P01DATA7,55,8) 
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM4 THEN SUBSTR(P01DATA8,55,8) 
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM4 THEN SUBSTR(P01DATA9,55,8) 
+			       ELSE '' END appNo4
+			        ,
+			  CASE WHEN SUBSTR(P01DATA1,1,1)='3'  AND SUBSTR(P01DATA1,65,9)=P01HSM5 THEN SUBSTR(P01DATA1,55,8) 
+			       WHEN SUBSTR(P01DATA2,1,1)='3'  AND SUBSTR(P01DATA2,65,9)=P01HSM5 THEN SUBSTR(P01DATA2,55,8) 
+			       WHEN SUBSTR(P01DATA3,1,1)='3'  AND SUBSTR(P01DATA3,65,9)=P01HSM5 THEN SUBSTR(P01DATA3,55,8) 
+			       WHEN SUBSTR(P01DATA4,1,1)='3'  AND SUBSTR(P01DATA4,65,9)=P01HSM5 THEN SUBSTR(P01DATA4,55,8) 
+			       WHEN SUBSTR(P01DATA5,1,1)='3'  AND SUBSTR(P01DATA5,65,9)=P01HSM5 THEN SUBSTR(P01DATA5,55,8) 
+			       WHEN SUBSTR(P01DATA6,1,1)='3'  AND SUBSTR(P01DATA6,65,9)=P01HSM5 THEN SUBSTR(P01DATA6,55,8) 
+			       WHEN SUBSTR(P01DATA7,1,1)='3'  AND SUBSTR(P01DATA7,65,9)=P01HSM5 THEN SUBSTR(P01DATA7,55,8) 
+			       WHEN SUBSTR(P01DATA8,1,1)='3'  AND SUBSTR(P01DATA8,65,9)=P01HSM5 THEN SUBSTR(P01DATA8,55,8) 
+			       WHEN SUBSTR(P01DATA9,1,1)='3'  AND SUBSTR(P01DATA9,65,9)=P01HSM5 THEN SUBSTR(P01DATA9,55,8) 
+			       ELSE '' END appNo5
+			       
+		        ,P01HEGM                as disCount
+		        ,P01DATA1               as data1
+		        ,P01DATA2               as data2
+		        ,P01DATA3               as data3
+		        ,P01DATA4               as data4
+		        ,P01DATA5               as data5
+		        ,P01DATA6               as data6
+		        ,P01DATA7               as data7
+		        ,P01DATA8               as data8
+		        ,P01DATA9               as data9
+
+		FROM SPOTNRDB.SPOPF01
+		WHERE P01HSYY=substr(#{startDt},1,4) AND P01HSMM=substr(#{startDt},5,2) AND P01HSDD=substr(#{startDt},7,2) 
+				AND P01HSCD='01' AND P01HRNO=#{posNum} AND P01HTNO=#{receiptNum} AND P01HSEQ=1
+	</select>
+	<select id="selectReceiptInfoInqList2" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqTrModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" fetchSize="1000">
+	
+		        SELECT  P01HWCC  
+				,       P01HSYY  
+				,       P01HSMM  
+				,       P01HSDD  
+				,       P01HTHH  
+				,       P01HTMM  
+				,       P01HTSS  
+				,       P01HSCD  
+				,       P01HRNO  
+				,       P01HTNO  
+				,       P01HSEQ  
+				,       P01HOPN  
+				,       P01HICN  
+				,       P01HJCN  
+				,       P01HSGU  
+				,       P01HSG1  
+				,       P01HSM1  
+				,       P01HSG2  
+				,       P01HSM2  
+				,       P01HSG3  
+				,       P01HSM3  
+				,       P01HSG4  
+				,       P01HSM4  
+				,       P01HSG5  
+				,       P01HSM5  
+				,       P01HEGM  
+				,       P01CODG  
+				,       P01CODN  
+				,       P01DATA1 
+				,       P01DATA2 
+				,       P01DATA3 
+				,       P01DATA4 
+				,       P01DATA5 
+				,       P01DATA6 
+				,       P01DATA7 
+				,       P01DATA8 
+				,       P01DATA9 
+				,       P01RDATE 
+				,       P01RTIME     
+				FROM SPOTNRDB.SPOPF01
+		
+		WHERE P01HSYY=substr(#{startDt},1,4) AND P01HSMM=substr(#{startDt},5,2) AND P01HSDD=substr(#{startDt},7,2) 
+				AND P01HSCD='01' AND P01HRNO=#{posNum} AND P01HTNO=#{receiptNum}
+	</select>
+	
+	<select id="selectReceiptInfoInqList4" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" fetchSize="1000">
+		SELECT 	
+		        P01DATA1                 AS data1
+		        ,P01DATA2                AS data2
+		        ,P01DATA3                AS data3
+		        ,P01DATA4                AS data4
+		        ,P01DATA5                AS data5
+		        ,P01DATA6                AS data6
+		        ,P01DATA7                AS data7
+		        ,P01DATA8                AS data8
+		        ,P01DATA9                AS data9
+
+		FROM SPOTNRDB.SPOPF01
+		WHERE P01HSYY=substr(#{startDt},1,4) AND P01HSMM=substr(#{startDt},5,2) AND P01HSDD=substr(#{startDt},7,2) 
+				AND P01HSCD='01' AND P01HRNO=#{posNum} AND P01HTNO=#{receiptNum}
+	</select>
+	
+	<select id="findCls" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+		SELECT 
+				Trim(MS0604)	as clsNm
+		FROM SPFRDB.SPFM06PF
+		WHERE MS0601='01' and ms0602=substr(#{cls},1,5) and ms0603=substr(#{cls},6,2)
+	</select>
+	<select id="findItem" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+		SELECT 
+				Trim(MS0702)	as clsNm
+		FROM SPFRDB.SPFM07PF
+		WHERE MS0701='01' and ms0702=substr(#{posNum},1,2) and ms0703=#{item}
+	</select>
+	
+	<select id="findPoint" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+			SELECT  P02WHEGU||'-'||P02SEQNO||'-'||P02CHECK	 as pointNum
+				,FLOOR((P02CARDP+P02CASHP)*100) AS totPoint
+				,P02IIL as afterChk
+				
+			FROM SCDRDB.SCDP02PF
+			WHERE P02MAEJUM='01' AND P02MAEY1=substr(#{startDt},1,2) AND P02MAEY2=substr(#{startDt},3,2) 
+				AND P02MAEM=substr(#{startDt},5,2) AND P02MAED=substr(#{startDt},7,2) 
+				AND P02MAEGU='2' AND P02REGINO=#{posNum} AND P02SLPNO=#{receiptNum} AND P02SLPSEQ=1
+
+	</select>
+	<select id="findPointafter" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+			SELECT 
+				case when P02USABUN!='888888' and P02IIL!='' then  P02WHEGU||'-'||P02SEQNO||'-'||P02CHECK||'(사후적립:'||P02IIL||')'
+					when P02USABUN='888888' and P02IIL!='' then  P02WHEGU||'-'||P02SEQNO||'-'||P02CHECK||'(세션적립:'||P02IIL||')'
+					else '' end as pointNum
+				,FLOOR((P02CARDP+P02CASHP)*100) AS totPoint
+				,P02IIL as afterChk
+				
+		FROM SCDRDB.SCDP02PF
+		WHERE P02MAEJUM='01' AND P02MAEY1=substr(#{startDt},1,2) AND P02MAEY2=substr(#{startDt},3,2) 
+			AND P02MAEM=substr(#{startDt},5,2) AND P02MAED=substr(#{startDt},7,2) 
+			AND P02MAEGU='2' AND P02REGINO=#{posNum} AND P02SLPNO=#{receiptNum} AND P02SLPSEQ=1
+
+	</select>
+	
+	<select id="findCoupon" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+				 SELECT C52COUPON	as 	couponCd
+	 					,trim(C51CGBNNM)	as	couponNm
+	 					,round((ABS(C52HALIN)/(ABS(C52HALIN)+ABS(C52SUNMAE)))*100,1) as couponDiscount
+			
+			 	FROM SCDRDB.SCDC52LF1 
+			 	LEFT OUTER JOIN SCDRDB.SCDC51LF3 
+			 	ON C51JUM=C52MAEJUM  AND C51COUPON = C52COUPON
+				 WHERE C52MAEJUM ='01' AND C52MAEY=substr(#{startDt},1,4) AND C52MAEM=substr(#{startDt},5,2) AND C52MAED=substr(#{startDt},7,2) 
+				   AND C52REGINO =#{posNum} AND (C52SLPNO =${chit} OR C52SLPNO =${receiptNum}) 
+		
+
+	</select>
+	
+	<select id="findMessageCoupon" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+			
+			 	SELECT 	C61COUPON   		as 	couponCd
+						,TRIM(C61CGBNNM)	as	couponNm
+						,C61DCPER   		as  couponDiscount
+				FROM SCDRDB.SCDC61PF 
+				WHERE C61COUPON =#{couponCd}
+
+	</select>
+	<select id="findCash" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+				 SELECT C02MBRNO||'(사후)'	as 	cashNum
+	 					,C02APPNO			as	cashApp
+			
+			 	FROM SCDRDB.SCDC02PF 
+			 	
+				 WHERE C02JUM ='01' AND C02SALEDT=#{startDt} AND C02POSNO=#{posNum} AND C02RCPT=#{receiptNum} 
+		
+
+	</select>
+	<select id="findEvent" resultType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" parameterType="com.saydept.api.spf.selng.receiptInfoInq.model.ReceiptInfoInqModel" >
+		SELECT 	JS0518	 
+				,JS0519
+				,JS0518||'-'||JS0519 AS eventCd
+				,TRIM(JS0109)	AS eventNm
+				,JS0410			AS eventGift
+				,trim(JS0707)	AS eventGiftNm
+				,JS0514 		AS eventAcceptAmount
+		FROM SPFRDB.SPFJ05LF1
+		
+			LEFT OUTER JOIN SPFRDB.SPFJ01PF 
+			ON JS0100='01' AND JS0101=JS0518 AND JS0102=JS0519
+			LEFT OUTER JOIN SPFRDB.SPFJ04PF 
+			ON JS0400=JS0500 AND JS0401=JS0501 AND JS0402 =JS0502 AND JS0403=JS0503 AND JS0404 = JS0504
+			LEFT OUTER JOIN SPFRDB.SPFJ06LF2
+			ON  JS0600  =JS0500 AND JS0601  =JS0501 AND	JS0602  =JS0502 AND JS0603  =JS0503 AND	JS0610  =JS0518 AND JS0611  =JS0519 AND JS0604  =JS0504
+			LEFT OUTER JOIN SPFRDB.SPFJ07PF 
+			ON JS0701=JS0605 
+	
+			WHERE JS0505=#{startDt} AND JS0506=#{posNum} AND JS0507=#{receiptNum}  AND JS0500='01' 
+		</select>
+
+
+</mapper>

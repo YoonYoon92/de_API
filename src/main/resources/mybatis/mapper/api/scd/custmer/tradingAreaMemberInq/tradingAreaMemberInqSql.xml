@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.scd.custmer.tradingAreaMemberInq.TradingAreaMemberInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="tradingAreaMemberInqModel" type="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectTradingAreaMemberInq" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel">
+		/*selectTradingAreaMemberInq*/
+		SELECT ...
+	</select>
+
+	<!-- 조회구분 상권선택x 지역부누선택x-->
+	<select id="TradingAreaList" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+		SELECT  SUBSTR(M12GUBUN,1,1) as tradingAreaCd
+		        ,MAX(M12SNAM) as tradingAreaNm
+		        ,SUM(CASE WHEN M13GBN='02' THEN M13WHE  ELSE 0 END) as cdMember
+		        ,SUM(CASE WHEN M13GBN='01' THEN M13WHE  ELSE 0 END) as plusMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SWHE ELSE 0 END) as useMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SAMT ELSE 0 END)/1000 as memberAmt
+
+		FROM ScdRDB.SCDM12PF
+		LEFT OUTER JOIN SCDRDB.SCDNM13PF
+		        ON M13YY=substr(#{searchDt},1,4) AND M13MM=substr(#{searchDt},5,2) AND M13JUM='01'
+		           AND M13SGUBUN=SUBSTR(M12GUBUN,1,1) AND M13GGUBUN=SUBSTR(M12GUBUN,2,1)
+		GROUP BY SUBSTR(M12GUBUN,1,1)
+
+	</select>
+	<!-- 조회구분 상권선택x 지역부누선택x-->
+		<select id="TradingAreaList2" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+		SELECT  M12GUBUN as tradingAreaCd
+		        ,MAX(M12GNAM  ) as tradingAreaNm
+		        ,SUM(CASE WHEN M13GBN='02' THEN M13WHE  ELSE 0 END) as cdMember
+		        ,SUM(CASE WHEN M13GBN='01' THEN M13WHE  ELSE 0 END) as plusMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SWHE ELSE 0 END) as useMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SAMT ELSE 0 END)/1000 as memberAmt
+
+		FROM ScdRDB.SCDM12PF
+		LEFT OUTER JOIN SCDRDB.SCDNM13PF
+		        ON M13YY=substr(#{searchDt},1,4) AND M13MM=substr(#{searchDt},5,2) AND M13JUM='01'
+		           AND M13SGUBUN=SUBSTR(M12GUBUN,1,1) AND M13GGUBUN=SUBSTR(M12GUBUN,2,1)
+		where  SUBSTR(M12GUBUN,1,1)=#{tradingAreaCd}
+		GROUP BY M12GUBUN
+
+	</select>
+	<!-- 조회구분 상권선택x 지역부누선택x-->
+		<select id="TradingAreaList3" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+		SELECT TRIM(SCDM02003) AS tradingAreaNm
+		        ,SUM(CASE WHEN M13GBN='02' THEN M13WHE  ELSE 0 END) AS cdMember
+		        ,SUM(CASE WHEN M13GBN='01' THEN M13WHE  ELSE 0 END) as plusMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SWHE ELSE 0 END) as useMember
+		        ,SUM(CASE WHEN M13GBN='00' THEN M13SAMT ELSE 0 END)/1000 as memberAmt
+		FROM SCDRDB.SCDM11LF3
+		 LEFT OUTER JOIN SCDRDB.SCDNM13PF
+		 ON M11DPOST1=M13DPOST1 AND M11DPOST2=M13DPOST2 AND M13YY=substr(#{searchDt},1,4) AND M13MM=substr(#{searchDt},5,2) AND M13JUM='01'
+		  LEFT OUTER JOIN SCDRDB.SCDM02PF
+		 ON SCDM02001=M11DPOST1 AND SCDM02002=M11DPOST2
+		WHERE M11GUBUN=#{areaCd}
+		GROUP BY SCDM02003
+
+	</select>
+	<select id="TradingAreaList4" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+	    SELECT    M11POST1, M11POST2
+	    		 ,M11APTNAME AS tradingAreaNm
+	    		 ,M11COUNT as tradingAreaCd
+                 ,SUM(CASE WHEN M13GBN='02' THEN M13WHE  ELSE 0 END) AS cdMember
+                 ,SUM(CASE WHEN M13GBN='01' THEN M13WHE  ELSE 0 END) as plusMember
+                 ,SUM(CASE WHEN M13GBN='00' THEN M13SWHE ELSE 0 END) as useMember
+                 ,SUM(CASE WHEN M13GBN='00' THEN M13SAMT ELSE 0 END)/1000 as memberAmt
+                
+      FROM SCDRDB.SCDM11LF3
+          LEFT OUTER JOIN SCDRDB.SCDNM13PF
+               ON M11DPOST1=M13DPOST1 AND M11DPOST2=M13DPOST2 AND M13YY='2021' AND M13MM='09' AND M13JUM='01'
+          LEFT OUTER JOIN SCDRDB.SCDM02PF
+               ON SCDM02001=M11DPOST1 AND SCDM02002=M11DPOST2
+     WHERE M11APTNAME!=''
+     
+     GROUP BY M11POST1, M11POST2, M11APTNAME, M11COUNT
+     ORDER BY M11APTNAME, M11POST1, M11POST2
+
+	</select>
+
+	
+<select id="tradingAreaCdList" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+		SELECT  SUBSTR(M12GUBUN,1,1) as tradingAreaCd
+        		,MAX(M12SNAM) as tradingAreaNm
+
+		
+		FROM SCDRDB.SCDM12PF
+		GROUP BY SUBSTR(M12GUBUN,1,1)
+
+	</select>
+	<select id="areaCdList" resultType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" parameterType="com.saydept.api.scd.custmer.tradingAreaMemberInq.model.TradingAreaMemberInqModel" fetchSize="1000">
+		SELECT  M12GUBUN as areaCd
+        		,M12GNAM as areaNm
+
+		FROM SCDRDB.SCDM12PF
+		        WHERE SUBSTR(M12GUBUN,1,1)=#{tradingAreaCd}
+
+	</select>
+	
+</mapper>

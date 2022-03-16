@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.component.searchConer.SearchConerMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="BuyReqDocRegistModel" type="com.saydept.api.component.searchClass.model.SearchClassModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSearchConer" resultType="com.saydept.api.component.searchConer.model.SearchConerModel" parameterType="com.saydept.api.component.searchConer.model.SearchConerParamModel" fetchSize="1000">
+		/*selectSearchConer*/
+		SELECT  MS0501 			AS jum
+		,		MS0502			AS bu
+		,		MS0503			AS team
+		,		MS0504			AS pc
+		,		trim(MS0506)			AS jumName
+		,		trim(MS0507)			AS buName
+		,		trim(MS0508)			AS teamName
+		,		MS0509			AS pcName
+		,		MS0505			AS conerNo 
+		,		TRIM(MS0510)	AS conerName
+		,       MS0516          AS codeCrtDate
+		,       MS0515          AS codeDispDate
+		FROM 	${dbType}SPFRDB.SPFM05PF  
+		WHERE	
+				MS0501 = #{jum} 
+		AND    (MS0505 LIKE '%${searchConer}%'	   
+		OR		UPPER(MS0510) LIKE UPPER('%${searchConerFullCharUpper}%')
+		OR		LOWER(MS0510) LIKE LOWER('%${searchConerFullCharLower}%')
+		OR		UPPER(MS0510) LIKE UPPER('%${searchConerUpper}%') 
+		OR		LOWER(MS0510) LIKE LOWER('%${searchConerLower}%')
+		OR		MS0510 LIKE '%${searchConerFullChar}%'
+		OR		MS0510 LIKE '%${searchConer}%'
+		OR		MS0510 LIKE LOWER('%${searchConer}%')
+		OR		MS0510 LIKE UPPER('%${searchConer}%')
+		) 
+				
+		ORDER BY MS0505
+	</select>
+
+</mapper>

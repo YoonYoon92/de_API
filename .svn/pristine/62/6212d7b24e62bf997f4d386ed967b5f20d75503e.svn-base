@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.PCLastYearCntstIncrsrateInqMapper">
+
+		<!-- 조직조회(코너) -->
+	<select id="getConerlist" parameterType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel" resultType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel" >
+		/*getConer*/
+		SELECT	TB1.MS0505							AS Coner			/* 조직코드 */
+		,		TRIM(TB1.MS0510) 					AS ConerNm			/* 조직명 */
+		FROM 	SPFRDB.SPFM05PF TB1
+		WHERE  	TRIM(TB1.MS0501)||
+				TRIM(TB1.MS0502)||
+				TRIM(TB1.MS0503)
+				= #{tim}
+				AND MS0515='' AND SUBSTR(MS0521,2,1)='Y'
+				AND MS0502||MS0503||MS0504 !='727571' 
+				AND MS0505!='20195' 
+				AND MS0505!='27815' 
+				AND MS0505!='27817' 
+				/* 외식건강，세이문고，유니클로　제외 CHECK */
+	</select>
+	<!-- 종속코너찾기 -->
+	<select id="getSubordconerlist" parameterType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel" resultType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel" >
+		/*getConer*/
+		SELECT	TB1.MS05102							AS Subordconer			/* 조직코드 */
+		FROM 	SPFRDB.SPFM051PF TB1
+		WHERE  	MS05101='01'
+		AND		MS05103 = #{Coner}
+				
+	</select>
+	
+	
+		<!-- 월 목표 조회 -->
+	<select id="getSaleGoal" parameterType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel" resultType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel">
+		/*getMonthSaleGoal*/
+		SELECT 	TB1.IS0707  			AS coner	/*코너*/
+		,		SUM(TB1.IS0709)  		AS Try		/*계획*/
+		FROM 	SPFRDB.SPFI07LF2 TB1
+	
+		WHERE 	TB1.IS0702	&gt;= #{startDt}
+		AND     TB1.IS0702	&lt;= #{endDt}
+		AND		TRIM(TB1.IS0703)||TRIM(TB1.IS0704)||TRIM(TB1.IS0705) = #{tim}
+		AND    	IS0707=#{coner}
+		GROUP BY IS0707
+		
+		
+	</select>
+			
+		<!--전년실적조회 -->
+	<select id="getlastyearSale" parameterType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel" resultType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel">
+		/*getlastyearSale*/
+		SELECT 	TB1.IS0104  			AS coner				/*코너*/
+		,		SUM(TB1.IS0129)  		AS LastyearSplan		/*계획*/
+		FROM 	SPFRDB.SPFI01LF10 TB1
+		
+		WHERE 	TB1.IS0102	&gt;= #{LastyearstartDt}
+		AND     TB1.IS0102	&lt;= #{LastyearendDt}
+		AND    	IS0104=#{coner}
+		GROUP BY IS0104
+		
+	</select>		
+		<!--실적조회 -->
+	<select id="getSale" parameterType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqParamModel" resultType="com.saydept.api.spf.saleNews.PCLastYearCntstIncrsrateInq.model.PCLastYearCntstIncrsrateInqModel">
+		/*getlastyearSale*/
+		SELECT 	TB1.IS0104  			AS coner		/*코너*/
+		,		SUM(TB1.IS0129)  		AS Splan		/*계획*/
+		FROM 	SPFRDB.SPFI01LF10 TB1
+		
+		WHERE 	TB1.IS0102	&gt;= #{startDt}
+		AND     TB1.IS0102	&lt;= #{endDt}
+		AND    	IS0104=#{coner}
+		GROUP BY IS0104
+		
+	</select>		
+</mapper>

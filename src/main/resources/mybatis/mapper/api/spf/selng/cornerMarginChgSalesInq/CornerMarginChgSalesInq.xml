@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.cornerMarginChgSalesInq.CornerMarginChgSalesInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectCornerMarginChgSalesInqList" resultType="com.saydept.api.spf.selng.cornerMarginChgSalesInq.model.CornerMarginChgSalesInqModel" parameterType="com.saydept.api.spf.selng.cornerMarginChgSalesInq.model.CornerMarginChgSalesInqParamModel" fetchSize="1000">
+		/*selectCornerMarginChgSalesInqList*/
+		
+		WITH 
+		MS06(JUM, CLS1, CLS2, ORGMARGIN)
+		AS (
+			SELECT  MS0601 AS JUM
+			,		MS0602 AS CLS1
+			,       MS0603 AS CLS2
+			,       MS0609 AS ORGMARGIN
+			FROM	${dbType}SPFRDB.SPFM06LF2 sp 
+			WHERE   MS0601 = #{jum}
+			AND     MS0605 = #{conerCd}
+			AND     (MS0627='' OR SUBSTR(MS0627,1,6) &gt;=#{yyyymm})
+		   ),
+		
+		IS01(CLSKEY, SALEDATE, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT, FEEAMOUNT, MARGIN, MFDATE, MTDATE) 
+		AS (
+			SELECT 	IS0105 AS CLSKEY 
+			,		IS0102 AS SALEDATE
+			,		IS0129 AS NETAMOUNT
+			, 		IS0130 AS SALEAMOUNT
+			, 		IS0131 AS TOTALAMOUNT
+			, 		IS0132 AS FEEAMOUNT
+			,       CASE WHEN MS1610 IS NOT NULL THEN MS1610 ELSE MS0609 END MARJIN
+			,       MS1601 AS MFDATE
+			,       MS1611 AS MTDATE
+		 	FROM	${dbType}SPFRDB.SPFI01LF9 
+		 			INNER JOIN ${dbType}SPFRDB.SPFM06PF 
+		 			ON 	MS0601=IS0103 AND MS0602=IS0104 AND MS0603=IS0105 
+		 			LEFT OUTER JOIN ${dbType}SPFRDB.SPFM16LF2 
+		 			ON  MS1602=IS0103 AND MS1603=IS0104 AND MS1604=IS0105 AND MS1601 &lt;=IS0102 AND MS1611 &gt;=IS0102 
+		 	WHERE 	
+		 			IS0103 = #{jum}
+		 	AND 	IS0104 = #{conerCd}
+		 	AND     SUBSTR(IS0102,1,6) = #{yyyymm}
+		   ),
+		   
+	   MS16F(CLSKEY, SALEDATE, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT, FEEAMOUNT, MARGIN, MFDATE, MTDATE)  
+	   AS (
+			SELECT  MS1604 AS CLSKEY	
+			,       CASE WHEN SUBSTR(MS1601,1,6) &lt; #{yyyymm} THEN ${yyyymm}||'01' ELSE MS1601 END AS SALEDATE
+			,       0 AS NETAMOUNT
+			,       0 AS SALEAMOUNT
+			,       0 AS TOTALAMOUNT
+			,       0 AS FEEAMOUNT
+			,       MS1610 AS MARGIN
+			,       MS1601 AS MFDATE
+			,       MS1611 AS MTDATE
+			FROM 	${dbType}SPFRDB.SPFM16LF2 sl 
+			WHERE 	MS1602=#{jum} AND MS1603=#{conerCd} AND 
+					SUBSTR(MS1601,1,6) &lt;= #{yyyymm} AND SUBSTR(MS1611,1,6) &gt;= #{yyyymm}
+		),
+		MS16T(CLSKEY, SALEDATE, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT, FEEAMOUNT, MARGIN, MFDATE, MTDATE)  
+		AS (
+			SELECT  MS1604 AS CLSKEY
+			,       CASE WHEN SUBSTR(MS1611,1,6) &gt; #{yyyymm} 
+			  THEN SUBSTR(DIGITS( YEAR(LAST_DAY(SUBSTR(${yyyymm},1,4)||'-'||SUBSTR(${yyyymm},5,2)||'-'||'01'))),7,4)
+			     ||SUBSTR(DIGITS(MONTH(LAST_DAY(SUBSTR(${yyyymm},1,4)||'-'||SUBSTR(${yyyymm},5,2)||'-'||'01'))),9,2)
+			     ||SUBSTR(DIGITS(  DAY(LAST_DAY(SUBSTR(${yyyymm},1,4)||'-'||SUBSTR(${yyyymm},5,2)||'-'||'01'))),9,2) ELSE MS1611 END    AS SALEDATE
+			,       0 AS NETAMOUNT
+			,       0 AS SALEAMOUNT
+			,       0 AS TOTALAMOUNT
+			,       0 AS FEEAMOUNT
+			,       MS1610 AS MARGIN
+			,       MS1601 AS MFDATE
+			,       MS1611 AS MTDATE
+			FROM 	${dbType}SPFRDB.SPFM16LF2 sl 
+			WHERE 	MS1602=#{jum} AND MS1603=#{conerCd} AND 
+					SUBSTR(MS1601,1,6) &lt;= #{yyyymm} AND SUBSTR(MS1611,1,6) &gt;= #{yyyymm}
+		),
+		IS01ALL(CLSKEY, SALEDATE, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT, FEEAMOUNT, MARGIN, MFDATE, MTDATE)  
+		AS (
+			SELECT * FROM IS01
+			UNION
+			SELECT * FROM MS16F
+			UNION
+			SELECT * FROM MS16T
+		),  
+		   
+		IS01SUM(CLSKEY, MARGIN, MFDATE, MTDATE, MINDAY, MAXDAY, NETAMOUNT, SALEAMOUNT, TOTALAMOUNT, FEEAMOUNT)
+		AS (
+			SELECT 	CLSKEY
+			, 		MARGIN
+			, 		MFDATE
+			, 		MTDATE
+			, 		MIN(SUBSTR(SALEDATE,7,2)) AS MINDAY
+			,		MAX(SUBSTR(SALEDATE,7,2)) AS MAXDAY
+			,		SUM(NETAMOUNT) AS NETAMOUNT
+			,		SUM(SALEAMOUNT) AS SALEAMOUNT
+			,		SUM(TOTALAMOUNT) AS TOTALAMOUNT
+			,		SUM(FEEAMOUNT) AS FEEAMOUNT
+			FROM  	IS01ALL
+			GROUP BY CLSKEY, MARGIN, MFDATE, MTDATE
+		   )
+		 
+		
+		SELECT  CLS2
+		, 		MINDAY
+		, 		MAXDAY
+		, 		NETAMOUNT
+		, 		SALEAMOUNT
+		, 		TOTALAMOUNT
+		, 		FEEAMOUNT
+		, 		CASE WHEN MARGIN IS NOT NULL THEN MARGIN ELSE ORGMARGIN END  AS MARGINRATE
+		,		MFDATE AS MARGINFRDATE
+		, 		MTDATE AS MARGINTODATE
+		FROM 	MS06
+				LEFT OUTER JOIN IS01SUM
+				ON CLSKEY=CLS2
+		ORDER BY CLS2, MINDAY
+
+	</select>
+
+</mapper>

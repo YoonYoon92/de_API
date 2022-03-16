@@ -1,0 +1,25 @@
+package com.saydept.api.login;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.saydept.api.login.model.LoginModel;
+
+@Service
+public class LoginService {
+	
+	@Autowired
+	private LoginMapper loginMapper;
+
+	/**
+	 * 그리드 조회 테스트
+	 * @param request
+	 * @return
+	 */
+	public List<LoginModel> selectGridList(LoginModel request) {
+		// TODO Auto-generated method stub
+		return loginMapper.selectGridList(request);
+	}
+}

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+
+<mapper namespace="com.saydept.api.spf.saleNews.corpSaleNews.CorpSaleNewsMapper">
+
+	<!-- 부 목록 조회 -->
+	<select id="getBulist" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getBulist*/
+		SELECT 	TB1.MS0201		AS jum
+		,			TB1.MS0203	AS jumNm
+		,			TB1.MS0202 	AS bu
+		,			TB1.MS0204 	AS buNm
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE EXISTS 
+		(
+			SELECT 'X'
+			FROM 	SPFRDB.SPFM04PF2 TB2
+			WHERE 	TB2.MS04221 = 'Y'
+			AND 	TB1.MS0201 = TB2.MS04201
+			AND 	TB1.MS0202 = TB2.MS04202
+		)
+		AND		TB1.MS0201 = #{jum}
+		ORDER BY TB1.MS0201
+		,		 TB1.MS0202
+	</select>
+	
+	<!-- 일 목표 조회 -->
+	<select id="getDaySaleGoal" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getDaySaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS dayTry	/*일매출계획*/
+		FROM 	SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	= #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+	</select>
+	
+	<!-- 월 목표 조회 -->
+	<select id="getMonthSaleGoal" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getMonthSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS mmTry	/*월매출계획*/
+		FROM 	SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	BETWEEN SUBSTR(#{searchDay}, 1,6)||'01' AND #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+		<!-- SELECT	TB1.IS06102 	AS jum		/*점*/
+		,		TB1.IS06103 	AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 	AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105 	AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS06106) 	AS mmTry	/*월매출계획*/
+		FROM 	SPFRDB.SPFI06PF1 TB1
+		WHERE 	TB1.IS06101	= SUBSTR(#{searchDay},1,6)
+		AND		TB1.IS06102 = #{jum}
+		AND		TB1.IS06103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS06104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS06105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS06102 
+		,			TB1.IS06103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105
+		</if>
+		ORDER BY 	TB1.IS06102 
+		,			TB1.IS06103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105
+		</if> -->
+	</select>
+	
+	<!-- 년 목표 조회 -->
+	<select id="getYearSaleGoal" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getYearSaleGoal*/
+		SELECT 	TB1.IS05102 		AS jum		/*점*/
+		,		TB1.IS05103 		AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 		AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105 		AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS05106) 	AS yyTry	/*년매출계획*/
+		FROM 	SPFRDB.SPFI05PF1 TB1
+		WHERE 	TB1.IS05101	BETWEEN SUBSTR(#{searchDay}, 1,4)||'0101' AND #{searchDay}
+		AND		TB1.IS05102 = #{jum}
+		AND		TB1.IS05103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS05104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS05105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS05102 
+		,			TB1.IS05103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS05104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS05105
+		</if>
+		<!-- SELECT	TB1.IS06102 	AS jum		/*점*/
+		,		TB1.IS06103 	AS bu		/*부*/
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 	AS tim		/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105 	AS pc		/*세분류*/
+		</if>
+		,		SUM(TB1.IS06106) 	AS yyTry	/*월매출계획*/
+		FROM 	SPFRDB.SPFI06PF1 TB1
+		WHERE 	TB1.IS06101	LIKE SUBSTR(#{searchDay},1,4)||'%'
+		AND		TB1.IS06102 = #{jum}
+		AND		TB1.IS06103	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS06104 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS06105 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS06102 
+		,			TB1.IS06103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105
+		</if>
+		ORDER BY 	TB1.IS06102 
+		,			TB1.IS06103 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS06104 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS06105
+		</if> -->
+	</select>
+	
+	<!-- 일 실적 조회 -->
+	<select id="getDaySalePer" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getDaySalePer*/
+		SELECT 	TB1.IS5203				AS jum			/*점*/
+		,			TB1.IS5204			AS bu			/*부*/
+		<if test="tim != null and tim != ''">
+		,			TB1.IS5205			AS tim			/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,			TB1.IS5206			AS pc			/*세분류*/
+		</if>
+		,			SUM(TB1.IS5213)		AS dayNetsale	/*순매출*/
+		,			SUM(TB1.IS5214)		AS dayDsicount	/*할인*/
+		FROM 	SPFRDB.SPFI52PF TB1 
+		WHERE 	TB1.IS5201 	= #{searchDay}
+		AND		TB1.IS5203 	= #{jum}
+		AND		TB1.IS5204	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS5205 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS5206 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS5203 
+		,			TB1.IS5204 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS5205 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS5206
+		</if>
+		
+	</select>
+	
+	<!-- 당월 실적 조회 -->
+	<select id="getMonthSalePer" parameterType="corpSaleNewsParamModel" resultType="corpSaleNewsModel">
+		/*getMonthSalePer*/
+		SELECT 	TB1.IS5303				AS jum			/*점*/
+		,			TB1.IS5304			AS bu			/*부*/
+		<if test="tim != null and tim != ''">
+		,			TB1.IS5305			AS tim			/*팀*/
+		</if>
+		<if test="pc != null and pc != ''">
+		,			TB1.IS5306			AS pc			/*세분류*/
+		</if>
+		,			SUM(TB1.IS5309)		AS mmNetsale	/*순매출*/
+		,			SUM(TB1.IS5310)		AS mmDsicount	/*할인*/
+		,			SUM(TB1.IS5315)		AS yyNetsale	/*순매출*/
+		,			SUM(TB1.IS5316)		AS yyDsicount	/*할인*/
+		FROM 	SPFRDB.SPFI53PF TB1 
+		WHERE 	TB1.IS5301 	= #{searchDay}
+		AND		TB1.IS5303 	= #{jum}
+		AND		TB1.IS5304	= #{bu}
+		<if test="tim != null and tim != ''">
+			AND		TB1.IS5305 = #{tim}
+		</if>
+		<if test="pc != null and pc != ''">
+			AND		TB1.IS5306 = #{pc}
+		</if>
+		GROUP BY 	TB1.IS5303 
+		,			TB1.IS5304 
+		<if test="tim != null and tim != ''">
+		,		TB1.IS5305 
+		</if>
+		<if test="pc != null and pc != ''">
+		,		TB1.IS5306
+		</if>
+	</select>
+	
+</mapper>

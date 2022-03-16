@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.NonSalesCornerByPeriodMgtMapper">
+
+
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectNonSalesCornerByPeriodList" resultType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtModel"
+		parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtParamModel">
+	
+		SELECT
+				MS0501   AS  JUMNO
+		, 		MS0506   AS  JUMNAME
+		, 		MS0502   AS  BUNO
+		,       MS0507   AS  BUNAME
+		, 		MS0503   AS  TEAMNO 
+		,       MS0508   AS  TEAMNAME
+		, 		MS0504   AS  PCNO
+		,       MS0509   AS  PCNAME
+		, 		MS0505   AS  CORNERNO
+		, 		MS0510   AS  CORNERNAME
+		, 		MS0516   AS  REGIDATE
+		
+		FROM	${dbType}SPFRDB.SPFM05PF
+
+		WHERE 	MS0501 = #{jum}
+		--직매입제외 
+		AND     NOT SUBSTR(MS0505,5,1) IN ('1','2')
+		--매출발생이전 등록 코너 
+		AND     MS0516 &lt;= #{fromSaleDate}
+		--폐기되지 않은 코너
+		AND     MS0515 = ''	
+		
+		--기간매출 = 0
+	    AND    (SELECT  SUM(IS0413) 
+				FROM 	${dbType}SPFRDB.SPFI04PF
+				WHERE 	IS0404=MS0501 
+				AND 	IS0401||IS0402||IS0403 &gt;= #{fromSaleDate}
+				AND     IS0401||IS0402||IS0403 &lt;= #{toSaleDate}
+				AND     IS0408||IS0409=MS0505
+			   ) = 0	
+			   
+		--현재 재고 = 0	
+		AND    (SELECT  SUM(WS0125) 
+				FROM 	${dbType}SPFRDB.SPFW01PF TT1 						
+				WHERE 	WS0101=MS0501 
+				AND     WS0102=MS0505 
+				AND 	WS0104=(SELECT 	MAX(TT2.WS0104) 
+				                FROM 	${dbType}SPFRDB.SPFW01PF TT2 
+				                WHERE 	TT2.WS0101=TT1.WS0101 
+				                AND   	TT2.WS0102=TT1.WS0102
+				                AND   	TT2.WS0103=TT1.WS0103)
+			   ) = 0 	
+			   
+		ORDER BY MS0501, MS0502, MS0503, MS0504, MS0505, MS0516
+		
+	</select>
+	
+	<!-- 폐기할 코너의 살아있는 클래스 내역 SPFM06PF-->
+	<select id="selectClassList" resultType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtClassClosedModel"
+		parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtCornerClosedModel">
+		SELECT  MS0601		AS JUMNO
+		,		MS0602		AS CLASS1
+		,		MS0603      AS CLASS2
+		,		SUBSTR(MS0604,1,15)      AS CLASSNAME
+		,		MS0618      AS BUNO
+		,		MS0619      AS TEAMNO
+		,		MS0620      AS PCNO
+		,       ${cornerClosedDate} AS CLASSCLOSEDDATE
+		FROM 	${dbType}SPFRDB.SPFM06PF
+		WHERE  	MS0601 = #{jum}
+		AND     MS0602 = #{cornerNo} 
+		AND     MS0627 = ''	
+	</select>
+	
+	<!-- 코너마스터 미사용코너 폐기 처리  SPFM05PF-->
+	<update id="updateNonSalesCornerClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtCornerClosedModel">
+		UPDATE	${dbType}SPFRDB.SPFM05PF
+		SET		MS0515=${cornerClosedDate}
+		,       MS0517=${updateDate}
+		WHERE   MS0501=#{jum} 
+		AND     MS0505=#{cornerNo}
+	</update>
+	
+	<!-- 클래스마스터 미사용코너 폐기 처리  SPFM06PF-->
+	<update id="updateNonSalesClassClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtClassClosedModel">
+		UPDATE	${dbType}SPFRDB.SPFM06PF
+		SET		MS0627=${classClosedDate}
+		,		MS0631='NN'		
+		WHERE   MS0601=#{jumNo} 
+		AND     MS0602=#{class1}
+		AND     MS0603=#{class2}
+		AND     MS0627=''
+	</update>
+	
+	
+	<!-- 단품마스터 미사용코너 폐기 처리  SPFM07PF-->
+	<update id="updateNonSalesDanpumClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtClassClosedModel">
+		UPDATE	${dbType}SPFRDB.SPFM07LF1				   
+		SET		MS0738=${classClosedDate}
+		WHERE   MS0701=#{jumNo} 
+		AND     MS0702=#{buNo}
+		AND     MS0704=#{class1}
+		AND     MS0705=#{class2}
+		AND     MS0738=''		
+	</update>
+	
+	
+	<!-- CLASS 송신 내역 마스터      SPFM26PF-->
+	<update id="updateNonSalesClassSendClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtClassClosedModel">
+		UPDATE	${dbType}SPFRDB.SPFM26PF				   
+		SET		MS2606='D'
+		WHERE   MS2611=#{jumNo} 
+		AND     MS2601=SUBSTR(#{classClosedDate},1,4)
+		AND     MS2602=SUBSTR(#{classClosedDate},5,2)
+		AND     MS2603=SUBSTR(#{classClosedDate},7,2)
+		AND     MS2604=#{class1}		
+		AND     MS2605=#{class2} 
+		AND     MS2606 &lt;&gt; 'D'
+	</update>
+	
+	<!-- CLASS 송신 내역 마스터      SPFM26PF-->
+	<insert id="insertNonSalesClassSendClosed" parameterType="com.saydept.api.spf.org.nonSalesCornerByPeriodMgt.model.NonSalesCornerByPeriodMgtClassClosedModel">
+		INSERT INTO ${dbType}SPFRDB.SPFM26PF				   
+		(		MS2601
+		, 		MS2602
+		, 		MS2603
+		, 		MS2604
+		, 		MS2605
+		, 		MS2606
+		, 		MS2607
+		, 		MS2608
+		, 		MS2609
+		, 		MS2610
+		, 		MS2611
+		, 		MS2612
+		, 		MS2613
+		, 		MS2614
+		)
+		VALUES(	SUBSTR(${classClosedDate},1,4)
+		, 		SUBSTR(${classClosedDate},5,2)
+		, 		SUBSTR(${classClosedDate},7,2)
+		, 		${class1}
+		, 		${class2}
+		, 		'D'
+		, 		(SELECT SUBSTR(MS0604,1,15)||X'0F' FROM ${dbType}SPFRDB.SPFM06PF WHERE MS0601=#{jumNo} AND MS0602=#{class1} AND MS0603=#{class2})
+		--,       ${className}
+		, 		''
+		, 		''
+		, 		'N'
+		, 		${jumNo}
+		, 	    ${buNo}
+		, 		${teamNo}
+		, 		${pcNo}
+		)		
+	</insert>
+
+	
+	
+</mapper>

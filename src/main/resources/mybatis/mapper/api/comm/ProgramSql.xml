@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.comm.ProgramMapper">
+
+
+	<!-- 메뉴조회 -->
+	<select id="selectMenuList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectMenuList*/
+		SELECT	TRIM(TB1.ZD0102) 		AS id			/* 메뉴ID */
+		,		TRIM(TB1.ZD0102) 		AS name			/* 메뉴명 */
+		,		TRIM(TB1.ZD0103)		AS text			/* 메뉴명(KR) */
+		,		TRIM(TB1.ZD0105) 		AS iconCls		/* 아이콘 */
+		,		'false'			AS leaf   
+		,		'false'			AS checked
+		FROM 	WEBRDB.WEBZ01PF TB1
+		WHERE 	TB1.ZD0101 = #{id}
+		ORDER BY TB1.ZD0105 
+	</select>
+	<!-- 프로그램조회 -->
+	<select id="selectProgList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectProgList*/
+		SELECT	TRIM(TB1.ZD0203)     	AS id 			/* 프로그램ID */ 
+		,		TRIM(TB1.ZD0203)     	AS name 		/* 프로그램 */ 
+		,		TRIM(TB1.ZD0204)		AS text      	/* 프로그램명 */ 
+		,		TRIM(TB1.ZD0205)      AS iconCls		/* 아이콘명 */ 
+		,		'true'			AS leaf
+		,		'false'			AS checked
+		FROM 	WEBRDB.WEBZ02PF TB1
+	
+		<where>
+			<choose>
+				<when test="id!='SPF016'">
+					TB1.ZD0202 = #{id}
+				</when>
+				<when test="id='SPF016'">
+					TB1.ZD0208='1' AND SUBSTR(TB1.ZD0202,1,3) = SUBSTR(#{id},1,3)
+				</when>
+			</choose>
+		</where>		
+			
+		ORDER BY TB1.ZD0206 
+	</select>
+	<!-- 환경설정메뉴조회 -->
+	<select id="selectEnvMenuList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectMenuList*/
+		SELECT	TRIM(TB1.ZD0102) 		AS id			/* 메뉴ID */
+		,		TRIM(TB1.ZD0102) 		AS name			/* 메뉴명 */
+		,		TRIM(TB1.ZD0103)		AS text			/* 메뉴명(KR) */
+		,		TRIM(TB1.ZD0105) 		AS iconCls		/* 아이콘 */
+		,		'false'			AS leaf   
+		,		'false'			AS checked
+		FROM 	WEBRDB.WEBZ01PF TB1
+		WHERE 	TB1.ZD0101 = #{id} AND TB1.ZD0102='ENV000'
+		ORDER BY TB1.ZD0105 
+	</select>
+	<!-- 프로그램조회 -->
+	<select id="selectEnvProgList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectProgList*/
+		SELECT	TRIM(TB1.ZD0203)     	AS id 			/* 프로그램ID */ 
+		,		TRIM(TB1.ZD0203)     	AS name 		/* 프로그램 */ 
+		,		TRIM(TB1.ZD0204)		AS text      	/* 프로그램명 */ 
+		,		TRIM(TB1.ZD0205)      AS iconCls		/* 아이콘명 */ 
+		,		'true'			AS leaf
+		,		'false'			AS checked
+		FROM 	WEBRDB.WEBZ02PF TB1
+	
+		<where>
+			<choose>
+				<when test="id!='SPF016'">
+					TB1.ZD0202 = 'ENV000'
+				</when>
+				<when test="id='SPF016'">
+				SUBSTR(TB1.ZD0202,1,3) = SUBSTR(#{id},1,3)
+				</when>
+			</choose>
+		</where>		
+			
+		ORDER BY TB1.ZD0206 
+	</select>
+	
+<!-- ========ADMIN==ADMIN===ADMIN====ADMIN===ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN==ADMIN====== -->
+	<!-- 메뉴조회 -->
+	<select id="selectAdminMenuList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectMenuList*/
+		SELECT	TRIM(TB1.ZD0102) 		AS id			/* 메뉴ID */
+		,		TRIM(TB1.ZD0102) 		AS name			/* 메뉴명 */
+		,		TRIM(TB1.ZD0103)		AS text			/* 메뉴명(KR) */
+		,		TRIM(TB1.ZD0105) 		AS iconCls		/* 아이콘 */
+		,		'false'			AS leaf   
+		,		CASE WHEN WBY01STS > '0' THEN WBY01STS ELSE 'false' END		AS checked
+		FROM 	WEBRDB.WEBZ01PF TB1
+				
+			LEFT OUTER JOIN WEBRDB.WEBY01PF
+			ON WBY01PGMID = TB1.ZD0102 AND WBY01SABUN = #{userId}
+			
+		WHERE 	TB1.ZD0101 = #{id} 
+		ORDER BY TB1.ZD0105 
+	</select>
+	
+	<!-- 프로그램조회 -->
+	<select id="selectAdminProgList" resultType="progModel" parameterType="progModel" fetchSize="100">
+		/*selectProgList*/
+		SELECT	TRIM(TB1.ZD0203)     	AS id 			/* 프로그램ID */ 
+		,		TRIM(TB1.ZD0203)     	AS name 		/* 프로그램 */ 
+		,		TRIM(TB1.ZD0204)		AS text      	/* 프로그램명 */ 
+		,		TRIM(TB1.ZD0205)      AS iconCls		/* 아이콘명 */ 
+		,		'true'			AS leaf
+		,		CASE WHEN WBY01STS > '0' THEN WBY01STS ELSE 'false' END		AS checked
+		FROM 	WEBRDB.WEBZ02PF TB1
+			
+			LEFT OUTER JOIN WEBRDB.WEBY01PF
+				ON WBY01PGMID = TB1.ZD0203 AND WBY01SABUN = #{userId}
+				
+		
+
+		<where>
+			<choose>
+				<when test="id!='SPF016'">
+					TB1.ZD0202 = #{id}
+				</when>
+				<when test="id='SPF016'">
+					TB1.ZD0208='1' AND SUBSTR(TB1.ZD0202,1,3) = SUBSTR(#{id},1,3)
+				</when>
+			</choose>
+		</where>		
+		ORDER BY TB1.ZD0206 
+	</select>
+	
+	<!-- 메뉴저장 -->	
+	<insert id="saveAdminProgList" parameterType="com.saydept.api.comm.model.UserProgModel">
+		/*insertAdminProgList*/
+		INSERT INTO WEBRDB.WEBY01PF(
+			WBY01SABUN
+		,	WBY01PGMID
+		,   WBY01STS	
+		)VALUES(
+			#{userId}
+		,	#{id}
+		,	#{checked}
+		)	
+	</insert>
+		
+	<!-- 메뉴저장 -->	
+	<insert id="insertAdminProgList" parameterType="com.saydept.api.comm.model.UserProgModel">
+		/*insertAdminProgList*/
+		INSERT INTO WEBRDB.WEBY01PF(
+			WBY01SABUN
+		,	WBY01PGMID
+		,   WBY01STS	
+		)VALUES(
+			#{userId}
+		,	#{id}
+		,	#{checked}
+		)	
+	</insert>
+	
+	<!-- 메뉴저장 -->	
+	<update id="updateAdminProgList" parameterType="com.saydept.api.comm.model.UserProgModel">
+		/*insertAdminProgList*/
+		UPDATE  WEBRDB.WEBY01PF
+			SET	WBY01STS   = #{checked}
+		WHERE	WBY01SABUN = #{userId}
+			AND WBY01PGMID = #{id}
+	</update>
+	<!-- 프로그램저장 -->
+
+<!-- ==========USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==USER==== -->
+	<!-- 메뉴조회 -->
+	<select id="selectUserMenuList" resultType="progModel" parameterType="com.saydept.api.comm.model.ProgModel">
+		/*selectMenuList*/
+		SELECT	TRIM(TB1.ZD0102) 		AS id			/* 메뉴ID */
+		,		TRIM(TB1.ZD0102) 		AS name			/* 메뉴명 */
+		,		TRIM(TB1.ZD0103)		AS text			/* 메뉴명(KR) */
+		,		TRIM(TB1.ZD0105) 		AS iconCls		/* 아이콘 */
+		,		'false'			AS leaf   
+		,       'false' 		AS checked
+		FROM 	WEBRDB.WEBZ01PF TB1
+		
+			INNER JOIN WEBRDB.WEBY01PF
+				ON WBY01SABUN = #{userId} AND WBY01PGMID = TB1.ZD0102 AND WBY01STS = 1
+				
+		WHERE 	TB1.ZD0101 = #{id} 
+		
+		ORDER BY TB1.ZD0106
+	</select>
+	
+	<!-- 프로그램조회 -->
+	<select id="selectUserProgList" resultType="progModel" parameterType="com.saydept.api.comm.model.ProgModel">
+		/*selectProgList*/
+		SELECT	TRIM(TB1.ZD0203)     	AS id 			/* 프로그램ID */ 
+		,		TRIM(TB1.ZD0203)     	AS name 		/* 프로그램 */ 
+		,		TRIM(TB1.ZD0204)		AS text      	/* 프로그램명 */ 
+		,		TRIM(TB1.ZD0205)      AS iconCls		/* 아이콘명 */ 
+		,		'true'			AS leaf		
+		,       'false' 		AS checked
+		FROM 	WEBRDB.WEBZ02PF TB1
+		
+			INNER JOIN WEBRDB.WEBY01PF
+				ON WBY01SABUN = #{userId} AND WBY01PGMID = TB1.ZD0203 AND WBY01STS = 1
+				
+		
+			<where>
+			<choose>
+				<when test="id!='SPF016'">
+					TB1.ZD0202 = #{id}
+				</when>
+				<when test="id='SPF016'">
+					TB1.ZD0208='1' AND SUBSTR(TB1.ZD0202,1,3) = SUBSTR(#{id},1,3) 
+				</when>
+			</choose>
+		</where>		
+		
+		
+		ORDER BY TB1.ZD0206 
+	</select>
+	
+   
+   
+   <!-- 프로그램조회 -->
+	<select id="selectUserLastMenuList" resultType="progModel" parameterType="com.saydept.api.comm.model.ProgModel">
+		/*selectProgList*/
+		SELECT	TRIM(TB1.ZD0203)     	AS id 			/* 프로그램ID */ 
+		,		TRIM(TB1.ZD0203)     	AS name 		/* 프로그램 */ 
+		,		TRIM(TB1.ZD0204)		AS text      	/* 프로그램명 */ 
+		,		TRIM(TB1.ZD0205)      AS iconCls		/* 아이콘명 */ 
+		,		'true'			AS leaf		
+		,       'false' 		AS checked
+		FROM 	WEBRDB.WEBZ02PF TB1
+		
+			INNER JOIN WEBRDB.WEBY01PF
+				ON WBY01SABUN = #{userId} AND WBY01PGMID = TB1.ZD0203 AND WBY01STS = 1
+				
+		
+		WHERE ZD0201!='WEB000'	
+		
+		
+		ORDER BY CASE WHEN WBY01LDATE IS NULL THEN '000000000000000' WHEN WBY01LDATE ='' THEN '000000000000000'  ELSE WBY01LDATE END DESC
+			FETCH FIRST 3 ROWS ONLY
+	</select>
+ <!-- 프로그램 히팅 카운트 update(최초사용일있을시) -->
+	<update id="UpdateHitCount1"  parameterType="com.saydept.api.comm.model.ProgModel">
+		
+		    UPDATE WEBRDB.WEBY01PF SET WBY01CNT=WBY01CNT+1 , 
+		    							WBY01LDATE= TRIM(CHAR(YEAR(CURRENT DATE)))	||RIGHT('00'||TRIM(CHAR(MONTH(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(DAY(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(HOUR(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(MINUTE(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(SECOND(CURRENT TIMESTAMP))),2)												
+										      
+		 	  WHERE WBY01SABUN = #{userId} AND WBY01PGMID=#{id} AND (WBY01FDATE!='' OR WBY01FDATE IS NOT NULL)
+	</update>
+	
+	<!-- 프로그램 히팅 카운트 update(최초사용일없을시) -->
+	<update id="UpdateHitCount2"  parameterType="com.saydept.api.comm.model.ProgModel">	 	  
+		 	 UPDATE WEBRDB.WEBY01PF SET WBY01CNT=WBY01CNT+1 , 
+		    							WBY01LDATE= TRIM(CHAR(YEAR(CURRENT DATE)))	||RIGHT('00'||TRIM(CHAR(MONTH(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(DAY(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(HOUR(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(MINUTE(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(SECOND(CURRENT TIMESTAMP))),2)		
+										,
+										WBY01FDATE= TRIM(CHAR(YEAR(CURRENT DATE)))	||RIGHT('00'||TRIM(CHAR(MONTH(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(DAY(CURRENT DATE))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(HOUR(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(MINUTE(CURRENT TIMESTAMP))),2)
+																				     ||RIGHT('00'||TRIM(CHAR(SECOND(CURRENT TIMESTAMP))),2)												
+										      										
+										      
+		 	  WHERE WBY01SABUN = #{userId} AND WBY01PGMID=#{id} AND (WBY01FDATE ='' or WBY01FDATE IS NULL)
+	</update>
+</mapper>

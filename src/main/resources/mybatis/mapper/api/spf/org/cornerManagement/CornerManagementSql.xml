@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.cornerManagement.CornerManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectCornerManagement" resultType="com.saydept.api.spf.org.cornerManagement.model.CornerManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.cornerManagement.model.CornerManagementSaveModel" fetchSize="100">
+		 SELECT
+         A.MS0501 as ms05Jum
+        ,A.MS0502 as ms05Bu
+        ,A.MS0503 as ms05Tim
+        ,A.MS0504 as ms05Pc
+        ,A.MS0505 as ms05Corner
+        ,A.MS0506 as ms05JumNm
+        ,A.MS0507 as ms05BuNm
+        ,A.MS0508 as ms05TimNm
+        ,A.MS0509 as ms05PcNm
+        ,A.MS0510 as ms05CornerNm
+        ,A.MS0511 as ms0511
+        ,A.MS0512 as ms0512
+        ,A.MS0513 as ms0513
+        ,A.MS0514 as ms0514
+        ,A.MS0515 as ms0515
+        ,A.MS0516 as ms0516
+        ,A.MS0517 as ms0517
+        ,A.MS0518 as ms0518
+        ,A.MS0519 as ms0519
+        ,A.MS0520 as ms0520
+        ,substr(A.MS0521,1,1) as ms05211 --pda사용
+        ,substr(A.MS0521,2,1) as ms05212 --관리유무
+        ,substr(A.MS0521,3,1) as ms05213 --온라인
+
+        ,MS05703 as ms05703
+        ,MS05704 as ms05704
+        ,MS05705 as ms05705
+
+        ,C.MS05103 as ms05103
+        ,C.MS05104 as ms05104
+
+        ,D.GS0204 as dgs0204
+        
+        ,C.MS05107 as ms0517
+        ,E.GS0204 as egs0204
+        ,MS05803 as ms05CornerOn
+
+                FROM SPFRDB.SPFM05PX A
+                        LEFT OUTER JOIN SPFRDB.SPFM05PF7
+                        ON MS05701 = MS0501 AND MS05702 = MS0505
+                        LEFT OUTER JOIN
+            (SELECT MS05101,MS05102,MAX(MS05103) MS05103,MAX(MS05104) MS05104
+                    FROM SPFRDB.SPFM05PF1
+                    GROUP BY MS05101,MS05102
+            ) B
+            ON B.MS05101 = A.MS0501 AND B.MS05102 = A.MS0505
+            LEFT OUTER JOIN SPFRDB.SPFM05PF1 C
+            ON C.MS05101 = A.MS0501 AND C.MS05102 = A.MS0505 AND C.MS05103 = B.MS05103 AND C.MS05104 = B.MS05104
+            LEFT OUTER JOIN SPORDB.SPOG02PF D
+            ON D.GS0201 = '51' AND D.GS0202 = C.MS05106
+            LEFT OUTER JOIN SPORDB.SPOG02PF E
+            ON E.GS0201 = '52' AND E.GS0202 = C.MS05108
+            LEFT OUTER JOIN SPFRDB.SPFM05PF8
+            ON MS05801 = MS0501 AND MS05802 = MS0505
+            			
+			
+        WHERE MS0501 = #{ms05Jum}
+        AND MS0505 = #{ms05Corner}
+        
+	</select> 
+	
+	<!-- 코너조회  -->
+	<select id="selectCornerList" resultType="com.saydept.api.spf.org.cornerManagement.model.CornerManagementModel" 
+				parameterType="com.saydept.api.spf.org.cornerManagement.model.CornerManagementModel" fetchSize="9999" >
+		SELECT	 TRIM(TB1.MS0505) 	AS corner /*코너코드*/
+				--,TRIM(TB1.MS0510) 	AS cornerNm	/* 코너명 */
+				,TRIM(TB1.MS0505)||' - '||TRIM(TB1.MS0510) AS cornerCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM05PF TB1
+		WHERE  	MS0501  = ${jum}
+			AND SUBSTR(MS0505,1,1) &gt;= '1'
+			AND SUBSTR(MS0505,1,1) &lt;= '9'
+			AND MS0502 &gt;= '70'
+							
+			AND SUBSTR(MS0505,1,3) = '102' -- TEST
+	</select> 
+	
+		
+</mapper>

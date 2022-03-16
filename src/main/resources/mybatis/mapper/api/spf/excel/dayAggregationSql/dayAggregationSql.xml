@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.excel.dayAggregation.DayAggregationMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="dayAggregationModel" type="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectDayAggregation" resultType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel" 
+										parameterType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel">
+		/*selectDayAggregation*/
+		
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectDayAggregationList" resultType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel" 
+											parameterType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationParamModel">
+		WITH
+		TABLE1( Team,Pc,TeamNm,PcNm,dayTry,monthTry,yearTry,daySplan,dayLSplan,monthSplan,monthLastyearSplan,yearSplan,yearLastyearSplan,dayAchivmentrate,monthAchivmentrate,yearAchivmentrate,dayIncrsrate,monthIncrsrate,yearIncrsrate,monthDiff,yearDiff)AS (
+		SELECT  MS0403
+		        ,MS0404
+		        ,MS0407
+		        ,MS0408
+		        ,TA3.dayTry
+		        ,TA3.monthTry
+		        ,TA3.yearTry
+		        ,TA2.daySplan
+		        ,TA2.dayLSplan
+		        ,TA2.monthSplan
+		        ,TA2.monthLSplan
+		        ,TA2.yearSplan
+		        ,TA2.yearLSplan
+		        ,ROUND(FLOAT(TA2.daySplan)/FLOAT(TA3.dayTry)*100,2)   							AS dayAchivmentrate
+		        ,ROUND(FLOAT(TA2.monthSplan)/FLOAT(TA3.monthTry)*100,2)   						AS monthAchivmentrate
+		        ,ROUND(FLOAT(TA2.yearSplan)/FLOAT(TA3.yearTry)*100,2)   						AS yearAchivmentrate
+		        ,ROUND(FLOAT((TA2.daySplan-TA2.dayLSplan)/FLOAT(TA2.dayLSplan))*100,2)			AS dayIncrsrate
+		        ,ROUND(FLOAT((TA2.monthSplan-TA2.monthLSplan)/FLOAT(TA2.monthLSplan))*100,2)	AS monthIncrsrate
+		        ,ROUND(FLOAT((TA2.yearSplan-TA2.yearLSplan)/FLOAT(TA2.yearLSplan))*100,2)		AS yearIncrsrate
+		        ,TA2.monthSplan-TA3.monthTry													AS monthDiff
+		        ,TA2.yearSplan-TA3.yearTry														AS yearDiff
+		FROM SPFRDB.SPFM04PF TA1
+		        LEFT OUTER JOIN SPFRDB.SPFM04PF2
+		        ON      MS0401 = MS04201
+		        AND     MS0402 = MS04202
+		        AND     MS0403 = MS04203
+		        AND     MS0404 = MS04204
+		        LEFT OUTER JOIN
+		        (SELECT IS5203,IS5204,IS5205,IS5206
+		         	   ,SUM(CASE WHEN IS5201 =#{startDt} THEN IS5213 ELSE 0 END)/1000 											AS daySplan
+				       ,SUM(CASE WHEN IS5201 =#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000 											AS dayLSplan
+		               ,SUM(CASE WHEN IS5201 &gt;=#{mmDt} AND IS5201 &lt;=#{startDt} THEN IS5213 ELSE 0 END)/1000 					AS monthSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{lastyearmmDt} AND IS5201 &lt;=#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000  				AS monthLSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{yyDt} AND IS5201 &lt;=#{startDt} THEN IS5213 ELSE 0 END)/1000 					AS yearSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{lastyearyyDt} AND IS5201 &lt;=#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000  				AS yearLSplan
+				FROM SPFRDB.SPFI52PF
+				WHERE IS5201&gt;=#{lastyearyyDt} AND IS5201&lt;=#{startDt} 
+		         GROUP BY IS5203,IS5204,IS5205,IS5206) TA2
+		        ON      MS0401 = TA2.IS5203
+		        AND     MS0402 = TA2.IS5204
+		        AND     MS0403 = TA2.IS5205
+		        AND     MS0404 = TA2.IS5206
+		
+		         LEFT OUTER JOIN
+		         (SELECT IS05102,IS05103,IS05104,IS05105
+		         		,SUM(CASE WHEN IS05101=#{startDt} THEN IS05106 ELSE 0 END)  AS dayTry	
+			         	,SUM(CASE WHEN IS05101&gt;=#{mmDt} AND IS05101&lt;=#{startDt} THEN IS05106 ELSE 0 END)  AS monthTry
+			         	,SUM(CASE WHEN IS05101&gt;=#{yyDt} AND IS05101&lt;=#{startDt} THEN IS05106 ELSE 0 END)  AS yearTry
+		         FROM SPFRDB.SPFI05PF1
+		         WHERE  IS05101 &gt;=#{mmDt}  AND IS05101 &lt;=#{startDt}
+		         GROUP BY IS05102,IS05103,IS05104,IS05105 ) TA3
+		         ON      MS0401 = IS05102
+		         AND     MS0402 = IS05103
+		         AND     MS0403 = IS05104
+		         AND     MS0404 = IS05105
+		
+		WHERE MS04221='Y' AND MS0401=#{jum} AND MS0402=SUBSTR(#{bu},3,2) AND MS0403=SUBSTR(#{tim},5,2)
+		
+		UNION ALL
+		
+		SELECT  MS0303
+		        ,'999'
+		        ,''
+		        ,MS0306
+		        ,TA3.dayTry
+		        ,TA3.monthTry
+		        ,TA3.yearTry
+		        ,TA2.daySplan
+		        ,TA2.dayLSplan
+		        ,TA2.monthSplan
+		        ,TA2.monthLSplan
+		        ,TA2.yearSplan
+		        ,TA2.yearLSplan
+		        ,ROUND(FLOAT(TA2.daySplan)/FLOAT(TA3.dayTry)*100,2)   							AS dayAchivmentrate
+		        ,ROUND(FLOAT(TA2.monthSplan)/FLOAT(TA3.monthTry)*100,2)   						AS monthAchivmentrate
+		        ,ROUND(FLOAT(TA2.yearSplan)/FLOAT(TA3.yearTry)*100,2)   						AS yearAchivmentrate
+		       	,ROUND(FLOAT((TA2.daySplan-TA2.dayLSplan)/FLOAT(TA2.dayLSplan))*100,2)			AS dayIncrsrate
+		        ,ROUND(FLOAT((TA2.monthSplan-TA2.monthLSplan)/FLOAT(TA2.monthLSplan))*100,2)	AS monthIncrsrate
+		        ,ROUND(FLOAT((TA2.yearSplan-TA2.yearLSplan)/FLOAT(TA2.yearLSplan))*100,2)		AS yearIncrsrate
+		        ,TA2.monthSplan-TA3.monthTry													AS monthDiff
+		        ,TA2.yearSplan-TA3.yearTry														AS yearDiff
+		FROM SPFRDB.SPFM03PF TA1
+		
+		        LEFT OUTER JOIN
+		        (SELECT IS5203,IS5204,IS5205
+		                ,SUM(CASE WHEN IS5201 =#{startDt} THEN IS5213 ELSE 0 END)/1000 											AS daySplan
+				       ,SUM(CASE WHEN IS5201 =#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000 											AS dayLSplan
+		               ,SUM(CASE WHEN IS5201 &gt;=#{mmDt} AND IS5201 &lt;=#{startDt} THEN IS5213 ELSE 0 END)/1000 					AS monthSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{lastyearmmDt} AND IS5201 &lt;=#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000  				AS monthLSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{yyDt} AND IS5201 &lt;=#{startDt} THEN IS5213 ELSE 0 END)/1000 					AS yearSplan
+				       ,SUM(CASE WHEN IS5201 &gt;=#{lastyearyyDt} AND IS5201 &lt;=#{lastyearstartDt} THEN IS5213 ELSE 0 END)/1000  				AS yearLSplan
+		         FROM SPFRDB.SPFI52PF
+		         WHERE IS5201&gt;=#{lastyearyyDt} AND IS5201&lt;=#{startDt} 
+		         GROUP BY IS5203,IS5204,IS5205) TA2
+		        ON      MS0301 = TA2.IS5203
+		        AND     MS0302 = TA2.IS5204
+		        AND     MS0303 = TA2.IS5205
+		
+		         LEFT OUTER JOIN
+		         (SELECT IS05102,IS05103,IS05104
+		         	    ,SUM(CASE WHEN IS05101=#{startDt} THEN IS05106 ELSE 0 END)  AS dayTry	
+			         	,SUM(CASE WHEN IS05101&gt;=#{mmDt} AND IS05101&lt;=#{startDt} THEN IS05106 ELSE 0 END)  AS monthTry
+			         	,SUM(CASE WHEN IS05101&gt;=#{yyDt} AND IS05101&lt;=#{startDt} THEN IS05106 ELSE 0 END)  AS yearTry
+		         FROM SPFRDB.SPFI05PF1
+		       	 WHERE  IS05101 &gt;=#{yyDt}  AND IS05101 &lt;=#{startDt}
+		         GROUP BY IS05102,IS05103,IS05104 ) TA3
+		         ON      MS0301 = IS05102
+		         AND     MS0302 = IS05103
+		         AND     MS0303 = IS05104
+		
+		WHERE MS0301=#{jum} AND MS0302 IN('71','72')
+		)
+  				SELECT			Team   		   	                             AS   team
+                                ,Pc                                          AS   pc
+                                ,TRIM(TeamNm)								 AS   teamNm
+                                ,TRIM(PcNm)                                  AS   pcNm
+                                
+                                ,dayTry										 AS   pcDayTry
+                                ,monthTry                                    AS   pcMonthTry
+                                ,yearTry                                     AS   pcYearTry
+                                
+                                ,daySplan									 AS	  pcDaySplan
+                                ,monthSplan                                  AS   pcMonthSplan
+                                ,yearSplan                                   AS   pcYearSplan
+                                
+                                ,dayLSplan									 AS	  pcDayLastyearSplan
+                                ,monthLastyearSplan                          AS   pcMonthLastyearSplan
+                                ,yearLastyearSplan                       	 AS   pcYearLastyearSplan
+                                
+                                ,dayAchivmentrate                            AS   pcDayAchivmentrate
+                                ,monthAchivmentrate                          AS   pcMonthAchivmentrate
+                                ,yearAchivmentrate                           AS   pcYearAchivmentrate
+                                
+                                ,dayIncrsrate                                AS   pcDayIncrsrate
+                                ,monthIncrsrate                              AS   pcMonthIncrsrate
+                                ,yearIncrsrate                               AS   pcYearIncrsrate
+                                
+									
+								,monthDiff									AS pcMonthDiff
+								,yearDiff									AS pcYearDiff
+		        FROM TABLE1
+		        ORDER BY Pc
+		
+	</select>
+<select id="selectDayAggregationList2" resultType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel" 
+											parameterType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationParamModel">
+		WITH
+TA1(pc,pcNm,zoning,coner,conernm,daySplan,monthLSplan,monthSplan,monthLTry,monthTry,monthtotalTry)AS(
+SELECT  		 TB1.MS0504
+				,TB1.MS0509
+				,TB1.MS0518
+				,TB1.MS0505
+		        ,TRIM(TB1.MS0510)
+		        ,A.daySplan
+		        ,A.monthLSplan
+		        ,A.monthSplan
+		        ,B.monthLTry
+		        ,B.monthTry
+		        ,B.monthtotalTry
+		FROM    SPFRDB.SPFM05PF TB1
+		LEFT OUTER JOIN
+		                (SELECT IS0104
+		                ,SUM(CASE WHEN IS0102=#{startDt} THEN   IS0129 ELSE 0 END)/1000 AS daySplan
+                        ,SUM(CASE WHEN IS0102 &gt;= #{lastyearmmDt} AND IS0102 &lt;= #{lastyearstartDt} THEN   IS0129 ELSE 0 END)/1000 AS monthLSplan
+                        ,SUM(CASE WHEN IS0102 &gt;= #{mmDt} AND IS0102 &lt;= #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS monthSplan
+                        FROM SPFRDB.SPFI01PF
+                        WHERE ((IS0102 &gt;= #{lastyearmmDt} and IS0102 &lt;= #{lastyearstartDt})or(IS0102 &gt;=#{mmDt} and IS0102 &lt;= #{startDt}))                        
+                        GROUP BY IS0104) A
+                        ON A.IS0104 = TB1.MS0505
+        LEFT OUTER JOIN
+		                (SELECT IS0707
+		                ,SUM(CASE WHEN IS0702 &gt;= #{lastyearmmDt} AND IS0702 &lt;= #{lastyearstartDt} THEN  IS0709 ELSE 0 END) AS monthLTry
+                        ,SUM(CASE WHEN IS0702 &gt;= #{mmDt} AND IS0702 &lt;= #{startDt} THEN  IS0709 ELSE 0 END) AS monthTry
+                        ,SUM(CASE WHEN IS0702 &gt;= #{mmDt} AND IS0702 &lt;= #{mmEndDt} THEN  IS0709 ELSE 0 END) AS monthtotalTry
+                        FROM SPFRDB.SPFI07LF2
+                        WHERE ((IS0702 &gt;= #{lastyearmmDt} and IS0702 &lt;= #{lastyearmmEndDt})or(IS0702 &gt;= #{mmDt} and IS0702 &lt;= #{mmEndDt}))
+                        GROUP BY IS0707
+                         ) B
+                        ON B.IS0707 = TB1.MS0505
+
+	
+		WHERE  TB1.MS0501=#{jum} and TB1.MS0502=substr(#{bu},3,2)  and TB1.MS0503=substr(#{tim},5,2) 
+		        AND MS0515='' AND SUBSTR(MS0521,2,1)='Y'
+		        /*관리코너 CHECK*/
+		        AND MS0502||MS0503||MS0504 !='727571'
+		        AND MS0505!='20195'
+		        AND MS0505!='27815'
+		        AND MS0505!='27817'
+		         /*외식건강，세이문고，유니클로　제외 CHECK*/
+		        AND NOT EXISTS (SELECT MS05103 FROM SPFRDB.SPFM051PF WHERE MS05103=MS0505)
+		      --  AND SUBSTR(MS0505,1,1) &gt;='1'
+		      --  AND SUBSTR(MS0505,1,1) &lt;='9'
+	
+		ORDER BY TB1.MS0504
+		)
+		,
+		/*종속코너 합산*/
+		TA2(pc,pcNm,zoning,coner,conernm,daySplan,monthLSplan,monthSplan,monthLTry,monthTry,monthtotalTry)AS(
+		
+		SELECT  		 TB1.MS0504
+						,TB1.MS0509 
+						,TB1.MS0505
+						,TB1.MS0518
+				        ,TRIM(TB1.MS0510)
+				        ,A.daySplan
+				        ,A.monthLSplan
+				        ,A.monthSplan
+				        ,B.monthLTry
+				        ,B.monthTry
+				        ,B.monthtotalTry
+				FROM    SPFRDB.SPFM05PF TB1
+	
+		LEFT OUTER JOIN
+                        (SELECT IS0104
+		                ,SUM(CASE WHEN IS0102 =#{startDt} THEN   IS0129 ELSE 0 END)/1000 AS daySplan
+                        ,SUM(CASE WHEN IS0102 &gt;= #{lastyearmmDt} AND IS0102 &lt;= #{lastyearstartDt} THEN   IS0129 ELSE 0 END)/1000 AS monthLSplan
+                        ,SUM(CASE WHEN IS0102 &gt;= #{mmDt} AND IS0102 &lt;= #{startDt} THEN   IS0129 ELSE 0 END)/1000 AS monthSplan
+                        FROM SPFRDB.SPFI01PF
+                        WHERE ((IS0102 &gt;= #{lastyearmmDt} and IS0102 &lt;= #{lastyearstartDt})or(IS0102 &gt;= #{mmDt} and IS0102 &lt;= #{startDt}))                        
+                        GROUP BY IS0104) A
+                        ON A.IS0104 = TB1.MS0505
+		LEFT OUTER JOIN
+		                (SELECT IS0707
+		                ,SUM(CASE WHEN IS0702 &gt;= #{lastyearmmDt} AND IS0702 &lt;= #{lastyearstartDt} THEN  IS0709 ELSE 0 END) AS monthLTry
+                        ,SUM(CASE WHEN IS0702 &gt;= #{mmDt} AND IS0702 &lt;= #{startDt} THEN  IS0709 ELSE 0 END) AS monthTry
+                        ,SUM(CASE WHEN IS0702 &gt;= #{mmDt} AND IS0702 &lt;= #{mmEndDt} THEN  IS0709 ELSE 0 END) AS monthtotalTry
+                        FROM SPFRDB.SPFI07LF2
+                        WHERE ((IS0702 &gt;= #{lastyearmmDt} and IS0702 &lt;= #{lastyearmmEndDt})or(IS0702 &gt;= #{mmDt} and IS0702 &lt;= #{mmEndDt}))
+                        GROUP BY IS0707
+                         ) B
+                        ON B.IS0707 = TB1.MS0505
+
+        LEFT OUTER JOIN
+		       SPFRDB.SPFM051PF TB3
+		       ON MS05103=TB1.MS0505
+		LEFT OUTER JOIN
+		       SPFRDB.SPFM05PF  TB4
+		       ON TB4.MS0501='01' AND TB4.MS0505=TB3.MS05102
+
+		        WHERE  TB1.MS0501=#{jum} and TB1.MS0502=substr(#{bu},3,2)  and TB1.MS0503=substr(#{tim},5,2)  
+		        AND TB1.MS0515='' 
+		        AND SUBSTR(TB1.MS0521,2,1)='Y'
+		        AND TB1.MS0502||TB1.MS0503||TB1.MS0504 !='727571'
+		        AND TB1.MS0505!='20195'
+		        AND TB1.MS0505!='27815'
+		        AND TB1.MS0505!='27817'
+		        AND EXISTS (SELECT MS05103 FROM SPFRDB.SPFM051PF WHERE MS05103=TB1.MS0505)
+		        AND TB1.MS0505 IN ('18023','10505','10743','12003','12123','14193','19583')
+
+		
+		ORDER BY TB1.MS0504
+		)
+		,
+		TA3(pc,pcNm,zoning,coner,conernm,daySplan,monthLSplan,monthSplan,monthLTry,monthTry,monthtotalTry) as(
+		--select  --CASE WHEN(SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' ) THEN MS05802 ELSE coner END		AS	coner      --온라인+합산	
+		SELECT 		pc
+					,pcNm
+					,zoning
+					,coner
+					,conernm
+					,SUM(daySplan)
+					,SUM(monthLSplan)
+					,SUM(monthSplan)
+					,SUM(monthLTry)
+					,SUM(monthTry)
+					,SUM(monthtotalTry)
+          from (
+                select * from ta1
+                union all
+                select * from ta2
+                )
+          		LEFT OUTER JOIN SPFRDB.SPFM05PF8
+				ON  MS05803=coner	
+		--WHERE SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' 		--온라인만출력
+		  WHERE	coner&gt;='10000' AND coner&lt;='9' 		--오프라인만출력
+          group by --CASE WHEN(SUBSTR(coner,1,1)&gt;='A' AND SUBSTR(coner,1,1)&lt;='Z' ) THEN MS05802 ELSE coner END	    --온라인+합산	
+          			pc
+					,pcNm
+					,zoning
+					,coner
+					,conernm
+          		
+   		)
+		SELECT 					pc				as 	pc
+								,pcNm			as	zoningNm
+								,zoning			as  zoning
+								,coner			as 	coner
+								,conernm 		as  conerNm
+								,daySplan		as 	pcDaySplan
+								,monthtotalTry	as 	pcMonthTotalTry
+								,monthTry		as 	pcMonthTry
+								,monthSplan		as 	pcMonthSplan
+								,ROUND((FLOAT(monthSplan))/(FLOAT(monthTry))*100,2) AS pcMonthAchivmentrate
+								,ROUND((FLOAT(monthSplan))/(FLOAT(monthtotalTry))*100,2) AS pcMonthProgressRate
+								,monthLSplan			as pcMonthLastyearSplan
+								,ROUND((FLOAT(monthSplan-monthLSplan))/(FLOAT(monthLSplan))*100,2) AS pcMonthIncrsrate
+								,monthLTry 				as  pcMonthLastyearTry
+								,monthSplan-monthTry	AS pcMonthDiff
+			
+		
+		FROM TA3
+		WHERE monthtotalTry &gt;0
+		
+		ORDER BY zoning,CASE WHEN daySplan=0 OR monthTry=0 THEN 0 ELSE ROUND((FLOAT(monthSplan))/(FLOAT(monthTry))*100,2) END DESC
+	</select>
+	<select id="selectDayAggregationList3" resultType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationModel" 
+											parameterType="com.saydept.api.spf.excel.dayAggregation.model.DayAggregationParamModel">
+											
+				WITH
+				--일실적
+				TA1(Dt,week,daySplan,dayTry,dayLSplan) AS (
+				SELECT 	MS1901
+						,CASE WHEN MS1903='0' THEN '일' 
+							  WHEN MS1903='1' THEN '월'  		
+							  WHEN MS1903='2' THEN '화'
+							  WHEN MS1903='3' THEN '수'
+							  WHEN MS1903='4' THEN '목'
+							  WHEN MS1903='5' THEN '금'
+							  WHEN MS1903='6' THEN '토'
+							  ELSE ' ' END 
+				
+							,SUM(IS5213)/1000
+							,0
+							,0
+							  
+				FROM SPFRDB.SPFM19PF
+				
+				
+				--	LEFT OUTER  JOIN SPFRDB.SPFI05PF1 
+				--		ON IS05101=MS1901 AND IS05102='01' AND IS05103='71' AND IS05104='71' 
+				
+				
+					LEFT OUTER  JOIN SPFRDB.SPFI52PF 
+						ON IS5201=MS1901 AND IS5203=#{jum} AND IS5204 =substr(#{bu},3,2) AND IS5205 =SUBSTR(#{tim},5,2)
+						
+					
+				
+				WHERE SUBSTR(MS1901,1,6)=substr(#{startDt},1,6)
+				GROUP BY MS1901,MS1903
+				ORDER BY MS1901
+				)
+				,
+				TA2(Dt,week,daySplan,dayTry,dayLSplan) AS (
+				SELECT 	MS1901
+						,CASE WHEN MS1903='0' THEN '일' 
+							  WHEN MS1903='1' THEN '월'  		
+							  WHEN MS1903='2' THEN '화'
+							  WHEN MS1903='3' THEN '수'
+							  WHEN MS1903='4' THEN '목'
+							  WHEN MS1903='5' THEN '금'
+							  WHEN MS1903='6' THEN '토'
+							  ELSE ' ' END 
+							,0
+							,SUM(IS05106)
+							,0
+							  
+				FROM SPFRDB.SPFM19PF
+				
+				
+					LEFT OUTER  JOIN SPFRDB.SPFI05PF1 
+						ON IS05101=MS1901 AND IS05102=#{jum} AND IS05103=substr(#{bu},3,2) AND IS05104=SUBSTR(#{tim},5,2)
+				
+				WHERE SUBSTR(MS1901,1,6)=substr(#{startDt},1,6)
+				GROUP BY MS1901,MS1903
+				ORDER BY MS1901
+				)
+				,
+				TA3(Dt,week,daySplan,dayTry,dayLSplan) AS (
+				SELECT 	MS1901
+						,CASE WHEN MS1903='0' THEN '일' 
+							  WHEN MS1903='1' THEN '월'  		
+							  WHEN MS1903='2' THEN '화'
+							  WHEN MS1903='3' THEN '수'
+							  WHEN MS1903='4' THEN '목'
+							  WHEN MS1903='5' THEN '금'
+							  WHEN MS1903='6' THEN '토'
+							  ELSE ' ' END 
+							,0
+							,0
+							,SUM(IS5213)/1000
+						
+							  
+				FROM SPFRDB.SPFM19PF
+				
+				
+				--	LEFT OUTER  JOIN SPFRDB.SPFI05PF1 
+				--		ON IS05101=MS1901 AND IS05102='01' AND IS05103='71' AND IS05104='71' 
+				
+				
+					LEFT OUTER  JOIN SPFRDB.SPFI52PF 
+						ON IS5201=(MS1901-10000) AND IS5203=#{jum} AND IS5204 =substr(#{bu},3,2) AND IS5205 =SUBSTR(#{tim},5,2)
+						
+					
+				
+				WHERE SUBSTR(MS1901,1,6)=substr(#{startDt},1,6)
+				GROUP BY MS1901,MS1903
+				ORDER BY MS1901
+				)
+				,
+				TA4(dt,week,daySplan,dayTry,dayLSplan) as(
+				SELECT dt,week,SUM(daySplan),SUM(dayTry),SUM(dayLSplan)
+				FROM (
+				SELECT * FROM TA1
+				UNION ALL 
+				SELECT * FROM TA2
+				UNION ALL
+				SELECT * FROM TA3
+				)
+				GROUP BY dt,week
+				)
+				
+				
+				SELECT 	dt		as dt	
+									,week	as week
+									,dayTry	as pcDayTry
+									,daySplan	as pcDaySplan
+									,ROUND((FLOAT(daySplan))/(FLOAT(dayTry))*100,2)  as pcDayAchivmentrate
+									,dayLSplan 	as pcDayLastyearSplan
+									,ROUND((FLOAT(daySplan-dayLSplan))/(FLOAT(dayLSplan))*100,2) AS pcDayIncrsrate
+							FROM TA4
+							ORDER BY dt
+											
+			
+			
+	</select>
+</mapper>

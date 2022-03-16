@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.zoneManagement.ZoneManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectZoneManagement" resultType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementSaveModel" fetchSize="1000">
+		 SELECT
+         MS2101 as ms21Jum
+        ,MS2102 as ms21Bu
+        ,MS2103 as ms21Tim
+        ,MS2104 as ms21Pc
+        ,MS0408 as ms04PcNm
+        ,MS2105 as ms21Zone
+        ,MS2106 as ms21ZoneNm
+        ,MS2107 as ms2107
+        ,MS2108 as ms2108
+        ,MS2109 as ms2109
+        ,MS2110 as ms2110
+        ,MS2111 as ms2111
+        ,MS2112 as ms2112
+        ,MS2113 as ms2113
+
+	FROM SPFRDB.SPFM21PX
+		LEFT OUTER JOIN SPFRDB.SPFM04PF
+		ON MS0401 = MS2101 AND MS0402 = MS2102 AND MS0403 = MS2103 AND MS0404 = MS2104
+		
+        WHERE MS2101 = #{ms21Jum}
+        AND   MS2102 = #{ms21Bu}
+        AND   MS2105 = #{ms21Zone}
+
+	</select> 
+	
+	<!-- 부서조회  -->
+	<select id="selectBuList" resultType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementModel" 
+				parameterType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0201) 	AS jum /*점*/
+				,TRIM(TB1.MS0202) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0204) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0202)||' '||TRIM(TB1.MS0204) AS buCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE  	TRIM(TB1.MS0201)  = #{jum}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+				
+				ORDER BY TRIM(TB1.MS0201),TRIM(TB1.MS0202)
+				
+	</select> 
+	
+	
+	<!-- 존조회  -->
+	<select id="selectZoneList" resultType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementModel" 
+				parameterType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS2101) 	AS jum 			/*점*/
+				,TRIM(TB1.MS2102) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS2103) 	AS tim			/* 조직코드 */
+				,TRIM(TB1.MS2104) 	AS pc			/* 조직코드 */
+				,TRIM(TB1.MS2105) 	AS zone			/* 조직코드 */
+				,TRIM(TB1.MS2106) 	AS zoneNm		/* 조직명 */
+				,TRIM(TB1.MS2105)||' - '||TRIM(TB1.MS2106) AS zoneCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM21PF TB1
+		WHERE  	    TRIM(TB1.MS2101)  = #{jum}
+				AND TRIM(TB1.MS2102)  = #{bu}
+				AND TB1.MS2113 = ''
+				
+				ORDER BY TRIM(TB1.MS2101),TRIM(TB1.MS2102),TRIM(TB1.MS2103),TRIM(TB1.MS2104),TRIM(TB1.MS2105)
+				
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updateZoneManagement"  
+				parameterType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementSaveModel">
+         
+         UPDATE  SPFRDB.SPFM03LF1 SET
+          MS2102 = #{ms03JumNm}
+         ,MS2103 = #{ms03Sano}
+         ,MS2104 = #{ms03Dname}
+         ,MS2105 = #{ms03Juno1}
+         ,MS2106 = #{ms03Juno2}
+         ,MS2107 = #{ms03Post1}
+         ,MS2108 = #{ms03Post2}
+         ,MS2113 = #{ms03Address}
+         ,MS2110 = #{ms03Phone1}
+         ,MS2111 = #{ms03Phone2}
+         ,MS2112 = #{ms03Phone3}
+         ,MS2114 = #{ms03Crdate}
+         ,MS2115 = #{ms03Camonth}
+         ,MS2116 = #{ms03Deldate}
+         ,MS2117 = #{ms03Adddate}
+         ,MS2121 = #{ms03Uptdate}
+         WHERE MS2101 = #{ms03Jum}
+	</update> 
+	
+	
+	<!-- 인서트 1행  -->
+	<insert id="insertZoneManagement"  
+				parameterType="com.saydept.api.spf.org.zoneManagement.model.ZoneManagementSaveModel">
+         
+         INSERT INTO  SPFRDB.SPFM02LF1 VALUES
+         (
+          #{ms02Jum}
+         ,''
+         ,#{ms02Sano}
+         ,''
+         ,#{ms02Juno1}
+         ,#{ms02Juno2}
+         ,#{ms02Post1}
+         ,#{ms02Post2}
+         ,#{ms02Phone1}
+         ,#{ms02Phone2}
+         ,#{ms02Phone3}
+         ,''
+         ,#{ms02Crdate}
+         ,#{ms02Camonth}
+         ,#{ms02Deldate}
+         ,#{ms02Adddate}
+         ,#{ms02Uptdate}
+		 ,#{ms02Adduser}
+		 ,#{ms02Uptuser}
+		 )	
+	</insert>
+		
+</mapper>

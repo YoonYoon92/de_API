@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.app.appSayCash.AppSayCashMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="appSayCashModel" type="com.saydept.api.app.appSayCash.model.AppSayCashModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectAppSayCash" resultType="com.saydept.api.app.appSayCash.model.AppSayCashModel" parameterType="com.saydept.api.app.appSayCash.model.AppSayCashModel">
+		SELECT	Q05JUMIN1 as citizenNo1
+				,Q05JUMIN2 as citizenNo2
+				,Q05TPOINT	as eCash
+				--,Q05NPOINT	as 
+		
+		FROM SCDRDB.SCDP01PF
+		
+		        LEFT OUTER JOIN SCDRDB.SCDQ05PF
+		        ON Q05JUMIN1=P01JUMIN1 AND Q05JUMIN2=P01JUMIN2
+		
+		WHERE P01JUM='01' AND P01WHEGU=substr(#{wheno},1,2) AND
+		P01SEQNO=substr(#{wheno},3,6) AND P01CHECK=substr(#{wheno},9,1)
+	</select>
+	
+		<!-- ecash내역조회 -->
+	<select id="AppSayCashDetail" resultType="com.saydept.api.app.appSayCash.model.AppSayCashModel" parameterType="com.saydept.api.app.appSayCash.model.AppSayCashModel">
+
+	select Q02MAEY1||Q02MAEY2||Q02MAEM||Q02MAED								as	saleDate
+	        ,Q02REGINO||'-'||RIGHT('000'||Q02SLPNO,4)                       AS slpNo
+	        ,REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(
+	                 REPLACE(Q02CLSNAME
+	                                ,'　','')
+	                                ,('（면）'),'')
+	                                ,('（정）'),'')
+	                                ,('（행）'),'')
+	                                ,('（균）'),'')
+	                                ,('（한）'),'')
+	                                ,('（특）'),'')
+	                                ,('（Ｆ）'),'')
+	                                ,('（전시）'),'')
+	                                ,('（교육）'),'')
+	                                ,('（배달）'),'')
+	                                ,('（２）'),'')                                         AS clsNm
+	                                ,Q02MPOINT                                              AS useCash
+	                                ,Q02TPOINT                                              AS totCash
+	                                ,SUBSTR(Q02TIME,1,2)||':'||SUBSTR(Q02TIME,3,2)||':'||SUBSTR(Q02TIME,5,2)        AS saleTime
+	       							,Q02FIL4					as eventNum
+	FROM SCDRDB.SCDP01PF
+	
+	        LEFT OUTER JOIN SCDRDB.SCDQ02PF
+	        ON Q02MAEJUM='01' AND Q02JUMIN1=P01JUMIN1 AND Q02JUMIN2=P01JUMIN2
+	        AND Q02MAEY1||Q02MAEY2||Q02MAEM||Q02MAED&gt;=#{frDate}
+WHERE P01JUM='01' AND P01WHEGU=substr(#{wheno},1,2) AND
+		P01SEQNO=substr(#{wheno},3,6) AND P01CHECK=substr(#{wheno},9,1)
+	
+	ORDER BY Q02MAEY1||Q02MAEY2||Q02MAEM||Q02MAED DESC
+
+	</select>
+	<!-- ecash사은내역 -->
+	<select id="eventReceipt" resultType="com.saydept.api.app.appSayCash.model.AppSayCashModel" parameterType="com.saydept.api.app.appSayCash.model.AppSayCashModel">
+		SELECT  JS0505
+	        ,JS0506
+	        ,JS0507
+	        ,JS0513
+	
+		
+		FROM SPFRDB.SPFJ04PF
+		LEFT OUTER JOIN SPFRDB.SPFJ05PF
+		ON JS0500=JS0400 AND JS0501=JS0401 AND JS0502=JS0402 AND JS0503=JS0403 AND JS0504=JS0404
+		
+		WHERE JS0400='01' AND JS0401='2021' AND JS0402='08' AND JS0403='13' AND JS0404=00091
+
+
+
+	</select>
+	
+
+	
+</mapper>

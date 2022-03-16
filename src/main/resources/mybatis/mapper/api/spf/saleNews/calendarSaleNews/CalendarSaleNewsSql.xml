@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.calendarSaleNews.CalendarSaleNewsMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="CalendarSaleNewsModel" type="com.saydept.api.spf.saleNews.calendarSaleNews.model.CalendarSaleNewsModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectCalendarSaleNewsList" resultType="com.saydept.api.spf.saleNews.calendarSaleNews.model.CalendarSaleNewsModel" parameterType="com.saydept.api.spf.saleNews.calendarSaleNews.model.CalendarSaleNewsParamModel" fetchSize="1000">
+		/*selectCalendarSaleNewsList*/
+		
+		WITH
+		
+		/**
+		 * 일 실적
+		 */
+		TA01 AS (
+		SELECT  
+				IS5201      AS SALEDATE,
+				SUM(IS5213) AS SALEAMOUNT
+		FROM	${dbType}SPFRDB.SPFI52PF
+		WHERE 	SUBSTR(IS5201,1,6) = SUBSTR(#{inqYM},1,6)
+		AND     IS5203= #{jum}
+		<if test="bu != null and bu !=''">
+		AND 	IS5204 = SUBSTR(#{bu},3,2)
+		</if>
+		<if test="tim != null and tim !=''">
+		AND 	IS5205 = SUBSTR(#{tim},5,2)
+		</if>
+		
+		GROUP BY IS5201
+		)
+		
+		
+		/**
+		 * 일 목표
+		 */
+		,
+		TA02 AS ( 
+		SELECT 	IS05101           AS SALEDATE,
+				SUM(IS05106*1000) AS DAYGOAL
+		FROM	${dbType}SPFRDB.SPFI05PF1 sp 
+		WHERE 	SUBSTR(IS05101,1,6) = SUBSTR(#{inqYM},1,6)
+		AND 	IS05102 = #{jum}
+		<if test="bu != null and bu !=''">
+		AND 	IS05103 = SUBSTR(#{bu},3,2)
+		</if>
+		<if test="tim != null and tim !=''">
+		AND 	IS05104 = SUBSTR(#{tim},5,2)
+		</if>
+		GROUP BY IS05101
+		)
+		
+		
+		/**
+		 *	  result Query
+		 */
+		
+		
+		SELECT  MS1901   													  AS SALEDATE,
+				CASE WHEN MS1906='1' THEN '맑음 ' 
+			         WHEN MS1906='2' THEN '흐림 '
+				     WHEN MS1906='3' THEN '비 ' 
+				     WHEN MS1906='4' THEN '눈 '
+				     ELSE '기타'      END   								      AS WEATHER, 
+				CASE WHEN MS1906='1' THEN 'fas fa-sun' 
+			         WHEN MS1906='2' THEN 'fas fa-cloud'
+				     WHEN MS1906='3' THEN 'fas fa-cloud-showers-heavy' 
+				     WHEN MS1906='4' THEN 'far fa-snowflake'
+				     ELSE ''      END   								      AS WEATHERICON, 
+				TA01.SALEAMOUNT 									          AS SALEAMOUNT,
+				TA02.DAYGOAL 											      AS DAYGOAL,
+				FLOAT(TA01.SALEAMOUNT)/FLOAT(TA02.DAYGOAL)*100                AS ACHIEVEMENTRATE		
+		FROM 	${dbType}SPFRDB.SPFM19LF1
+				LEFT OUTER JOIN TA01
+				ON TA01.SALEDATE = MS1901
+				LEFT OUTER JOIN TA02
+				ON TA02.SALEDATE = MS1901
+		WHERE   MS1902 = '01'
+		AND 	SUBSTR(MS1901,1,6) = SUBSTR(#{inqYM},1,6)
+		ORDER BY SALEDATE
+
+	</select>
+
+</mapper>

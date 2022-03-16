@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.conerMmAvrageSaleInq.ConerMmAvrageSaleInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="conerMmAvrageSaleInqModel" type="com.saydept.api.spf.saleNews.conerMmAvrageSaleInq.model.ConerMmAvrageSaleInqModel"/>
+	-->
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectConerMmAvrageSaleInqList" resultType="com.saydept.api.spf.saleNews.conerMmAvrageSaleInq.model.ConerMmAvrageSaleInqModel" parameterType="com.saydept.api.spf.saleNews.conerMmAvrageSaleInq.model.ConerMmAvrageSaleInqParamModel" fetchSize="1000">   		
+		/*selectConerMmAvrageSaleInqList*/
+		
+	WITH
+		--주코너 당년매출
+		tb1(corno,netSale) as(
+			SELECT 	IS0204
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+			WHERE	IS0201||IS0202 &gt;=#{frYYMM}
+				AND	IS0201||IS0202 &lt;=#{toYYMM}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}
+				AND substr(IS0204 ,1 ,1) &gt;='0'	
+				AND NOT EXISTS(SELECT * FROM SPFRDB.SPFM051PF WHERE MS05101='01' AND MS05103=IS0204)
+		),
+			--온라인코너 당년매출
+		tb2(corno,netSale) as(
+			SELECT 	(CASE 			WHEN (substr(IS0204 ,1 ,1)='A') THEN '1'||substr(IS0204 ,2 ,4) 
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='B') THEN '2'||substr(IS0204 ,2 ,4)
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='C') THEN '3'||substr(IS0204 ,2 ,4) 
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='D') THEN '4'||substr(IS0204 ,2 ,4) 
+						ELSE '5'||substr(IS0204 ,2 ,4) END) END) END) END)		
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+			WHERE	IS0201||IS0202 &gt;=#{frYYMM}
+				AND	IS0201||IS0202 &lt;=#{toYYMM}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}	
+				AND substr(IS0204 ,1 ,1) &lt;'0'	
+		),
+			--종속코너 당년매출
+		tb3(corno, netSale) as(
+			SELECT 	MS05102
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+				INNER JOIN 	SPFRDB.SPFM051PF 
+				ON 			MS05101='01' AND MS05103=IS0204
+			WHERE	IS0201||IS0202 &gt;=#{frYYMM}
+				AND	IS0201||IS0202 &lt;=#{toYYMM}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}		
+				AND substr(IS0204 ,1 ,1) &gt;='0'	
+		),
+		
+		--당년매출 계
+		Tb4(corno, netSale) as(
+			SELECT CORNO, SUM(netSale) 
+			FROM (
+					SELECT * FROM tb1
+					UNION ALL
+					SELECT * FROM tb2
+					UNION ALL	
+					SELECT * FROM tb3
+				)
+			GROUP BY corno		
+		),
+		
+		--주코너 전년매출
+		tb11(corno,netSale) as(
+			SELECT 	IS0204
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+			WHERE	IS0201||IS0202 &gt;=#{frYYMMLastY}
+				AND	IS0201||IS0202 &lt;=#{toYYMMLastY}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}
+				AND substr(IS0204 ,1 ,1) &gt;='0'	
+				AND NOT EXISTS(SELECT * FROM SPFRDB.SPFM051PF WHERE MS05101='01' AND MS05103=IS0204)
+		),
+			--온라인코너 전년매출
+		tb12(corno,netSale) as(
+			SELECT 	(CASE 			WHEN (substr(IS0204 ,1 ,1)='A') THEN '1'||substr(IS0204 ,2 ,4) 
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='B') THEN '2'||substr(IS0204 ,2 ,4)
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='C') THEN '3'||substr(IS0204 ,2 ,4) 
+						ELSE (CASE  WHEN (substr(IS0204 ,1 ,1)='D') THEN '4'||substr(IS0204 ,2 ,4) 
+						ELSE '5'||substr(IS0204 ,2 ,4) END) END) END) END)		
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+			WHERE	IS0201||IS0202 &gt;=#{frYYMMLastY}
+				AND	IS0201||IS0202 &lt;=#{toYYMMLastY}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}	
+				AND substr(IS0204 ,1 ,1) &lt;'0'	
+		),
+			--종속코너 전년매출
+		tb13(corno, netSale) as(
+			SELECT 	MS05102
+			,	   	IS0229
+			FROM 	SPFRDB.SPFI02LF1 
+				INNER JOIN 	SPFRDB.SPFM051PF 
+				ON 			MS05101='01' AND MS05103=IS0204
+			WHERE	IS0201||IS0202 &gt;=#{frYYMMLastY}
+				AND	IS0201||IS0202 &lt;=#{toYYMMLastY}
+				AND IS0203 =#{jum}
+				AND IS0206 =#{bu}
+				AND IS0207 =#{tim}		
+				AND substr(IS0204 ,1 ,1) &gt;='0'	
+		),
+		
+		--전년매출 계
+		Tb14(corno, netSaleLastY) as(
+			SELECT CORNO, SUM(netSale) 
+			FROM (
+					SELECT * FROM tb11
+					UNION ALL
+					SELECT * FROM tb12
+					UNION ALL	
+					SELECT * FROM tb13
+				)
+			GROUP BY corno		
+		)	
+				
+		
+		
+		SELECT 	tb4.corno						AS corno
+		, 		trim(ms0510)	 				AS cornm
+		,		tb4.netSale 					AS netSale
+		, 		tb4.netSale/#{mmCount}  		AS avg
+		,		tb14.netSaleLastY 				AS netSaleLastY
+		, 		tb14.netSaleLastY/#{mmCount}  	AS avgLastY		
+		FROM 	tb4 
+			INNER JOIN 	SPFRDB.SPFM05PF
+			ON	MS0501=#{jum} 
+			AND	MS0505=tb4.corno
+			INNER JOIN  Tb14
+			ON	Tb4.corno = TB14.corno
+		ORDER BY tb4.corno
+	</select>
+
+
+</mapper>

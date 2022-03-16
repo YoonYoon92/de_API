@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.profitAnalysisOfMarginRateChg.ProfitAnalysisOfMarginRateChgMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectProfitAnalysisOfMarginRateChgList" resultType="com.saydept.api.spf.selng.profitAnalysisOfMarginRateChg.model.ProfitAnalysisOfMarginRateChgModel" parameterType="com.saydept.api.spf.selng.profitAnalysisOfMarginRateChg.model.ProfitAnalysisOfMarginRateChgParamModel" fetchSize="1000">
+		/*selectProfitAnalysisOfMarginRateChgList*/
+		
+		SELECT  IS0201||IS0202      								AS YYYYMM
+		,		IS0229              								AS NETAMOUNT
+		,		IS0234             									AS PROFITAMOUNT
+		,       IS0234 / IS0229 * 100 								AS PROFITRATE
+		,       IS0229 * #{prevMarginRate} 	/100    				AS PREVPROFIT 
+		,       IS0229 * #{afterMarginRate} /100					AS AFTERPROFIT
+		,       (IS0229 * #{afterMarginRate} /100) - (IS0229 * #{prevMarginRate} /100) 	AS PROFITDIFF
+		FROM 	${dbType}SPFRDB.SPFI02PF sp 
+		WHERE   IS0203 = #{jum}
+		AND 	IS0201||IS0202 &gt;= #{startYM}       --조회시작년월(from)
+		AND 	IS0201||IS0202 &lt;= #{endYM}         --조회종료년월(to)
+		AND 	IS0204||IS0205 = #{classCd}           --클래스(7자리)
+	</select>
+
+</mapper>

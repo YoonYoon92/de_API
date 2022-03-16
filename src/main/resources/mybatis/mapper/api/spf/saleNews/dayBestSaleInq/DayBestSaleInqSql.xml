@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.saleNews.dayBestSaleInq.DayBestSaleInqMapper">
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<!-- 일별 기네스매출 순위 조회 (점) 2000위까지 -->
+	<select id="selectDayBestSaleInqListLv1" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+		/*selectDayBestSaleInqList*/
+		SELECT 	TB1.IS5221									AS saleDate
+		,	 	TB1.IS5223      							AS netSale
+		, 		TB1.IS5224      							AS rank
+		,		sum(TB2.IS05106*1000)    					AS saleTry
+		,		(TB1.IS5223/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+		,		trim(TB3.MS1911)                       		AS remark
+		FROM	${dbType}SPFRDB.SPFI522PF TB1
+			INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+			ON			TB1.IS5221=TB2.IS05101	
+			AND			TB1.IS5222=TB2.IS05102
+			INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+			ON 			TB1.IS5221=TB3.MS1901 
+		GROUP BY TB1.IS5221,TB1.IS5223,TB1.IS5224,TB3.MS1911 
+		ORDER BY TB1.IS5224 
+		FETCH FIRST 2000 ROWS ONLY		
+	</select>
+	
+	<!-- 일별 기네스매출 순위 조회 (점) 당일 순위 -->	
+	<select id="selectDayBestSaleInqListLv1Today" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+	/*selectDayBestSaleInqListToday*/
+	SELECT 	TB1.IS5221									AS saleDate
+	,	 	TB1.IS5223      							AS netSale
+	, 		TB1.IS5224      							AS rank
+	,		sum(TB2.IS05106*1000)    					AS saleTry
+	,		(TB1.IS5223/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+	,		trim(TB3.MS1911)                       		AS remark
+	FROM	${dbType}SPFRDB.SPFI522PF TB1
+		INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+		ON			TB1.IS5221=TB2.IS05101	
+		AND			TB1.IS5222=TB2.IS05102
+		INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+		ON 			TB1.IS5221=TB3.MS1901 
+	WHERE 	TB1.IS5221	= #{searchDay}
+	AND		TB1.IS5222  = #{jum}	
+	GROUP BY TB1.IS5221,TB1.IS5223,TB1.IS5224,TB3.MS1911 
+	ORDER BY TB1.IS5224 	
+	</select>
+	
+	
+	<!-- 일별 기네스매출 순위 조회 (부) 2000위까지 -->
+	<select id="selectDayBestSaleInqListLv2" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+		/*selectDayBestSaleInqList*/
+		SELECT 	TB1.IS5231									AS saleDate
+		,	 	TB1.IS5233      							AS netSale
+		, 		TB1.IS5234      							AS rank
+		,		sum(TB2.IS05106*1000)    					AS saleTry
+		,		(TB1.IS5233/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+		,		trim(TB3.MS1911)                       		AS remark
+		FROM	${dbType}SPFRDB.SPFI523PF TB1
+			INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+			ON			TB1.IS5231=TB2.IS05101	
+			AND			SUBSTRING(TB1.IS5232,1,2)=TB2.IS05102
+			AND			SUBSTRING(TB1.IS5232,3,2)=TB2.IS05103
+			INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+			ON 			TB1.IS5231=TB3.MS1901 
+		WHERE	TB1.IS5232=#{bu}
+		GROUP BY TB1.IS5231,TB1.IS5233,TB1.IS5234,TB3.MS1911 
+		ORDER BY TB1.IS5234 
+		FETCH FIRST 2000 ROWS ONLY		
+	</select>
+	
+	<!-- 일별 기네스매출 순위 조회 (부) 당일 순위 -->
+	<select id="selectDayBestSaleInqListLv2Today" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+		/*selectDayBestSaleInqList*/
+		SELECT 	TB1.IS5231									AS saleDate
+		,	 	TB1.IS5233      							AS netSale
+		, 		TB1.IS5234      							AS rank
+		,		sum(TB2.IS05106*1000)    					AS saleTry
+		,		(TB1.IS5233/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+		,		trim(TB3.MS1911)                       		AS remark
+		FROM	${dbType}SPFRDB.SPFI523PF TB1
+			INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+			ON			TB1.IS5231=TB2.IS05101	
+			AND			SUBSTRING(TB1.IS5232,1,2)=TB2.IS05102
+			AND			SUBSTRING(TB1.IS5232,3,2)=TB2.IS05103
+			INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+			ON 			TB1.IS5231=TB3.MS1901 
+		WHERE 	TB1.IS5231	= #{searchDay}
+		AND		TB1.IS5232  = #{bu}	
+		GROUP BY TB1.IS5231,TB1.IS5233,TB1.IS5234,TB3.MS1911 
+		ORDER BY TB1.IS5234 	
+	</select>
+	
+	
+	<!-- 일별 기네스매출 순위 조회 (팀) 2000위까지 -->
+	<select id="selectDayBestSaleInqListLv3" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+		/*selectDayBestSaleInqList*/
+		SELECT 	TB1.IS5241									AS saleDate
+		,	 	TB1.IS5243      							AS netSale
+		, 		TB1.IS5244      							AS rank
+		,		sum(TB2.IS05106*1000)    					AS saleTry
+		,		(TB1.IS5243/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+		,		trim(TB3.MS1911)                       		AS remark
+		FROM	${dbType}SPFRDB.SPFI524PF TB1
+			INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+			ON			TB1.IS5241=TB2.IS05101	
+			AND			SUBSTRING(TB1.IS5242,1,2)=TB2.IS05102
+			AND			SUBSTRING(TB1.IS5242,3,2)=TB2.IS05103
+			AND			SUBSTRING(TB1.IS5242,5,2)=TB2.IS05104
+			INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+			ON 			TB1.IS5241=TB3.MS1901 
+		WHERE	TB1.IS5242=#{tim}
+		GROUP BY TB1.IS5241,TB1.IS5243,TB1.IS5244,TB3.MS1911 
+		ORDER BY TB1.IS5244 
+		FETCH FIRST 2000 ROWS ONLY		
+	</select>
+	
+	<!-- 일별 기네스매출 순위 조회 (팀) 당일 순위 -->
+	<select id="selectDayBestSaleInqListLv3Today" resultType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" parameterType="com.saydept.api.spf.saleNews.dayBestSaleInq.model.DayBestSaleInqModel" fetchSize="2000">
+		/*selectDayBestSaleInqList*/
+		SELECT 	TB1.IS5241									AS saleDate
+		,	 	TB1.IS5243      							AS netSale
+		, 		TB1.IS5244      							AS rank
+		,		sum(TB2.IS05106*1000)    					AS saleTry
+		,		(TB1.IS5243/sum(TB2.IS05106*1000))*100  	AS achivmentrate
+		,		trim(TB3.MS1911)                       		AS remark
+		FROM	${dbType}SPFRDB.SPFI524PF TB1
+			INNER JOIN 	${dbType}SPFRDB.SPFI05PF1 TB2
+			ON			TB1.IS5241=TB2.IS05101	
+			AND			SUBSTRING(TB1.IS5242,1,2)=TB2.IS05102
+			AND			SUBSTRING(TB1.IS5242,3,2)=TB2.IS05103
+			AND			SUBSTRING(TB1.IS5242,5,2)=TB2.IS05104
+			INNER JOIN 	${dbType}SPFRDB.SPFM19PF  TB3
+			ON 			TB1.IS5241=TB3.MS1901 
+		WHERE 	TB1.IS5241	= #{searchDay}
+		AND		TB1.IS5242  = #{tim}	
+		GROUP BY TB1.IS5241,TB1.IS5243,TB1.IS5244,TB3.MS1911 
+		ORDER BY TB1.IS5244 	
+	</select>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.giftEventInq.GiftEventInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="giftEventInqModel" type="com.saydept.api.tasks.giftEventInq.model.GiftEventInqModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectGiftEventInq" resultType="giftEventInqModel" parameterType="giftEventInqModel">
+		/*selectGiftEventInq*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectGiftEventInqList" resultType="giftEventInqModel" parameterType="giftEventInqModel" fetchSize="1000">
+		/*selectGiftEventInqList*/
+		SELECT ...
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateGiftEventInq" parameterType="giftEventInqModel">
+		/*updateGiftEventInq*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertGiftEventInq" parameterType="giftEventInqModel">
+		/*insertGiftEventInq*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteGiftEventInq" parameterType="giftEventInqModel">
+		/*deleteGiftEventInq*/
+		DELETE ...
+	</delete>
+
+</mapper>

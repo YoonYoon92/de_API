@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.org.pcManagement.PcManagementMapper">
+
+
+	<!-- 목록조회 1건  -->
+	<select id="selectPcManagement" resultType="com.saydept.api.spf.org.pcManagement.model.PcManagementSaveModel" 
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementSaveModel" fetchSize="1000">
+		 SELECT
+         MS0401 as ms04Jum
+        ,MS0402 as ms04Bu
+        ,MS0403 as ms04Tim
+        ,MS0404 as ms04Pc
+        ,MS0405 as ms04JumNm
+        ,MS0406 as ms04BuNm
+        ,MS0407 as ms04TimNm
+        ,MS0408 as ms04PcNm
+        ,MS0409 as ms0409
+        ,MS0410 as ms0410
+        ,MS0411 as ms0411
+        ,MS0412 as ms0412
+        ,MS0413 as ms0413
+        ,MS0414 as ms0414
+        ,MS0415 as ms0415
+        ,MS0416 as ms0416
+        ,MS0417 as ms0417
+        ,MS0418 as ms0418
+        ,MS0418 as ms0418 
+        ,MS0419 as ms0419 
+        ,MS0420 as ms0420 
+
+	FROM SPFRDB.SPFM04PX
+        WHERE MS0401 = #{ms04Jum}
+        AND   MS0402 = #{ms04Bu}
+        AND   MS0403 = #{ms04Tim}
+        AND   MS0404 = #{ms04Pc}
+
+	</select> 
+	
+	<!-- 부서조회  -->
+	<select id="selectBuList" resultType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" 
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0201) 	AS jum /*점*/
+				,TRIM(TB1.MS0202) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0204) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0202)||'-'||TRIM(TB1.MS0204) AS buCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM02PF TB1
+		WHERE  	TRIM(TB1.MS0201)  = #{jum}
+				AND TB1.MS0202 &gt;='70'
+				AND TB1.MS0214 = ''
+				
+				ORDER BY TRIM(TB1.MS0201),TRIM(TB1.MS0202)
+				
+	</select> 
+	
+<!-- 팀조회  -->
+	<select id="selectTimList" resultType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" 
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0301) 	AS jum 			/*점*/
+				,TRIM(TB1.MS0302) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0303) 	AS tim			/* 조직코드 */
+				,TRIM(TB1.MS0304) 	AS jumNm		/* 조직명 */
+				,TRIM(TB1.MS0305) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0306) 	AS timNm		/* 조직명 */
+				,TRIM(TB1.MS0303)||' '||TRIM(TB1.MS0306) AS timCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM03PF TB1
+		WHERE  	    TRIM(TB1.MS0301)  = #{jum}
+				AND TRIM(TB1.MS0302)  = #{bu}
+				AND TB1.MS0318 = ''
+				
+				ORDER BY TRIM(TB1.MS0301),TRIM(TB1.MS0302),TRIM(TB1.MS0303)
+				
+	</select> 
+	
+<!-- PC조회  -->
+	<select id="selectPcList" resultType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" 
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementModel" fetchSize="1000">
+		SELECT	 TRIM(TB1.MS0401) 	AS jum 			/*점*/
+				,TRIM(TB1.MS0402) 	AS bu			/* 조직코드 */
+				,TRIM(TB1.MS0403) 	AS tim			/* 조직코드 */
+				,TRIM(TB1.MS0404) 	AS pc			/* 조직코드 */
+				,TRIM(TB1.MS0405) 	AS jumNm		/* 조직명 */
+				,TRIM(TB1.MS0406) 	AS buNm			/* 조직명 */
+				,TRIM(TB1.MS0407) 	AS timNm		/* 조직명 */
+				,TRIM(TB1.MS0408) 	AS pcNm			/* 조직명 */
+				,TRIM(TB1.MS0404)||' - '||TRIM(TB1.MS0408) AS pcCom /*조직코드명*/
+		FROM 	SPFRDB.SPFM04PF TB1
+		WHERE  	    TRIM(TB1.MS0401)  = #{jum}
+				AND TRIM(TB1.MS0402)  = #{bu}
+				AND TRIM(TB1.MS0403)  = #{tim}
+				AND TB1.MS0418 = ''
+				
+				ORDER BY TRIM(TB1.MS0401),TRIM(TB1.MS0402),TRIM(TB1.MS0403),TRIM(TB1.MS0404)
+				
+	</select> 
+	
+<!-- 업데이트 1행  -->
+	<update id="updatePcManagement"  
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementSaveModel">
+         
+         UPDATE  SPFRDB.SPFM03LF1 SET
+          MS0302 = #{ms03JumNm}
+         ,MS0303 = #{ms03Sano}
+         ,MS0304 = #{ms03Dname}
+         ,MS0305 = #{ms03Juno1}
+         ,MS0306 = #{ms03Juno2}
+         ,MS0307 = #{ms03Post1}
+         ,MS0308 = #{ms03Post2}
+         ,MS0313 = #{ms03Address}
+         ,MS0310 = #{ms03Phone1}
+         ,MS0311 = #{ms03Phone2}
+         ,MS0312 = #{ms03Phone3}
+         ,MS0314 = #{ms03Crdate}
+         ,MS0315 = #{ms03Camonth}
+         ,MS0316 = #{ms03Deldate}
+         ,MS0317 = #{ms03Adddate}
+         ,MS0321 = #{ms03Uptdate}
+         WHERE MS0301 = #{ms03Jum}
+	</update> 
+	
+	
+<!-- 인서트 1행  -->
+	<insert id="insertPcManagement"  
+				parameterType="com.saydept.api.spf.org.pcManagement.model.PcManagementSaveModel">
+         
+         INSERT INTO  SPFRDB.SPFM02LF1 VALUES
+         (
+          #{ms02Jum}
+         ,''
+         ,#{ms02Sano}
+         ,''
+         ,#{ms02Juno1}
+         ,#{ms02Juno2}
+         ,#{ms02Post1}
+         ,#{ms02Post2}
+         ,#{ms02Phone1}
+         ,#{ms02Phone2}
+         ,#{ms02Phone3}
+         ,''
+         ,#{ms02Crdate}
+         ,#{ms02Camonth}
+         ,#{ms02Deldate}
+         ,#{ms02Adddate}
+         ,#{ms02Uptdate}
+		 ,#{ms02Adduser}
+		 ,#{ms02Uptuser}
+		 )	
+	</insert>
+		
+</mapper>

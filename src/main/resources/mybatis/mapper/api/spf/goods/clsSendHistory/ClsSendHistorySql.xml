@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.goods.clsSendHistory.ClsSendHistoryMapper">
+
+	
+
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectClsSendHistoryList" resultType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel" 
+				parameterType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel" fetchSize="1000">
+					SELECT MS2601||'/'||MS2602||'/'||MS2603||''	AS sendDt
+							,	MS2604||' - '||MS2605 AS cls
+							,	REPLACE(MS2607,'　　','')	AS	clsNm
+							,	MS2604	AS	cls1
+							,	MS2605	AS 	cls2
+							,	SUBSTR(MS2608,1,4)||'/'||SUBSTR(MS2608,5,2)||'/'||SUBSTR(MS2608,7,2)||'' 	AS	eventStartDt
+							,	SUBSTR(MS2609,1,4)||'/'||SUBSTR(MS2609,5,2)||'/'||SUBSTR(MS2609,7,2)||'' 	AS	eventEndDt
+							,	MS2606 	AS	proc
+							,	MS2610 	AS	disol
+							--,	MS2611	AS	jum
+							,	MS2611||' '||REPLACE(MS0102,'　　','') AS	jum
+							--,	MS2612	AS	bu
+							,	MS2612||' '||REPLACE(MS0204,'　　','') AS	bu
+							--,	MS2613	AS	tim
+							,	MS2613||' '||REPLACE(MS0306,'　　','')	AS	tim
+							--,	MS2614	AS	pc
+							,	MS2614||' '||REPLACE(MS0408,'　　','')	AS	pc
+					FROM ${dbType}SPFRDB.SPFM26PF
+						LEFT OUTER JOIN SPFRDB.SPFM01PF
+						ON MS0101 = MS2611
+						LEFT OUTER JOIN SPFRDB.SPFM02PF
+						ON MS0201 = MS2611 AND MS0202 = MS2612
+						LEFT OUTER JOIN SPFRDB.SPFM03PF
+						ON MS0301 = MS2611 AND MS0302 = MS2612 AND MS0303 = MS2613
+						LEFT OUTER JOIN SPFRDB.SPFM04PF
+						ON MS0401 = MS2611 AND MS0402 = MS2612 AND MS0403 = MS2613 AND MS0404 = MS2614
+				<where>
+				<choose>
+					<when test="jum != null or jum != '' ">
+						MS2611=#{jum} 
+						AND (#{startDt} = '' OR MS2601||MS2602||MS2603 &gt;=#{startDt}) 
+						AND (#{endDt}   = '' OR MS2601||MS2602||MS2603 &lt;=#{endDt}  )	
+						AND (#{cls1}    = '' OR #{cls1} = MS2604)
+						AND (#{cls2}    = '' OR #{cls2} = MS2605)
+					</when>
+					</choose>
+				</where>
+				ORDER BY MS2601 DESC ,MS2602 DESC,MS2603 DESC
+				
+				FETCH FIRST 100 ROWS ONLY
+	</select>
+
+		<select id="selectClsList" resultType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel"  
+		parameterType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel">
+				SELECT	MS0505			as	cls
+					,	MS0505||'('||trim(MS0510)||')'	as	clsNm
+					
+		 		FROM ${dbType}SPFRDB.SPFM05PF 
+				WHERE MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515=''
+				ORDER BY MS0505
+			
+	</select>
+			<select id="selectCls2List" resultType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel"  
+		parameterType="com.saydept.api.spf.goods.clsSendHistory.model.ClsSendHistoryModel">
+				SELECT 	MS0603	AS cls
+				,		MS0603||'('||trim(MS0604)||')'	AS clsNm
+				FROM ${dbType}SPFRDB.SPFM06PF 
+				WHERE	MS0602=#{cls1}
+				 
+	</select>	
+</mapper>

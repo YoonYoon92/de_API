@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.saydept.api.spf.goods.chgMarginCmplSlp.ChgMarginCmplSlpMapper">
+
+	<select id="getChgMarginCmplSlplist"
+		parameterType="com.saydept.api.spf.goods.chgMarginCmplSlp.model.ChgMarginCmplSlpParamModel"
+		resultType="com.saydept.api.spf.goods.chgMarginCmplSlp.model.ChgMarginCmplSlpModel">
+
+		SELECT 
+		  MS1603||'-'||MS1604 AS clsNo
+		, REPLACE(MS1608,'　','') AS clsNm
+		, MS1609 AS frMargin
+		, MS1610 AS toMargin
+		, SUBSTR(MS1601,1,4)||'/'||SUBSTR(MS1601,5,2)||'/'||SUBSTR(MS1601,7,2) AS chgDate
+		, MS1606||'-'||MS1607 AS eventCode
+		, 'SPFM41PF' AS eventNm
+		, SUBSTR(MS1611,1,4)||'/'||SUBSTR(MS1611,5,2)||'/'||SUBSTR(MS1611,7,2) AS eventEndDate
+		, MS1605 AS bizCustomNo
+		, REPLACE(MS0804,'　','') AS bizCustomNm
+		                                              
+		FROM ${dbType}SPFRDB.SPFM16PF
+			LEFT OUTER JOIN SPFRDB.SPFM05PF TB1
+			ON TB1.MS0501 = #{jum} AND TB1.MS0505 = MS1603
+			LEFT OUTER JOIN SPFRDB.SPFM08PF
+			ON MS0801 = #{jum} AND MS0802 = MS1605
+	
+	<where>
+         <choose>
+            <when test="onlineChk == 'Y'">
+               MS1601 &gt;= #{frDate} AND MS1601 &lt;= #{toDate}
+            </when>
+            <when test="onlineChk == 'N'">
+               MS1601 &gt;= #{frDate} AND MS1601 &lt;= #{toDate}
+            </when>
+            <otherwise>
+               MS1601 &gt;= #{frDate} AND MS1601 &lt;= #{toDate}
+            </otherwise>
+         </choose>
+      </where>
+				AND MS1602 = #{jum}
+				AND (substr(#{bu},3,2) = '' or substr(#{bu},3,2) = MS0502)
+				AND (substr(#{tim},5,2) = '' or substr(#{tim},5,2) = MS0503)
+	
+	ORDER BY MS1601 DESC, TB1.MS0505
+
+	</select>
+
+</mapper>
+
+

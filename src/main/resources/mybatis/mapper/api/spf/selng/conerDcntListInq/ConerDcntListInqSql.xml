@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.spf.selng.conerDcntListInq.ConerDcntListInqMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="conerDcntListInqModel" type="com.saydept.api.tasks.conerDcntListInq.model.ConerDcntListInqModel"/>
+	-->
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectConerDcntListInqList" resultType="com.saydept.api.spf.selng.conerDcntListInq.model.ConerDcntListInqModel" 
+											parameterType="com.saydept.api.spf.selng.conerDcntListInq.model.ConerDcntListInqModel">
+		SELECT 	JR1201 	AS 	saleDt
+				,	JR1206	AS 	coner
+				,	trim(MS0510)	AS	conerNm
+				,	JR1207	AS	regi
+				,	JR1208	AS	receipt
+				,	JR1209	AS	netSale
+				,	JR1210	AS	dsnt
+				,	JR1211	AS	totSale
+				,	JR1217	AS 	cardNo
+				,	CASE
+					WHEN A6.CM0103!=''	THEN	TRIM(A6.CM0103) 	
+					WHEN A5.CM0103!=''	THEN	TRIM(A5.CM0103)	
+					WHEN A4.CM0103!=''	THEN	TRIM(A4.CM0103)	
+					WHEN A3.CM0103!=''	THEN	TRIM(A3.CM0103)	
+					WHEN A2.CM0103!=''	THEN	TRIM(A2.CM0103)	
+					ELSE '' END		AS	cardNm
+				,	JR1418 	AS	pointNum
+				,	ROUND(JR1210/JR1211 * 100,0) AS dsntRate
+				,	CASE 
+					WHEN VM01WHEGU != '' THEN '프라임' 
+					WHEN C51CGBNNM!=''	THEN trim(C51CGBNNM)
+					WHEN C61CGBNNM!=''	THEN trim(C61CGBNNM)			
+					WHEN MR2502	!=''	THEN trim(MR2502)	
+					
+					ELSE '' 	END	AS dsntDiv
+			
+			FROM ${dbType}SPORDB.SPOJ12PF
+			
+				LEFT OUTER JOIN ${dbType}SPFRDB.SPFM05PF 
+					ON JR1206 = MS0505 AND MS0515=''
+				
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOCDM01PF A6
+					ON A6.CM0100=JR1202 AND A6.CM0101=SUBSTRING(JR1217,1,6)
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOCDM01PF A5
+					ON A5.CM0100=JR1202 AND A5.CM0101=SUBSTRING(JR1217,1,5) 
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOCDM01PF A4
+					ON A4.CM0100=JR1202 AND A4.CM0101=SUBSTRING(JR1217,1,4) 
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOCDM01PF A3
+					ON A3.CM0100=JR1202 AND A3.CM0101=SUBSTRING(JR1217,1,3) 
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOCDM01PF A2
+					ON A2.CM0100=JR1202 AND A2.CM0101=SUBSTRING(JR1217,1,2) 
+				
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOJ14PF
+					ON JR1201=JR1401 AND JR1202 = JR14011 AND JR1207 = JR1402 AND JR1208 = JR1403 AND JR1206=JR1404 AND JR1406=1
+				
+				LEFT OUTER JOIN ${dbType}SPORDB.SPOM25PF 
+					ON MR2500=JR1202 AND MR2501= (CASE 	WHEN JR1415!='' THEN JR1415
+													WHEN JR1415=''	THEN '99' 
+													ELSE JR1415 	END) 
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SCDC52LF1
+					ON C52MAEJUM=JR1202 AND C52MAEY=SUBSTR(JR1201,1,4) AND C52MAEM=SUBSTR(JR1201,5,2) AND C52MAED= SUBSTR(JR1201,7,2)
+					AND C52REGINO=JR1207 AND C52SLPNO=JR1208 
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SCDC51LF3
+					ON C51JUM=JR1202 AND C51COUPON =C52COUPON
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SCDC62LF1
+					ON C62MAEJUM=JR1202 AND C62MAEY=SUBSTR(JR1201,1,4) AND C62MAEM=SUBSTR(JR1201,5,2) AND C62MAED= SUBSTR(JR1201,7,2)
+					AND C62REGINO=JR1207 AND C62SLPNO=JR1208 
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SCDC61PF
+					ON C61COUPON=C62COUPON
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SVPM02PF 
+					ON	M02APPLYIL &gt;=JR1201 AND M02CLOSEIL  &lt;=JR1201
+				
+				LEFT OUTER JOIN ${dbType}SCDRDB.SVPM01LF1
+					ON VM01WHEGU = SUBSTR(JR1418,1,2) 
+					AND VM01SEQNO=SUBSTR(JR1418,3,6)
+					AND VM01GISU=M02GISU AND  VM01CHECK=SUBSTR(JR1418,9,1) AND  VM01LILJA=''  
+			
+			
+				<where>
+				<choose>
+					<when test="coner !=null and coner !='' ">
+					 JR1201=#{startDt} AND JR1202=#{jum} AND JR1203=substr(#{bu},3,2) AND JR1204=substr(#{tim},5,2) AND JR1205=substr(#{pc},7,2) AND JR1206=#{coner}
+					 </when>
+					 <when test="pc !=null and pc !='' ">
+					 JR1201=#{startDt} AND JR1202=#{jum} AND JR1203=substr(#{bu},3,2) AND JR1204=substr(#{tim},5,2) AND JR1205=substr(#{pc},7,2) 
+					 </when>
+					 <when test="tim !=null and tim !='' ">
+					 JR1201=#{startDt} AND JR1202=#{jum} AND JR1203=substr(#{bu},3,2) AND JR1204=substr(#{tim},5,2) 
+					 </when>
+					 <when test="bu !=null and bu !='' ">
+					 JR1201=#{startDt} AND JR1202=#{jum} AND JR1203=substr(#{bu},3,2)  
+					 </when>
+					 <when test="jum !=null and jum !='' ">
+					 JR1201=#{startDt} AND JR1202=#{jum}
+					 </when>
+			 </choose>
+			 </where>
+			ORDER BY JR1206
+			
+
+
+	</select>
+	<select id="selectConerList" resultType="com.saydept.api.spf.selng.conerDcntListInq.model.ConerDcntListInqModel" 
+											parameterType="com.saydept.api.spf.selng.conerDcntListInq.model.ConerDcntListInqModel">
+				SELECT	MS0505			as	coner
+					,	MS0505||'('||trim(MS0510)||')'	as	conerNm
+					
+		 		FROM ${dbType}SPFRDB.SPFM05PF 
+				WHERE MS0501=#{jum} AND MS0502=SUBSTR(#{bu},3,2) AND MS0503=SUBSTR(#{tim},5,2) AND MS0504=SUBSTR(#{pc},7,2)
+						AND MS0515=''
+				ORDER BY MS0505
+			
+	</select>
+
+</mapper>

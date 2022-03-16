@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saydept.api.scd.custmer.smsExceptManagement.SmsExceptManagementMapper">
+
+	<!--
+		mybatis-config.xml text copy
+		<typeAlias alias="smsExceptManagementModel" type="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel"/>
+	-->
+	<!-- 단일 조회 -->
+	<select id="selectSmsExceptManagement" resultType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel" parameterType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel">
+		/*selectSmsExceptManagement*/
+		SELECT ...
+	</select>
+
+	<!-- 목록조회 fetchSize="1000" 옵션은 많은 수의 데이터를 조회 할 때 한번에 읽어들일  크기  -->
+	<select id="selectSmsExceptManagementList" resultType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel" parameterType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel" >
+		SELECT M40HPHONE AS excetpTelNum
+			  ,M40IIL 	AS excetpTelDt
+		FROM SCDRDB.SCDM40PF
+		
+	</select>
+
+	<!-- 수정 -->
+	<update id="updateSmsExceptManagement" parameterType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel">
+		/*updateSmsExceptManagement*/
+		UPDATE ...
+	</update>
+
+	<!-- 등록 -->
+	<insert id="insertSmsExceptManagement" parameterType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel">
+		/*insertSmsExceptManagement*/
+		INSERT ...
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteSmsExceptManagement" parameterType="com.saydept.api.scd.custmer.smsExceptManagement.model.SmsExceptManagementModel">
+		/*deleteSmsExceptManagement*/
+		DELETE ...
+	</delete>
+
+</mapper>
