@@ -50,8 +50,8 @@ import com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel;
 								}
 				else {
 						
-						AS400 as400System = new AS400("128.131.0.1","SUBUL","SUBUL");
-						//AS400 as400System = new AS400("128.129.0.11","SUBUL","SUBUL");
+						AS400 as400System = new AS400("아이피","아이디","비밀번호");
+					
 						//The ProgramCall class allows a user to call an iSeries server program, 
 						//pass parameters to it (input and output), and access data returned in the 
 						//output parameters after the program runs. Use ProgramCall to call programs.
@@ -60,7 +60,7 @@ import com.saydept.api.app.appSaySignUp.model.AppSaySignUpParamModel;
 						try
 						{
 							// Initialize the name of the program to run.
-							String programName = "/QSYS.LIB/SCDOBJ.LIB/SCDP11IU.PGM";
+							String programName = "/시스템.LIB/파일위치.LIB/프로그램.PGM";
 							// Set up the 3 parameters.
 							ProgramParameter[] parameterList = new ProgramParameter[7];
 	

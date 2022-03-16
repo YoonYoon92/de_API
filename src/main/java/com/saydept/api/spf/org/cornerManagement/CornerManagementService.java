@@ -85,13 +85,14 @@ import com.saydept.api.spf.puchas.buyReqFormInq.model.BuyReqFormInqModel;
 
 		String message="";
 		
-					AS400 as400System = new AS400("128.131.0.1","SUBUL","SUBUL");
+		AS400 as400System = new AS400("아이피","아이디","비밀번호");
+
 					ProgramCall program = new ProgramCall(as400System);
 
 					try
 					{
 						// Initialize the name of the program to run.
-						String programName = "/QSYS.LIB/SPFOBJ.LIB/SPFM05JT.PGM";
+						String programName = "/시스템.LIB/파일위치.LIB/프로그램.PGM";
 						// Set up the 3 parameters.
 						ProgramParameter[] parameterList = new ProgramParameter[28];
 						// Parameter 1 is the First Name

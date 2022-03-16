@@ -85,14 +85,15 @@ import com.saydept.api.spf.goods.partnerManagement.model.PartnerManagementModel;
 		String data6="";
 		
 		
-		AS400 as400System = new AS400("128.131.0.1","SUBUL","SUBUL");
+		AS400 as400System = new AS400("아이피","아이디","비밀번호");
 		ProgramCall program = new ProgramCall(as400System);
 		System.out.println(request);
 		try
 		{
 			// Initialize the name of the program to run.
 			
-			String programName = "/QSYS.LIB/SPFOBJ.LIB/SPFM08JT.PGM";
+	
+		String programName = "/시스템.LIB/파일위치.LIB/프로그램.PGM";
 			
 			ProgramParameter[] parameterList = new ProgramParameter[10];
 			
